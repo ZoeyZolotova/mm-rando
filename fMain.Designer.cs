@@ -744,7 +744,7 @@
             this.cN64.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.cN64.Checked = true;
             this.cN64.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.cN64.Enabled = false;
+            this.cN64.Enabled = true;
             this.cN64.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cN64.ForeColor = System.Drawing.Color.Black;
             this.cN64.Location = new System.Drawing.Point(117, 71);
@@ -753,6 +753,7 @@
             this.cN64.TabIndex = 10;
             this.cN64.Text = "N64 ROM";
             this.cN64.UseVisualStyleBackColor = false;
+            this.cN64.CheckedChanged += cN64_CheckedChanged;
             // 
             // lOutput
             // 

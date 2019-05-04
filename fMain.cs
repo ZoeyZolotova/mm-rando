@@ -9,7 +9,7 @@ namespace MMRando
 
     public partial class mmrMain : Form
     {
-
+        bool Output_ROM = true;
         bool Updating = false;
         bool Output_VC = false;
         string SettingOld = "";
@@ -133,7 +133,7 @@ namespace MMRando
                 cGossip.Enabled = false;
                 cAdditional.Enabled = false;
                 cUserItems.Enabled = false;
-            } 
+            }
             else
             {
                 cMixSongs.Enabled = true;
@@ -235,19 +235,19 @@ namespace MMRando
                 MessageBox.Show($"Error randomizing logic: {ex.Message}\r\n\r\nPlease try a different seed", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-            if (!File.Exists(tROMName.Text))
+            if (Output_ROM && !File.Exists(tROMName.Text))
             {
                 MessageBox.Show("Input ROM not selected or doesn't exist, cannot generate output.",
                     "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
-            if (saveROM.ShowDialog() != DialogResult.OK)
+            if (Output_ROM && saveROM.ShowDialog() != DialogResult.OK)
             {
                 MessageBox.Show("No output selected; ROM will not be saved.",
                     "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
-            if (saveROM.FileName == "")
+            if (Output_ROM && saveROM.FileName == "")
             {
                 MessageBox.Show("Output file not selected.",
                     "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -262,12 +262,30 @@ namespace MMRando
                     return;
                 };
             };
-            if (!ValidateROM(tROMName.Text))
+            if (Output_ROM && !ValidateROM(tROMName.Text))
             {
                 MessageBox.Show("Cannot verify input ROM is Majora's Mask (U).",
                     "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
+
+            if (!Output_ROM && !Output_VC)
+            {
+                if (cSpoiler.Checked)
+                {
+                    WriteSpoilerLog();
+
+                    MessageBox.Show("Successfully built output spoiler log!",
+                        "Success", MessageBoxButtons.OK, MessageBoxIcon.None);
+                }
+                else
+                {
+                    MessageBox.Show("No output specified!",
+                        "Warning", MessageBoxButtons.OK, MessageBoxIcon.None);
+                }
+                return;
+            }
+
             MakeROM(tROMName.Text, saveROM.FileName);
             MessageBox.Show("Successfully built output ROM!",
                 "Success", MessageBoxButtons.OK, MessageBoxIcon.None);
@@ -426,6 +444,10 @@ namespace MMRando
             ItemEditor.Show();
         }
 
+        private void cN64_CheckedChanged(object sender, EventArgs e)
+        {
+            Output_ROM = cN64.Checked;
+        }
     }
 
 }
