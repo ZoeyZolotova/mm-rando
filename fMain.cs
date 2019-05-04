@@ -393,6 +393,10 @@ namespace MMRando
 
         private void cVC_CheckedChanged(object sender, EventArgs e)
         {
+            cN64.Enabled = !cVC.Checked;
+            cN64.Checked = cVC.Checked || cN64.Checked;
+
+            Output_ROM = cVC.Checked;
             Output_VC = cVC.Checked;
         }
 
@@ -447,6 +451,9 @@ namespace MMRando
         private void cN64_CheckedChanged(object sender, EventArgs e)
         {
             Output_ROM = cN64.Checked;
+            cVC.Enabled = cN64.Checked;
+
+            bopen.Enabled = Output_ROM;
         }
     }
 
