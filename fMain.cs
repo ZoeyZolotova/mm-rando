@@ -364,9 +364,7 @@ namespace MMRando
         {
             ItemEditor.Show();
         }
-
-
-
+        
         /// <summary>
         /// Checks for settings that invalidate others, and disable the checkboxes for them.
         /// </summary>
@@ -374,6 +372,7 @@ namespace MMRando
         {
             if (Settings.LogicMode == LogicMode.Vanilla)
             {
+                //cUnlockHints.Enabled = false; TODO
                 cMixSongs.Enabled = false;
                 cSoS.Enabled = false;
                 cDChests.Enabled = false;
@@ -387,6 +386,7 @@ namespace MMRando
             }
             else
             {
+                //cUnlockHints.Enabled = true; TODO
                 cMixSongs.Enabled = true;
                 cSoS.Enabled = true;
                 cDChests.Enabled = true;
@@ -496,6 +496,7 @@ namespace MMRando
 
             bTunic.BackColor = Color.FromArgb(0x1E, 0x69, 0x1B);
 
+            Settings.UnlockGossipHints = true;
             Settings.GenerateSpoilerLog = true;
             Settings.ExcludeSongOfSoaring = true;
             Settings.EnableGossipHints = true;
@@ -515,6 +516,7 @@ namespace MMRando
         {
             int[] O = new int[3];
 
+            if (Settings.UnlockGossipHints) { O[0] += 16384; };
             if (Settings.UseCustomItemList) { O[0] += 8192; };
             if (Settings.AddOther) { O[0] += 4096; };
             if (Settings.EnableGossipHints) { O[0] += 2048; };
@@ -577,6 +579,7 @@ namespace MMRando
             int Combos = (int)Base36.Decode(O[1]);
             int ColourAndMisc = (int)Base36.Decode(O[2]);
 
+            Settings.UnlockGossipHints = (Checks & 16384) > 0;
             Settings.UseCustomItemList = (Checks & 8192) > 0;
             Settings.AddOther = (Checks & 4096) > 0;
             Settings.EnableGossipHints = (Checks & 2048) > 0;
@@ -592,6 +595,7 @@ namespace MMRando
             Settings.ShortenCutscenes = (Checks & 2) > 0;
             Settings.QuickTextEnabled = (Checks & 1) > 0;
 
+            //cUnlockHints.Checked = Settings.UnlockGossipHints; TODO
             cUserItems.Checked = Settings.UseCustomItemList;
             cAdditional.Checked = Settings.AddOther;
             cGossip.Checked = Settings.EnableGossipHints;

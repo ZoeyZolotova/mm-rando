@@ -148,5 +148,10 @@ namespace MMRando.Models
         /// Replaces Tatl's colors
         /// </summary>
         public TatlColorSchema TatlColorSchema { get; set; }
+        
+        /// <summary>
+        /// Removes the need for Mask of Truth to read gossip stone hints
+        /// </summary>
+        public bool UnlockGossipHints { get; set; }
     }
 }

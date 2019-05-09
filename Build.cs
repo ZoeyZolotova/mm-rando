@@ -208,6 +208,13 @@ namespace MMRando
             }
         }
 
+        private void WriteUnlockHints()
+        {
+            int address = 0x00E0A810 + 0x378;
+            byte val = 0x00;
+            ROMFuncs.WriteToROM(address, val);
+        }
+
         private void WriteFreeItem(int Item)
         {
             ROMFuncs.WriteToROM(Items.ITEM_ADDRS[Item], Items.ITEM_VALUES[Item]);
@@ -310,6 +317,11 @@ namespace MMRando
             if (Settings.LogicMode == LogicMode.Vanilla)
             {
                 return;
+            }
+
+            if (Settings.UnlockGossipHints)
+            {
+                WriteUnlockHints();
             }
 
             if (Settings.EnableGossipHints)
@@ -473,7 +485,6 @@ namespace MMRando
             worker.ReportProgress(100, "Done!");
 
         }
-
     }
 
 }
