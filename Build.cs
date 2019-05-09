@@ -208,7 +208,7 @@ namespace MMRando
             }
         }
 
-        private void WriteUnlockHints()
+        private void WriteFreeHints()
         {
             int address = 0x00E0A810 + 0x378;
             byte val = 0x00;
@@ -319,9 +319,9 @@ namespace MMRando
                 return;
             }
 
-            if (Settings.UnlockGossipHints)
+            if (Settings.FreeHints)
             {
-                WriteUnlockHints();
+                WriteFreeHints();
             }
 
             if (Settings.EnableGossipHints)
