@@ -295,6 +295,10 @@ namespace MMRando
         {
             UpdateSingleSetting(() => Settings.TatlColorSchema = (TatlColorSchema)cTatl.SelectedIndex);
         }
+        private void cFreeHints_CheckedChanged(object sender, EventArgs e)
+        {
+            UpdateSingleSetting(() => Settings.FreeHints = cFreeHints.Checked);
+        }
 
         private void cMode_SelectedIndexChanged(object sender, EventArgs e)
         {

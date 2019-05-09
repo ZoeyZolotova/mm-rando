@@ -952,6 +952,7 @@ namespace MMRando
             this.cFreeHints.TabIndex = 15;
             this.cFreeHints.Text = "Free Hints";
             this.cFreeHints.UseVisualStyleBackColor = false;
+            this.cFreeHints.CheckedChanged += cFreeHints_CheckedChanged;
             // 
             // MainRandomizerForm
             // 
