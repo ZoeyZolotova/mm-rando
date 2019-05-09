@@ -138,7 +138,7 @@ namespace MMRando
             this.cUserItems.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.cUserItems.AutoSize = true;
             this.cUserItems.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.cUserItems.Location = new System.Drawing.Point(187, 60);
+            this.cUserItems.Location = new System.Drawing.Point(187, 45);
             this.cUserItems.Name = "cUserItems";
             this.cUserItems.Size = new System.Drawing.Size(119, 17);
             this.cUserItems.TabIndex = 11;
@@ -227,7 +227,6 @@ namespace MMRando
             // 
             // tabMain
             // 
-            this.tabMain.Controls.Add(this.cFreeHints);
             this.tabMain.Controls.Add(this.label3);
             this.tabMain.Controls.Add(this.label2);
             this.tabMain.Controls.Add(this.cAdditional);
@@ -256,7 +255,7 @@ namespace MMRando
             this.label3.BackColor = System.Drawing.Color.Transparent;
             this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label3.ForeColor = System.Drawing.Color.Black;
-            this.label3.Location = new System.Drawing.Point(102, 205);
+            this.label3.Location = new System.Drawing.Point(102, 212);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(143, 13);
             this.label3.TabIndex = 14;
@@ -266,7 +265,7 @@ namespace MMRando
             // 
             this.label2.AutoSize = true;
             this.label2.ForeColor = System.Drawing.SystemColors.ActiveBorder;
-            this.label2.Location = new System.Drawing.Point(10, 201);
+            this.label2.Location = new System.Drawing.Point(10, 208);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(325, 13);
             this.label2.TabIndex = 14;
@@ -339,7 +338,7 @@ namespace MMRando
             this.cEnemy.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.cEnemy.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cEnemy.ForeColor = System.Drawing.Color.Black;
-            this.cEnemy.Location = new System.Drawing.Point(141, 230);
+            this.cEnemy.Location = new System.Drawing.Point(141, 237);
             this.cEnemy.Name = "cEnemy";
             this.cEnemy.Size = new System.Drawing.Size(66, 17);
             this.cEnemy.TabIndex = 9;
@@ -448,7 +447,7 @@ namespace MMRando
             this.tabGimmick.Controls.Add(this.cGravity);
             this.tabGimmick.Location = new System.Drawing.Point(4, 25);
             this.tabGimmick.Name = "tabGimmick";
-            this.tabGimmick.Size = new System.Drawing.Size(346, 239);
+            this.tabGimmick.Size = new System.Drawing.Size(346, 269);
             this.tabGimmick.TabIndex = 2;
             this.tabGimmick.Text = "Gimmicks";
             this.tabGimmick.UseVisualStyleBackColor = true;
@@ -570,6 +569,7 @@ namespace MMRando
             // 
             // tabComfort
             // 
+            this.tabComfort.Controls.Add(this.cFreeHints);
             this.tabComfort.Controls.Add(this.cTatl);
             this.tabComfort.Controls.Add(this.cCutsc);
             this.tabComfort.Controls.Add(this.lTatl);
@@ -582,7 +582,7 @@ namespace MMRando
             this.tabComfort.Location = new System.Drawing.Point(4, 25);
             this.tabComfort.Name = "tabComfort";
             this.tabComfort.Padding = new System.Windows.Forms.Padding(3);
-            this.tabComfort.Size = new System.Drawing.Size(346, 239);
+            this.tabComfort.Size = new System.Drawing.Size(346, 269);
             this.tabComfort.TabIndex = 1;
             this.tabComfort.Text = "Comfort/Cosmetics";
             this.tabComfort.UseVisualStyleBackColor = true;
@@ -598,7 +598,7 @@ namespace MMRando
             "Cool",
             "Random",
             "Rainbow (cycle)"});
-            this.cTatl.Location = new System.Drawing.Point(234, 71);
+            this.cTatl.Location = new System.Drawing.Point(234, 82);
             this.cTatl.Name = "cTatl";
             this.cTatl.Size = new System.Drawing.Size(106, 21);
             this.cTatl.TabIndex = 12;
@@ -625,7 +625,7 @@ namespace MMRando
             this.lTatl.BackColor = System.Drawing.Color.Transparent;
             this.lTatl.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lTatl.ForeColor = System.Drawing.Color.Black;
-            this.lTatl.Location = new System.Drawing.Point(134, 74);
+            this.lTatl.Location = new System.Drawing.Point(134, 85);
             this.lTatl.Name = "lTatl";
             this.lTatl.Size = new System.Drawing.Size(94, 13);
             this.lTatl.TabIndex = 11;
@@ -655,7 +655,7 @@ namespace MMRando
             "Link (OoT)",
             "Adult Link (Risky!)",
             "Kafei"});
-            this.cLink.Location = new System.Drawing.Point(234, 44);
+            this.cLink.Location = new System.Drawing.Point(234, 55);
             this.cLink.Name = "cLink";
             this.cLink.Size = new System.Drawing.Size(106, 21);
             this.cLink.TabIndex = 10;
@@ -667,7 +667,7 @@ namespace MMRando
             this.lTunic.BackColor = System.Drawing.Color.Transparent;
             this.lTunic.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lTunic.ForeColor = System.Drawing.Color.Black;
-            this.lTunic.Location = new System.Drawing.Point(165, 20);
+            this.lTunic.Location = new System.Drawing.Point(165, 31);
             this.lTunic.Name = "lTunic";
             this.lTunic.Size = new System.Drawing.Size(63, 13);
             this.lTunic.TabIndex = 7;
@@ -694,7 +694,7 @@ namespace MMRando
             this.lLink.BackColor = System.Drawing.Color.Transparent;
             this.lLink.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lLink.ForeColor = System.Drawing.Color.Black;
-            this.lLink.Location = new System.Drawing.Point(158, 47);
+            this.lLink.Location = new System.Drawing.Point(158, 58);
             this.lLink.Name = "lLink";
             this.lLink.Size = new System.Drawing.Size(70, 13);
             this.lLink.TabIndex = 9;
@@ -704,7 +704,7 @@ namespace MMRando
             // 
             this.bTunic.BackColor = System.Drawing.Color.White;
             this.bTunic.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.bTunic.Location = new System.Drawing.Point(234, 15);
+            this.bTunic.Location = new System.Drawing.Point(234, 26);
             this.bTunic.Name = "bTunic";
             this.bTunic.Size = new System.Drawing.Size(106, 23);
             this.bTunic.TabIndex = 8;
@@ -946,7 +946,7 @@ namespace MMRando
             this.cFreeHints.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.cFreeHints.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cFreeHints.ForeColor = System.Drawing.Color.Black;
-            this.cFreeHints.Location = new System.Drawing.Point(68, 170);
+            this.cFreeHints.Location = new System.Drawing.Point(50, 92);
             this.cFreeHints.Name = "cFreeHints";
             this.cFreeHints.Size = new System.Drawing.Size(74, 17);
             this.cFreeHints.TabIndex = 15;
