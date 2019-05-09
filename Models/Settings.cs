@@ -99,6 +99,12 @@ namespace MMRando.Models
         /// </summary>
         public bool RandomizeBGM { get; set; }
 
+        /// <summary>
+        /// FrEe HiNtS FoR WeNiEs
+        /// </summary>
+        public bool FreeHints { get; set; }
+
+
 
         // Gimmicks
 
@@ -148,10 +154,5 @@ namespace MMRando.Models
         /// Replaces Tatl's colors
         /// </summary>
         public TatlColorSchema TatlColorSchema { get; set; }
-        
-        /// <summary>
-        /// Removes the need for Mask of Truth to read gossip stone hints
-        /// </summary>
-        public bool UnlockGossipHints { get; set; }
     }
 }

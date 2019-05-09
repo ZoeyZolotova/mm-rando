@@ -610,6 +610,7 @@ namespace MMRando
             cEnemy.Checked = Settings.RandomizeEnemies;
             cCutsc.Checked = Settings.ShortenCutscenes;
             cQText.Checked = Settings.QuickTextEnabled;
+            cFreeHints.Checked = Settings.FreeHints;
 
             var damageMultiplierIndex = (int)((Combos & 0xF0000000) >> 28);
             var damageTypeIndex = (Combos & 0xF000000) >> 24;
