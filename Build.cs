@@ -208,6 +208,9 @@ namespace MMRando
             }
         }
 
+        /// <summary>
+        /// Update the gossip stone actor to not check mask of truth
+        /// </summary>
         private void WriteFreeHints()
         {
             int address = 0x00E0A810 + 0x378;
