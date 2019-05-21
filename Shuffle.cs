@@ -1,5 +1,6 @@
 using MMRando.Models;
 using MMRando.Utils;
+using MMRando.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -614,6 +615,14 @@ namespace MMRando
                     lineNumber = 0;
                 }
             }
+
+            int combination = 1;
+            for (int i = Items.OtherOneMask; i <= Items.OtherFourMasks; i++)
+            {
+                ItemList[i].Conditionals = Enumerable.Range(Items.MaskPostmanHat, 20).Combinations(combination).Select(a => a.ToList()).ToList();
+                combination++;
+            }
+
         }
 
         private void ProcessConditionalsForItem(ItemObject currentItem, string line)
