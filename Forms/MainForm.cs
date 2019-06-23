@@ -25,9 +25,6 @@ namespace MMRando
         public LogicEditorForm LogicEditor { get; private set; }
         public ItemEditForm ItemEditor { get; private set; }
 
-        private Randomizer _randomizer;
-        private Builder _builder;
-
 
         public static string AssemblyVersion
         {
@@ -43,8 +40,6 @@ namespace MMRando
             InitializeComponent();
             InitializeSettings();
             InitializeTooltips();
-
-            _randomizer = new Randomizer(_settings);
 
             ItemEditor = new ItemEditForm(_settings);
             LogicEditor = new LogicEditorForm();
@@ -136,7 +131,47 @@ namespace MMRando
 
         private void bgWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            TryRandomize(sender as BackgroundWorker, e);
+            var worker = sender as BackgroundWorker;
+
+            RandomizedResult randomized;
+
+            if (!_settings.ApplyPatch)
+            {
+                if (!TryRandomize(worker, out randomized))
+                {
+                    return;
+                }
+            }
+            else
+            {
+                randomized = new RandomizedResult(_settings, null);
+            }
+
+            if (_settings.GenerateSpoilerLog
+                && _settings.LogicMode != LogicMode.Vanilla)
+            {
+                SpoilerUtils.CreateSpoilerLog(randomized, _settings);
+            }
+
+
+            if (_settings.ApplyPatch || _settings.OutputN64ROM || _settings.GeneratePatch)
+            {
+                try
+                {
+                    var _builder = new Builder(randomized);
+                    _builder.MakeROM(_settings.InputROMFilename, _settings.OutputROMFilename, worker);
+                }
+                catch (Exception ex)
+                {
+                    string nl = Environment.NewLine;
+                    MessageBox.Show($"Error building ROM: {ex.Message}{nl}{nl}Please contact the development team and provide them more information",
+                        "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+            }
+
+            MessageBox.Show("Generation complete!",
+                "Success", MessageBoxButtons.OK, MessageBoxIcon.None);
         }
 
         private void bTunic_Click(object sender, EventArgs e)
@@ -153,41 +188,81 @@ namespace MMRando
 
         private void bopen_Click(object sender, EventArgs e)
         {
-            openROM.ShowDialog();
+            var result = openROM.ShowDialog();
 
-            _settings.InputROMFilename = openROM.FileName;
-            tROMName.Text = _settings.InputROMFilename;
+            if (result == DialogResult.OK)
+            {
+                var validate = RomUtils.ValidateROM(openROM.FileName);
+
+                if (validate == ValidateRomResult.InvalidFile)
+                {
+                    MessageBox.Show("Input file is not a clean Majora's Mask (U).",
+                        "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                _settings.InputROMFilename = openROM.FileName;
+                tROMName.Text = _settings.InputROMFilename;
+            }
         }
 
-        private void Randomize()
-        {
-            if (_settings.GenerateROM && !ValidateInputFile()) return;
 
-            saveROM.FileName = !string.IsNullOrWhiteSpace(_settings.InputPatchFilename)
-                ? Path.ChangeExtension(Path.GetFileName(_settings.InputPatchFilename), "z64")
-                : _settings.DefaultOutputROMFilename;
-            if ((_settings.GenerateROM || _settings.OutputVC || _settings.GeneratePatch || _settings.GenerateSpoilerLog) && saveROM.ShowDialog() != DialogResult.OK)
+        private void bRandomise_Click(object sender, EventArgs e)
+        {
+            _settings.OutputROMFilename = Path.Combine("Output", _settings.DefaultOutputROMFilename);
+            _settings.ApplyPatch = false;
+
+            GenerateOutput();
+        }
+
+        private void bApplyPatch_Click(object sender, EventArgs e)
+        {
+            var filename = Path.ChangeExtension(Path.GetFileName(_settings.InputPatchFilename), "z64");
+
+            _settings.OutputROMFilename = Path.Combine("Output", filename);
+            _settings.ApplyPatch = true;
+            GenerateOutput();
+        }
+
+        private void GenerateOutput()
+        {
+            ValidateRomResult result = ValidateRomResult.NoFile;
+            if (_settings.NeedInputROM)
             {
-                MessageBox.Show("No output directory selected; Nothing will be saved.",
-                    "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                result = RomUtils.ValidateROM(_settings.InputROMFilename);
+                if (result == ValidateRomResult.NoFile)
+                {
+                    MessageBox.Show("Input ROM not found, cannot generate output.",
+                        "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+                else if (result == ValidateRomResult.InvalidFile)
+                {
+                    MessageBox.Show("Input file is not a clean Majora's Mask (U).",
+                        "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+            }
+            _settings.InputROMFormat = result;
+
+            if (_settings.ApplyPatch && string.IsNullOrWhiteSpace(_settings.InputPatchFilename))
+            {
+                MessageBox.Show("No patch file selected.",
+                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
-            _settings.OutputROMFilename = saveROM.FileName;
+            if (!(_settings.ApplyPatch || _settings.OutputN64ROM || _settings.OutputVC || _settings.GeneratePatch || _settings.GenerateSpoilerLog))
+            {
+                MessageBox.Show("No output selected.",
+                    "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
 
             EnableAllControls(false);
             bgWorker.RunWorkerAsync();
         }
 
-        private void bRandomise_Click(object sender, EventArgs e)
-        {
-            Randomize();
-        }
-
-        private void bApplyPatch_Click(object sender, EventArgs e)
-        {
-            Randomize();
-        }
 
         private void tSString_Enter(object sender, EventArgs e)
         {
@@ -318,7 +393,7 @@ namespace MMRando
 
         private void cN64_CheckedChanged(object sender, EventArgs e)
         {
-            UpdateSingleSetting(() => _settings.GenerateROM = cN64.Checked);
+            UpdateSingleSetting(() => _settings.OutputN64ROM = cN64.Checked);
             cVC.Enabled = cN64.Checked;
             cVC.Checked &= cVC.Enabled;
             UpdateSingleSetting(() => _settings.OutputVC = cVC.Enabled && cVC.Checked);
@@ -700,7 +775,7 @@ namespace MMRando
 
             bTunic.BackColor = Color.FromArgb(0x1E, 0x69, 0x1B);
 
-            _settings.GenerateROM = true;
+            _settings.OutputN64ROM = true;
             _settings.GenerateSpoilerLog = true;
             _settings.ExcludeSongOfSoaring = true;
             _settings.ShortenCutscenes = true;
@@ -721,92 +796,29 @@ namespace MMRando
         #region Randomization
 
         /// <summary>
-        /// Try to perform randomization and make rom
+        /// Try to create a RandomizedResult
         /// </summary>
-        private void TryRandomize(BackgroundWorker worker, DoWorkEventArgs e)
+        private bool TryRandomize(BackgroundWorker worker, out RandomizedResult randomized)
         {
-            if (!_settings.GenerateROM && !_settings.GenerateSpoilerLog && !_settings.GeneratePatch)
+            randomized = null;
+            try
             {
-                MessageBox.Show($"No output selected", "Error",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
+                Randomizer randomizer = new Randomizer(_settings);
+                randomized = randomizer.Randomize(worker);
+                return true;
             }
-
-            RandomizedResult randomized;
-            if (string.IsNullOrWhiteSpace(_settings.InputPatchFilename))
+            catch (InvalidDataException ex)
             {
-                try
-                {
-                    randomized = _randomizer.Randomize(worker, e);
-                }
-                catch (InvalidDataException ex)
-                {
-                    MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
+                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
 
-                }
-                catch (Exception ex)
-                {
-                    string nl = Environment.NewLine;
-                    MessageBox.Show($"Error randomizing logic: {ex.Message}{nl}{nl}Please try a different seed", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
-                
-                if (_settings.GenerateSpoilerLog
-                    && _settings.LogicMode != LogicMode.Vanilla)
-                {
-                    SpoilerUtils.CreateSpoilerLog(randomized, _settings);
-                }
             }
-            else
+            catch (Exception ex)
             {
-                randomized = new RandomizedResult(_settings, null);
-            }
-
-            if (_settings.GenerateROM || _settings.GeneratePatch)
-            {
-                if (!ValidateInputFile()) return;
-
-                if (!RomUtils.ValidateROM(_settings.InputROMFilename))
-                {
-                    MessageBox.Show("Cannot verify input ROM is Majora's Mask (U).",
-                        "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
-
-                _builder = new Builder(randomized);
-
-                try
-                {
-                    _builder.MakeROM(_settings.InputROMFilename, _settings.OutputROMFilename, worker);
-                }
-                catch (Exception ex)
-                {
-                    string nl = Environment.NewLine;
-                    MessageBox.Show($"Error building ROM: {ex.Message}{nl}{nl}Please contact the development team and provide them more information", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
-            }
-
-            _settings.InputPatchFilename = null;
-
-            MessageBox.Show("Generation complete!",
-                "Success", MessageBoxButtons.OK, MessageBoxIcon.None);
-        }
-
-        /// <summary>
-        /// Checks that the input file exists
-        /// </summary>
-        /// <returns></returns>
-        private bool ValidateInputFile()
-        {
-            if (!File.Exists(_settings.InputROMFilename))
-            {
-                MessageBox.Show("Input ROM not found, cannot generate output.",
-                    "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                string nl = Environment.NewLine;
+                MessageBox.Show($"Error randomizing logic: {ex.Message}{nl}{nl}Please try a different seed", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
-            return true;
         }
 
         #endregion

@@ -9,12 +9,21 @@ using System.Threading.Tasks;
 using System.IO.Compression;
 using MMRando.Utils.Mzxrules;
 using System.Diagnostics;
+using System.Security.Cryptography;
+using MMRando.Models;
 
 namespace MMRando.Utils
 {
 
     public static class RomUtils
     {
+        const string COMPRESSED_NOFLIP_SHA256 = "EFB1365B3AE362604514C0F9A1A2D11F5DC8688BA5BE660A37DEBF5E3BE43F2B";
+        const string COMPRESSED_FLIP32_SHA256 = "0C1FC983FA5CC010CF6441C22388CEAA81ACE85FFB0F0028755B209876E58070";
+        const string COMPRESSED_FLIP16_SHA256 = "8DC31559174F958A938AB7ECCB25DD310A4167F98CB68A521181F4653B684431";
+
+        public const int COMPRESSED_FILE_SIZE = 0x200_0000;
+
+
         const int FILE_TABLE = 0x1A500;
         const int SIGNATURE_ADDRESS = 0x1A4D0;
         public static void SetStrings(string filename, string ver, string setting)
@@ -58,10 +67,10 @@ namespace MMRando.Utils
             return newfile.Addr;
         }
 
-        public static int AddrToFile(int RAddr)
+        public static int AddrToFile(int addr)
         {
             return RomData.MMFileList.FindIndex(
-                file => RAddr >= file.Addr && RAddr < file.End);
+                file => addr >= file.Addr && addr < file.End);
         }
 
         public static void CheckCompressed(int fileIndex, List<MMFile> mmFileList = null)
@@ -81,54 +90,11 @@ namespace MMRando.Utils
             }
         }
 
-        public static int GetFileIndexForWriting(int rAddr)
+        public static int GetFileIndexForWriting(int addr)
         {
-            int index = AddrToFile(rAddr);
+            int index = AddrToFile(addr);
             CheckCompressed(index);
             return index;
-        }
-
-        public static int ByteswapROM(string filename)
-        {
-            using (BinaryReader ROM = new BinaryReader(File.Open(filename, FileMode.Open)))
-            {
-                if (ROM.BaseStream.Length % 4 != 0)
-                {
-                    return -1;
-                }
-
-                byte[] buffer = new byte[4];
-                ROM.Read(buffer, 0, 4);
-                // very hacky
-                ROM.BaseStream.Seek(0, 0);
-                if (buffer[0] == 0x80)
-                {
-                    return 1;
-                }
-                else if (buffer[1] == 0x80)
-                {
-                    using (BinaryWriter newROM = new BinaryWriter(File.Open(filename + ".z64", FileMode.Create)))
-                    {
-                        while (ROM.BaseStream.Position < ROM.BaseStream.Length)
-                        {
-                            newROM.Write(ReadWriteUtils.Byteswap16(ReadWriteUtils.ReadU16(ROM)));
-                        }
-                    }
-                    return 0;
-                }
-                else if (buffer[3] == 0x80)
-                {
-                    using (BinaryWriter newROM = new BinaryWriter(File.Open(filename + ".z64", FileMode.Create)))
-                    {
-                        while (ROM.BaseStream.Position < ROM.BaseStream.Length)
-                        {
-                            newROM.Write(ReadWriteUtils.Byteswap32(ReadWriteUtils.ReadU32(ROM)));
-                        }
-                    }
-                    return 0;
-                }
-            }
-            return -1;
         }
 
         private static void UpdateFileTable(byte[] ROM)
@@ -266,7 +232,7 @@ namespace MMRando.Utils
                     }
                 }
             });
-            byte[] ROM = new byte[0x2000000];
+            byte[] ROM = new byte[COMPRESSED_FILE_SIZE];
             int ROMAddr = 0;
             for (int i = 0; i < RomData.MMFileList.Count; i++)
             {
@@ -345,7 +311,10 @@ namespace MMRando.Utils
         {
             for (int i = 0; i < RomData.MMFileList.Count; i++)
             {
-                if (RomData.MMFileList[i].Cmp_Addr == -1) { continue; }
+                if (RomData.MMFileList[i].Cmp_Addr == -1)
+                {
+                    continue;
+                }
                 ROM.BaseStream.Seek(RomData.MMFileList[i].Cmp_Addr, 0);
                 if (RomData.MMFileList[i].IsCompressed)
                 {
@@ -358,6 +327,32 @@ namespace MMRando.Utils
                     var buffer = new byte[RomData.MMFileList[i].End - RomData.MMFileList[i].Addr];
                     ROM.Read(buffer, 0, buffer.Length);
                     RomData.MMFileList[i].Data = buffer;
+                }
+            }
+        }
+
+        public static void LoadROM(BinaryReader baseROM, ValidateRomResult format)
+        {
+            if (format == ValidateRomResult.ValidFile)
+            {
+                ReadFileTable(baseROM);
+            }
+            else
+            {
+                byte[] rom = new byte[COMPRESSED_FILE_SIZE];
+                baseROM.Read(rom, 0, COMPRESSED_FILE_SIZE);
+                if (format == ValidateRomResult.Swap16)
+                {
+                    SwapByteOrder(rom, 2);
+                }
+                else if (format == ValidateRomResult.Swap32)
+                {
+                    SwapByteOrder(rom, 4);
+                }
+
+                using (BinaryReader br = new BinaryReader(new MemoryStream(rom)))
+                {
+                    ReadFileTable(br);
                 }
             }
         }
@@ -385,25 +380,92 @@ namespace MMRando.Utils
             ExtractAll(ROM);
         }
 
-        public static bool CheckOldCRC(BinaryReader ROM)
+        public static ValidateRomResult ValidateROM(string filename)
         {
-            ROM.BaseStream.Seek(16, 0);
-            uint CRC1 = ReadWriteUtils.ReadU32(ROM);
-            uint CRC2 = ReadWriteUtils.ReadU32(ROM);
-            return (CRC1 == 0x5354631C) && (CRC2 == 0x03A2DEF0);
+            if (!File.Exists(filename))
+            {
+                return ValidateRomResult.NoFile;
+            }
+
+            byte[] file;
+            using (BinaryReader ROM = new BinaryReader(File.Open(filename, FileMode.Open, FileAccess.Read)))
+            {
+                if (ROM.BaseStream.Length != COMPRESSED_FILE_SIZE)
+                {
+                    return ValidateRomResult.InvalidFile;
+                }
+
+                file = ROM.ReadBytes(COMPRESSED_FILE_SIZE);
+            }
+
+            var hash = GetSha256Hash(file);
+            if (hash.SequenceEqual(ToByteArray(COMPRESSED_NOFLIP_SHA256)))
+            {
+                return ValidateRomResult.ValidFile;
+            }
+            if (hash.SequenceEqual(ToByteArray(COMPRESSED_FLIP32_SHA256)))
+            {
+                return ValidateRomResult.Swap32;
+            }
+            if (hash.SequenceEqual(ToByteArray(COMPRESSED_FLIP16_SHA256)))
+            {
+                return ValidateRomResult.Swap16;
+            }
+
+            return ValidateRomResult.InvalidFile;
         }
 
-        public static bool ValidateROM(string FileName)
+        private static byte[] GetSha256Hash(byte[] file)
         {
-            bool res = false;
-            using (BinaryReader ROM = new BinaryReader(File.Open(FileName, FileMode.Open, FileAccess.Read)))
+            byte[] hash;
+            using (var sha256 = SHA256.Create())
             {
-                if (ROM.BaseStream.Length == 0x2000000)
-                {
-                    res = CheckOldCRC(ROM);
-                }
+                hash = sha256.ComputeHash(file);
             }
-            return res;
+
+            Debug.WriteLine(
+                string.Concat(hash.Select(x => x.ToString("X2"))));
+
+            return hash;
+        }
+
+        /// <summary>
+        /// Swaps the byte ordering of a file
+        /// </summary>
+        /// <param name="input">The input byte array</param>
+        /// <param name="flipsize">Size in bytes of each chunk that will be reversed. Must be a positive power of 2</param>
+        /// <returns></returns>
+        public static byte[] SwapByteOrder(byte[] input, int flipsize)
+        {
+            int xor = flipsize - 1;
+            if (xor == 0)
+            {
+                return input;
+            }
+
+            byte[] output = new byte[input.Length];
+
+            for(var i = 0; i < input.Length; i++)
+            {
+                output[i] = input[i ^ xor];
+            }
+            return output;
+        }
+
+        private static byte[] ToByteArray(string hexLiteral)
+        {
+            if (hexLiteral.Length %2 != 0)
+            {
+                throw new Exception("String contains an uneven number of characters");
+            }
+
+            byte[] result = new byte[hexLiteral.Length / 2];
+
+            for (int i = 0; i < hexLiteral.Length; i += 2)
+            {
+                result[i/2] = Convert.ToByte(hexLiteral.Substring(i, 2), 16);
+            }
+            return result;
         }
     }
 

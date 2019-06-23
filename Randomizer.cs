@@ -1511,7 +1511,7 @@ namespace MMRando
         /// <summary>
         /// Randomizes the ROM with respect to the configured ruleset.
         /// </summary>
-        public RandomizedResult Randomize(BackgroundWorker worker, DoWorkEventArgs e)
+        public RandomizedResult Randomize(BackgroundWorker worker)
         {
             SeedRNG();
 

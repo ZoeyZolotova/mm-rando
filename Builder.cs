@@ -544,11 +544,11 @@ namespace MMRando
             RomUtils.SetStrings(Values.ModsDirectory + "logo-text", $"v{v}", _settings.ToString());
         }
 
-        public void MakeROM(string InFile, string FileName, BackgroundWorker worker)
+        public void MakeROM(string baseROMFilename, string outputROMFilename, BackgroundWorker worker)
         {
-            using (BinaryReader OldROM = new BinaryReader(File.Open(InFile, FileMode.Open, FileAccess.Read)))
+            using (BinaryReader baseROM = new BinaryReader(File.Open(baseROMFilename, FileMode.Open, FileAccess.Read)))
             {
-                RomUtils.ReadFileTable(OldROM);
+                RomUtils.LoadROM(baseROM, _settings.InputROMFormat);
                 _messageTable.InitializeTable();
             }
 
@@ -558,7 +558,7 @@ namespace MMRando
                 originalMMFileList = RomData.MMFileList.Select(file => file.Clone()).ToList();
             }
 
-            if (!string.IsNullOrWhiteSpace(_settings.InputPatchFilename))
+            if (_settings.ApplyPatch)
             {
                 worker.ReportProgress(50, "Applying patch...");
                 RomUtils.ApplyPatch(_settings.InputPatchFilename);
@@ -612,7 +612,7 @@ namespace MMRando
                 if (_settings.GeneratePatch)
                 {
                     worker.ReportProgress(70, "Generating patch...");
-                    RomUtils.CreatePatch(FileName, originalMMFileList);
+                    RomUtils.CreatePatch(outputROMFilename, originalMMFileList);
                 }
             }
 
@@ -621,15 +621,15 @@ namespace MMRando
             WriteTunicColor();
             WriteMuteMusic();
 
-            if (_settings.GenerateROM)
+            if (_settings.OutputN64ROM)
             {
                 worker.ReportProgress(75, "Building ROM...");
 
-                byte[] ROM = RomUtils.BuildROM(FileName);
+                byte[] ROM = RomUtils.BuildROM(outputROMFilename);
                 if (_settings.OutputVC)
                 {
                     worker.ReportProgress(90, "Building VC...");
-                    VCInjectionUtils.BuildVC(ROM, Values.VCDirectory, Path.ChangeExtension(FileName, "wad"));
+                    VCInjectionUtils.BuildVC(ROM, Values.VCDirectory, Path.ChangeExtension(outputROMFilename, "wad"));
                 }
             }
             worker.ReportProgress(100, "Done!");

@@ -16,7 +16,7 @@ namespace MMRando.Models.Settings
         /// <summary>
         ///  Outputs n64 rom if true (default: true)
         /// </summary>
-        public bool GenerateROM { get; set; } = true;
+        public bool OutputN64ROM { get; set; } = true;
 
         /// <summary>
         ///  Outputs virtual channel if true
@@ -69,11 +69,6 @@ namespace MMRando.Models.Settings
         public bool GenerateHTMLLog { get; set; }
 
         /// <summary>
-        /// Generate spoiler log only on randomizing
-        /// </summary>
-        public bool LogOnly { get; set; }
-
-        /// <summary>
         /// Use Custom Item list for the logic.
         /// </summary>
         public bool UseCustomItemList { get; set; }
@@ -82,6 +77,21 @@ namespace MMRando.Models.Settings
         /// Generate patch file
         /// </summary>
         public bool GeneratePatch { get; set; }
+
+        /// <summary>
+        /// Apply patch file during output generation
+        /// </summary>
+        public bool ApplyPatch { get; set; }
+
+        /// <summary>
+        /// Checks if the InputROM is needed for generation
+        /// </summary>
+        public bool NeedInputROM => ApplyPatch | OutputN64ROM | OutputVC | GeneratePatch;
+
+        /// <summary>
+        /// Stores the byte order of the rom
+        /// </summary>
+        public ValidateRomResult InputROMFormat { get; set; }
 
         #endregion
 
