@@ -42,7 +42,7 @@ namespace MMRando.Forms
             { "149", "150", "151", "152", "155", "156", "157", "158", "159", "160", "161", "162", "163", "164", "166", "167", "168", "169", "175", "176", "177", "179", "182", "183", "184", "185",
                 "188", "190", "194", "203", "204", "205", "233" } };
         /* Tingle Maps */
-        readonly string[,] MAP_NAMES = new string[,] { { "Map: Clock Town", "Map: Woodfall", "Map: Snowhea", "Map: Romani Ranch", "Map: Great Bay", "Map: Stone Tower" },
+        readonly string[,] MAP_NAMES = new string[,] { { "Map: Clock Town", "Map: Woodfall", "Map: Snowhead", "Map: Romani Ranch", "Map: Great Bay", "Map: Stone Tower" },
             { "226", "227", "228", "229", "230", "231" } };
         /* Songs */
         readonly string[,] SONG_NAMES = new string[,]  { {"Song of Healing", "Song of Soaring", "Epona's Song", "Song of Storms", "Sonata of Awakening", "Goron Lullaby",
