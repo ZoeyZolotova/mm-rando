@@ -38,7 +38,6 @@
             System.Windows.Forms.TreeNode treeNode8 = new System.Windows.Forms.TreeNode("Bottled Items");
             System.Windows.Forms.TreeNode treeNode9 = new System.Windows.Forms.TreeNode("Shop Items");
             System.Windows.Forms.TreeNode treeNode10 = new System.Windows.Forms.TreeNode("Other Items");
-            System.Windows.Forms.TreeNode treeNode11 = new System.Windows.Forms.TreeNode("");
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ItemEditForm));
             this.ItemListEditorTree = new System.Windows.Forms.TreeView();
             this.TSetting = new System.Windows.Forms.TextBox();
@@ -53,7 +52,6 @@
             // ItemListEditorTree
             // 
             this.ItemListEditorTree.CheckBoxes = true;
-            this.ItemListEditorTree.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ItemListEditorTree.Location = new System.Drawing.Point(0, 24);
             this.ItemListEditorTree.Name = "ItemListEditorTree";
             treeNode1.Name = "nodeItems";
@@ -86,8 +84,6 @@
             treeNode10.Name = "nodeOther";
             treeNode10.NodeFont = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             treeNode10.Text = "Other Items";
-            treeNode11.Name = "blanknode";
-            treeNode11.Text = "";
             this.ItemListEditorTree.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
             treeNode1,
             treeNode2,
@@ -98,9 +94,8 @@
             treeNode7,
             treeNode8,
             treeNode9,
-            treeNode10,
-            treeNode11});
-            this.ItemListEditorTree.Size = new System.Drawing.Size(441, 639);
+            treeNode10});
+            this.ItemListEditorTree.Size = new System.Drawing.Size(441, 611);
             this.ItemListEditorTree.TabIndex = 0;
             this.ItemListEditorTree.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.ItemListEditorTree_AfterCheck);
             // 
@@ -163,6 +158,7 @@
             this.Controls.Add(this.TSetting);
             this.Controls.Add(this.ItemListEditorTree);
             this.Controls.Add(this.menuStrip1);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "ItemEditForm";
