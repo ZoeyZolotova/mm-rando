@@ -10,7 +10,7 @@ namespace MMRando.Forms
     public partial class ItemEditForm : Form
     {
         /*Starting Items*/
-        readonly string[,] STARTING_ITEMS = new string[,] { { "Starting Sword", "Starting Sheild", "Starting Heart 1", "Starting Heart 2" }, { "239", "240", "241", "242" } };
+        readonly string[,] STARTING_ITEMS = new string[,] { { "Starting Sword", "Starting Sheild", "Starting Heart 1", "Starting Heart 2" }, { "242", "243", "244", "245" } };
         /* Collectable Items */
         readonly string[,] ITEM_NAMES = new string[,]  {  {"Hero's Bow", "Fire Arrow", "Ice Arrow", "Light Arrow", "Bomb Bag", "Magic Bean", "Powder Keg", "Pictobox", "Lens of Truth", "Hookshot",
             "Great Fairy's Sword", "Witch Bottle", "Aliens Bottle", "Gold Dust Bottle", "Beaver Race Bottle", "Dampe Bottle", "Chateau Bottle", "Bombers' Notebook", "Razor Sword", "Gilded Sword",
@@ -66,8 +66,10 @@ namespace MMRando.Forms
         readonly string[,] OTHER_ITEMS = new string[,]  { { "Graveyard Bad Bats", "Ikana Grotto", "Termina Bombchu Grotto", "Great Bay Coast Grotto", "Great Bay Cape Ledge (1)",
                 "Great Bay Cape Ledge (2)", "Great Bay Cape Grotto", "Great Bay Cape Underwater", "Path to Swamp Grotto", "Graveyard Grotto", "Swamp Grotto", "Mountain Village Chest (Spring)",
                 "Mountain Village Grotto Bottle (Spring)", "Path to Ikana Grotto", "Stone Tower Bombchu 10", "Stone Tower Magic Bean", "Path to Snowhead Grotto", "Secret Shrine Dinolfos",
-                "Secret Shrine Wizzrobe", "Secret Shrine Wart", "Secret Shrine Garo Master", "Inn Staff Room", "Inn Guest Room", "Mystery Woods Grotto", "Goron Racetrack Grotto" },
-            { "153", "154", "165", "170", "171", "172", "173", "174", "178", "180", "181", "186", "187", "189", "191", "192", "193", "196", "197", "198", "199", "200", "201", "202", "232" } };
+                "Secret Shrine Wizzrobe", "Secret Shrine Wart", "Secret Shrine Garo Master", "Inn Staff Room", "Inn Guest Room", "Mystery Woods Grotto", "Goron Racetrack Grotto",
+                "Link Trial 30 Arrows", "Link Trial 10 Bombchu", "Pre-Clocktown 10 Deku Nuts" },
+            { "153", "154", "165", "170", "171", "172", "173", "174", "178", "180", "181", "186", "187", "189", "191", "192", "193", "196", "197", "198", "199", "200", "201", "202", "232", "239",
+                "240", "241" } };
 
         bool updating = false;
         private readonly SettingsObject _settings;
