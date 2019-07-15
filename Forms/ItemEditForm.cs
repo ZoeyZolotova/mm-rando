@@ -9,6 +9,8 @@ namespace MMRando.Forms
 {
     public partial class ItemEditForm : Form
     {
+        /*Starting Items*/
+        readonly string[,] STARTING_ITEMS = new string[,] { { "Starting Sword", "Starting Sheild", "Starting Heart 1", "Starting Heart 2" }, { "239", "240", "241", "242" } };
         /* Collectable Items */
         readonly string[,] ITEM_NAMES = new string[,]  {  {"Hero's Bow", "Fire Arrow", "Ice Arrow", "Light Arrow", "Bomb Bag", "Magic Bean", "Powder Keg", "Pictobox", "Lens of Truth", "Hookshot",
             "Great Fairy's Sword", "Witch Bottle", "Aliens Bottle", "Gold Dust Bottle", "Beaver Race Bottle", "Dampe Bottle", "Chateau Bottle", "Bombers' Notebook", "Razor Sword", "Gilded Sword",
@@ -75,65 +77,72 @@ namespace MMRando.Forms
             InitializeComponent();
             _settings = settings;
             //Add each group to proper parent node
+
+            for (int i = 0; i < STARTING_ITEMS.GetLength(1); i++)
+            {
+                ItemListEditorTree.Nodes[0].Nodes.Add(STARTING_ITEMS[0, i]);
+                ItemListEditorTree.Nodes[0].Nodes[i].Tag = STARTING_ITEMS[1, i];
+                ItemListEditorTree.Nodes[0].Text = "Starting Items (" + (i + 1) + ")";
+            }
             for (int i = 0; i < ITEM_NAMES.GetLength(1); i++)
             {
-                ItemListEditorTree.Nodes[0].Nodes.Add(ITEM_NAMES[0, i]);
-                ItemListEditorTree.Nodes[0].Nodes[i].Tag = ITEM_NAMES[1, i];
-                ItemListEditorTree.Nodes[0].Text = "Items (" + (i + 1) + ")";
+                ItemListEditorTree.Nodes[1].Nodes.Add(ITEM_NAMES[0, i]);
+                ItemListEditorTree.Nodes[1].Nodes[i].Tag = ITEM_NAMES[1, i];
+                ItemListEditorTree.Nodes[1].Text = "Items (" + (i + 1) + ")";
             }
             for (int i = 0; i < MASK_NAMES.GetLength(1); i++)
             {
-                ItemListEditorTree.Nodes[1].Nodes.Add(MASK_NAMES[0, i]);
-                ItemListEditorTree.Nodes[1].Nodes[i].Tag = MASK_NAMES[1, i];
-                ItemListEditorTree.Nodes[1].Text = "Masks (" + (i + 1) + ")";
+                ItemListEditorTree.Nodes[2].Nodes.Add(MASK_NAMES[0, i]);
+                ItemListEditorTree.Nodes[2].Nodes[i].Tag = MASK_NAMES[1, i];
+                ItemListEditorTree.Nodes[2].Text = "Masks (" + (i + 1) + ")";
             }
             for (int i = 0; i < HEART_LOCATIONS.GetLength(1); i++)
             {
-                ItemListEditorTree.Nodes[2].Nodes.Add(HEART_LOCATIONS[0, i]);
-                ItemListEditorTree.Nodes[2].Nodes[i].Tag = HEART_LOCATIONS[1, i];
-                ItemListEditorTree.Nodes[2].Text = "Hearts (" + (i + 1) + ")";
+                ItemListEditorTree.Nodes[3].Nodes.Add(HEART_LOCATIONS[0, i]);
+                ItemListEditorTree.Nodes[3].Nodes[i].Tag = HEART_LOCATIONS[1, i];
+                ItemListEditorTree.Nodes[3].Text = "Hearts (" + (i + 1) + ")";
             }
             for (int i = 0; i < RUPIE_LOCATIONS.GetLength(1); i++)
             {
-                ItemListEditorTree.Nodes[3].Nodes.Add(RUPIE_LOCATIONS[0, i]);
-                ItemListEditorTree.Nodes[3].Nodes[i].Tag = RUPIE_LOCATIONS[1, i];
-                ItemListEditorTree.Nodes[3].Text = "Rupies (" + (i + 1) + ")";
+                ItemListEditorTree.Nodes[4].Nodes.Add(RUPIE_LOCATIONS[0, i]);
+                ItemListEditorTree.Nodes[4].Nodes[i].Tag = RUPIE_LOCATIONS[1, i];
+                ItemListEditorTree.Nodes[4].Text = "Rupies (" + (i + 1) + ")";
             }
             for (int i = 0; i < MAP_NAMES.GetLength(1); i++)
             {
-                ItemListEditorTree.Nodes[4].Nodes.Add(MAP_NAMES[0, i]);
-                ItemListEditorTree.Nodes[4].Nodes[i].Tag = MAP_NAMES[1, i];
-                ItemListEditorTree.Nodes[4].Text = "Tingle Maps (" + (i + 1) + ")";
+                ItemListEditorTree.Nodes[5].Nodes.Add(MAP_NAMES[0, i]);
+                ItemListEditorTree.Nodes[5].Nodes[i].Tag = MAP_NAMES[1, i];
+                ItemListEditorTree.Nodes[5].Text = "Tingle Maps (" + (i + 1) + ")";
             }
             for (int i = 0; i < SONG_NAMES.GetLength(1); i++)
             {
-                ItemListEditorTree.Nodes[5].Nodes.Add(SONG_NAMES[0, i]);
-                ItemListEditorTree.Nodes[5].Nodes[i].Tag = SONG_NAMES[1, i];
-                ItemListEditorTree.Nodes[5].Text = "Songs (" + (i + 1) + ")";
+                ItemListEditorTree.Nodes[6].Nodes.Add(SONG_NAMES[0, i]);
+                ItemListEditorTree.Nodes[6].Nodes[i].Tag = SONG_NAMES[1, i];
+                ItemListEditorTree.Nodes[6].Text = "Songs (" + (i + 1) + ")";
             }
             for (int i = 0; i < DUNGEON_ITEMS.GetLength(1); i++)
             {
-                ItemListEditorTree.Nodes[6].Nodes.Add(DUNGEON_ITEMS[0, i]);
-                ItemListEditorTree.Nodes[6].Nodes[i].Tag = DUNGEON_ITEMS[1, i];
-                ItemListEditorTree.Nodes[6].Text = "Dungeon Items (" + (i + 1) + ")";
+                ItemListEditorTree.Nodes[7].Nodes.Add(DUNGEON_ITEMS[0, i]);
+                ItemListEditorTree.Nodes[7].Nodes[i].Tag = DUNGEON_ITEMS[1, i];
+                ItemListEditorTree.Nodes[7].Text = "Dungeon Items (" + (i + 1) + ")";
             }
             for (int i = 0; i < BOTTLED_ITEMS.GetLength(1); i++)
             {
-                ItemListEditorTree.Nodes[7].Nodes.Add(BOTTLED_ITEMS[0, i]);
-                ItemListEditorTree.Nodes[7].Nodes[i].Tag = BOTTLED_ITEMS[1, i];
-                ItemListEditorTree.Nodes[7].Text = "Bottled Items (" + (i + 1) + ")";
+                ItemListEditorTree.Nodes[8].Nodes.Add(BOTTLED_ITEMS[0, i]);
+                ItemListEditorTree.Nodes[8].Nodes[i].Tag = BOTTLED_ITEMS[1, i];
+                ItemListEditorTree.Nodes[8].Text = "Bottled Items (" + (i + 1) + ")";
             }
             for (int i = 0; i < SHOP_ITEMS.GetLength(1); i++)
             {
-                ItemListEditorTree.Nodes[8].Nodes.Add(SHOP_ITEMS[0, i]);
-                ItemListEditorTree.Nodes[8].Nodes[i].Tag = SHOP_ITEMS[1, i];
-                ItemListEditorTree.Nodes[8].Text = "Shop Items (" + (i + 1) + ")";
+                ItemListEditorTree.Nodes[9].Nodes.Add(SHOP_ITEMS[0, i]);
+                ItemListEditorTree.Nodes[9].Nodes[i].Tag = SHOP_ITEMS[1, i];
+                ItemListEditorTree.Nodes[9].Text = "Shop Items (" + (i + 1) + ")";
             }
             for (int i = 0; i < OTHER_ITEMS.GetLength(1); i++)
             {
-                ItemListEditorTree.Nodes[9].Nodes.Add(OTHER_ITEMS[0, i]);
-                ItemListEditorTree.Nodes[9].Nodes[i].Tag = OTHER_ITEMS[1, i];
-                ItemListEditorTree.Nodes[9].Text = "Other Items (" + (i + 1) + ")";
+                ItemListEditorTree.Nodes[10].Nodes.Add(OTHER_ITEMS[0, i]);
+                ItemListEditorTree.Nodes[10].Nodes[i].Tag = OTHER_ITEMS[1, i];
+                ItemListEditorTree.Nodes[10].Text = "Other Items (" + (i + 1) + ")";
             }
             if (_settings.CustomItemList != null) { UpdateString(_settings.CustomItemList); }
             else { TSetting.Text = "0-0-0-0"; }
@@ -162,6 +171,7 @@ namespace MMRando.Forms
             TSetting.Text = ns[7] + "-" + ns[6] + "-" + ns[5] + "-" + ns[4] + "-"
                 + ns[3] + "-" + ns[2] + "-" + ns[1] + "-" + ns[0];
             _settings.CustomItemListString = TSetting.Text;
+            print(" Settings updated to: " + TSetting.Text + "\n String updated to: " + TSetting.Text);
         }
 
         private void UpdateChecks(string c)
@@ -205,6 +215,7 @@ namespace MMRando.Forms
         private void ItemListEditorTree_AfterCheck(object sender, TreeViewEventArgs e)
         {
             int index= System.Convert.ToInt32(e.Node.Tag);
+            print(" Node: " + e.Node.Text + "\n Index: " + index + "\n Checked: " + e.Node.Checked.ToString());
             if (e.Action != TreeViewAction.Unknown)
             {
                 if (e.Node.Parent != null)
@@ -215,9 +226,9 @@ namespace MMRando.Forms
                     else { _settings.CustomItemList.Remove(index); }
                 }
                 else { RecursiveCheck(e.Node, e.Node.Checked); }
-                UpdateString(_settings.CustomItemList);
                 updating = false;
             }
+            UpdateString(_settings.CustomItemList);
         }
 
         private void RecursiveCheck(TreeNode treeNode, bool nodeChecked)
@@ -254,7 +265,7 @@ namespace MMRando.Forms
 
         private void SelectAllToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            TSetting.Text = "7fff-ffffffff-ffffffff-ffffffff-ffffffff-ffffffff-ffffffff-ffffffff";
+            TSetting.Text = "7ffff-ffffffff-ffffffff-ffffffff-ffffffff-ffffffff-ffffffff-ffffffff";
             UpdateChecks(TSetting.Text);
         }
 
@@ -262,6 +273,12 @@ namespace MMRando.Forms
         {
             TSetting.Text = "-------";
             UpdateChecks(TSetting.Text);
+        }
+
+        private void print(string text)
+        {
+            Console.WriteLine(text);
+            Console.WriteLine("---------------------------------------------------------");
         }
     }
 }

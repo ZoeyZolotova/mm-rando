@@ -28,16 +28,17 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("Items");
-            System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("Masks");
-            System.Windows.Forms.TreeNode treeNode3 = new System.Windows.Forms.TreeNode("Hearts");
-            System.Windows.Forms.TreeNode treeNode4 = new System.Windows.Forms.TreeNode("Rupies");
-            System.Windows.Forms.TreeNode treeNode5 = new System.Windows.Forms.TreeNode("Tingle Maps");
-            System.Windows.Forms.TreeNode treeNode6 = new System.Windows.Forms.TreeNode("Songs");
-            System.Windows.Forms.TreeNode treeNode7 = new System.Windows.Forms.TreeNode("Dungeon Items");
-            System.Windows.Forms.TreeNode treeNode8 = new System.Windows.Forms.TreeNode("Bottled Items");
-            System.Windows.Forms.TreeNode treeNode9 = new System.Windows.Forms.TreeNode("Shop Items");
-            System.Windows.Forms.TreeNode treeNode10 = new System.Windows.Forms.TreeNode("Other Items");
+            System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("Starting Items");
+            System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("Items");
+            System.Windows.Forms.TreeNode treeNode3 = new System.Windows.Forms.TreeNode("Masks");
+            System.Windows.Forms.TreeNode treeNode4 = new System.Windows.Forms.TreeNode("Hearts");
+            System.Windows.Forms.TreeNode treeNode5 = new System.Windows.Forms.TreeNode("Rupies");
+            System.Windows.Forms.TreeNode treeNode6 = new System.Windows.Forms.TreeNode("Tingle Maps");
+            System.Windows.Forms.TreeNode treeNode7 = new System.Windows.Forms.TreeNode("Songs");
+            System.Windows.Forms.TreeNode treeNode8 = new System.Windows.Forms.TreeNode("Dungeon Items");
+            System.Windows.Forms.TreeNode treeNode9 = new System.Windows.Forms.TreeNode("Bottled Items");
+            System.Windows.Forms.TreeNode treeNode10 = new System.Windows.Forms.TreeNode("Shop Items");
+            System.Windows.Forms.TreeNode treeNode11 = new System.Windows.Forms.TreeNode("Other Items");
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ItemEditForm));
             this.ItemListEditorTree = new System.Windows.Forms.TreeView();
             this.TSetting = new System.Windows.Forms.TextBox();
@@ -54,36 +55,38 @@
             this.ItemListEditorTree.CheckBoxes = true;
             this.ItemListEditorTree.Location = new System.Drawing.Point(0, 24);
             this.ItemListEditorTree.Name = "ItemListEditorTree";
-            treeNode1.Name = "nodeItems";
-            treeNode1.NodeFont = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            treeNode1.Text = "Items";
-            treeNode2.Name = "nodeMasks";
+            treeNode1.Name = "nodeStarting";
+            treeNode1.Text = "Starting Items";
+            treeNode2.Name = "nodeItems";
             treeNode2.NodeFont = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            treeNode2.Text = "Masks";
-            treeNode3.Name = "nodeHearts";
+            treeNode2.Text = "Items";
+            treeNode3.Name = "nodeMasks";
             treeNode3.NodeFont = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            treeNode3.Text = "Hearts";
-            treeNode4.Name = "nodeRupies";
+            treeNode3.Text = "Masks";
+            treeNode4.Name = "nodeHearts";
             treeNode4.NodeFont = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            treeNode4.Text = "Rupies";
-            treeNode5.Name = "nodeMaps";
+            treeNode4.Text = "Hearts";
+            treeNode5.Name = "nodeRupies";
             treeNode5.NodeFont = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            treeNode5.Text = "Tingle Maps";
-            treeNode6.Name = "nodeSongs";
+            treeNode5.Text = "Rupies";
+            treeNode6.Name = "nodeMaps";
             treeNode6.NodeFont = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            treeNode6.Text = "Songs";
-            treeNode7.Name = "nodeDungeonItems";
+            treeNode6.Text = "Tingle Maps";
+            treeNode7.Name = "nodeSongs";
             treeNode7.NodeFont = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            treeNode7.Text = "Dungeon Items";
-            treeNode8.Name = "nodeBottledItems";
+            treeNode7.Text = "Songs";
+            treeNode8.Name = "nodeDungeonItems";
             treeNode8.NodeFont = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            treeNode8.Text = "Bottled Items";
-            treeNode9.Name = "nodeShopItems";
+            treeNode8.Text = "Dungeon Items";
+            treeNode9.Name = "nodeBottledItems";
             treeNode9.NodeFont = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            treeNode9.Text = "Shop Items";
-            treeNode10.Name = "nodeOther";
+            treeNode9.Text = "Bottled Items";
+            treeNode10.Name = "nodeShopItems";
             treeNode10.NodeFont = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            treeNode10.Text = "Other Items";
+            treeNode10.Text = "Shop Items";
+            treeNode11.Name = "nodeOther";
+            treeNode11.NodeFont = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            treeNode11.Text = "Other Items";
             this.ItemListEditorTree.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
             treeNode1,
             treeNode2,
@@ -94,7 +97,8 @@
             treeNode7,
             treeNode8,
             treeNode9,
-            treeNode10});
+            treeNode10,
+            treeNode11});
             this.ItemListEditorTree.Size = new System.Drawing.Size(441, 611);
             this.ItemListEditorTree.TabIndex = 0;
             this.ItemListEditorTree.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.ItemListEditorTree_AfterCheck);
