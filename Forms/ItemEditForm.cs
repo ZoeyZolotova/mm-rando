@@ -173,7 +173,6 @@ namespace MMRando.Forms
             TSetting.Text = ns[7] + "-" + ns[6] + "-" + ns[5] + "-" + ns[4] + "-"
                 + ns[3] + "-" + ns[2] + "-" + ns[1] + "-" + ns[0];
             _settings.CustomItemListString = TSetting.Text;
-            print(" Settings updated to: " + TSetting.Text + "\n String updated to: " + TSetting.Text);
         }
 
         private void UpdateChecks(string c)
@@ -216,8 +215,7 @@ namespace MMRando.Forms
 
         private void ItemListEditorTree_AfterCheck(object sender, TreeViewEventArgs e)
         {
-            int index= System.Convert.ToInt32(e.Node.Tag);
-            print(" Node: " + e.Node.Text + "\n Index: " + index + "\n Checked: " + e.Node.Checked.ToString());
+            int index = System.Convert.ToInt32(e.Node.Tag);
             if (e.Action != TreeViewAction.Unknown)
             {
                 if (e.Node.Parent != null)
@@ -227,21 +225,28 @@ namespace MMRando.Forms
                     if (e.Node.Checked) { _settings.CustomItemList.Add(index); }
                     else { _settings.CustomItemList.Remove(index); }
                 }
-                else { RecursiveCheck(e.Node, e.Node.Checked); }
+                else { RecursiveChildCheck(e.Node, e.Node.Checked); }
                 updating = false;
             }
             UpdateString(_settings.CustomItemList);
         }
 
-        private void RecursiveCheck(TreeNode treeNode, bool nodeChecked)
+        private void RecursiveChildCheck(TreeNode treeNode, bool parentChecked)
         {
-            foreach (TreeNode node in treeNode.Nodes)
+            foreach (TreeNode childNode in treeNode.Nodes)
             {
-                int index = System.Convert.ToInt32(node.Tag);
-                node.Checked = nodeChecked;
-                if (node.Checked) { _settings.CustomItemList.Add(index); }
-                else { _settings.CustomItemList.Remove(index); }
-                if (node.Nodes.Count > 0) { RecursiveCheck(node, nodeChecked); }
+                int index = System.Convert.ToInt32(childNode.Tag);
+                if (parentChecked && !childNode.Checked)
+                {
+                    childNode.Checked = true;
+                    _settings.CustomItemList.Add(index);
+                }
+                else if (!parentChecked && childNode.Checked)
+                {
+                    childNode.Checked = false;
+                    _settings.CustomItemList.Remove(index);
+                }
+                if (childNode.Nodes.Count > 0) { RecursiveChildCheck(childNode, parentChecked); }
             }
         }
 
@@ -255,7 +260,7 @@ namespace MMRando.Forms
 
         private void ExpandAllToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            for (int n=0; n < ItemListEditorTree.Nodes.Count; n++)
+            for (int n = 0; n < ItemListEditorTree.Nodes.Count; n++)
             { ItemListEditorTree.Nodes[n].Expand(); }
         }
 
@@ -275,12 +280,6 @@ namespace MMRando.Forms
         {
             TSetting.Text = "-------";
             UpdateChecks(TSetting.Text);
-        }
-
-        private void print(string text)
-        {
-            Console.WriteLine(text);
-            Console.WriteLine("---------------------------------------------------------");
         }
     }
 }
