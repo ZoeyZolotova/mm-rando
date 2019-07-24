@@ -48,16 +48,18 @@ namespace MMRando
             this.label1 = new System.Windows.Forms.Label();
             this.tabMain = new System.Windows.Forms.TabPage();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
-            this.cCrazyStartingItems = new System.Windows.Forms.CheckBox();
-            this.cBottled = new System.Windows.Forms.CheckBox();
+            this.cNoStartingItems = new System.Windows.Forms.CheckBox();
             this.cDEnt = new System.Windows.Forms.CheckBox();
             this.cEnemy = new System.Windows.Forms.CheckBox();
+            this.cMixSongs = new System.Windows.Forms.CheckBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.bItemListEditor = new System.Windows.Forms.Button();
             this.cSoS = new System.Windows.Forms.CheckBox();
+            this.cCrazyStartingItems = new System.Windows.Forms.CheckBox();
             this.cDChests = new System.Windows.Forms.CheckBox();
+            this.cBottled = new System.Windows.Forms.CheckBox();
             this.cNutChest = new System.Windows.Forms.CheckBox();
             this.cShop = new System.Windows.Forms.CheckBox();
-            this.cMixSongs = new System.Windows.Forms.CheckBox();
             this.cAdditional = new System.Windows.Forms.CheckBox();
             this.cMoonItems = new System.Windows.Forms.CheckBox();
             this.label3 = new System.Windows.Forms.Label();
@@ -65,7 +67,6 @@ namespace MMRando
             this.lMode = new System.Windows.Forms.Label();
             this.cMode = new System.Windows.Forms.ComboBox();
             this.tabGimmick = new System.Windows.Forms.TabPage();
-            this.cRandomStartingItems = new System.Windows.Forms.CheckBox();
             this.label7 = new System.Windows.Forms.Label();
             this.cHideClock = new System.Windows.Forms.CheckBox();
             this.label6 = new System.Windows.Forms.Label();
@@ -108,7 +109,6 @@ namespace MMRando
             this.mExit = new System.Windows.Forms.ToolStripMenuItem();
             this.mCustomise = new System.Windows.Forms.ToolStripMenuItem();
             this.mLogicEdit = new System.Windows.Forms.ToolStripMenuItem();
-            this.mItemIncl = new System.Windows.Forms.ToolStripMenuItem();
             this.mHelp = new System.Windows.Forms.ToolStripMenuItem();
             this.mManual = new System.Windows.Forms.ToolStripMenuItem();
             this.mSep1 = new System.Windows.Forms.ToolStripSeparator();
@@ -131,6 +131,8 @@ namespace MMRando
             this.tpPatchSettings = new System.Windows.Forms.TabPage();
             this.tPatch = new System.Windows.Forms.TextBox();
             this.bLoadPatch = new System.Windows.Forms.Button();
+            this.tCustomItemList = new System.Windows.Forms.TextBox();
+            this.lCustomItemAmount = new System.Windows.Forms.Label();
             this.tSettings.SuspendLayout();
             this.tabROMSettings.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -170,10 +172,9 @@ namespace MMRando
             // 
             // cUserItems
             // 
-            this.cUserItems.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.cUserItems.AutoSize = true;
             this.cUserItems.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.cUserItems.Location = new System.Drawing.Point(30, 23);
+            this.cUserItems.Location = new System.Drawing.Point(191, -1);
             this.cUserItems.Name = "cUserItems";
             this.cUserItems.Size = new System.Drawing.Size(119, 17);
             this.cUserItems.TabIndex = 11;
@@ -336,46 +337,31 @@ namespace MMRando
             // 
             // groupBox3
             // 
-            this.groupBox3.Controls.Add(this.cCrazyStartingItems);
-            this.groupBox3.Controls.Add(this.cBottled);
+            this.groupBox3.Controls.Add(this.cNoStartingItems);
             this.groupBox3.Controls.Add(this.cDEnt);
             this.groupBox3.Controls.Add(this.cEnemy);
-            this.groupBox3.Location = new System.Drawing.Point(175, 49);
+            this.groupBox3.Controls.Add(this.cMixSongs);
+            this.groupBox3.Location = new System.Drawing.Point(10, 187);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(162, 206);
+            this.groupBox3.Size = new System.Drawing.Size(324, 71);
             this.groupBox3.TabIndex = 16;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Other Customizations";
             // 
-            // cCrazyStartingItems
+            // cNoStartingItems
             // 
-            this.cCrazyStartingItems.AutoSize = true;
-            this.cCrazyStartingItems.BackColor = System.Drawing.Color.Transparent;
-            this.cCrazyStartingItems.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.cCrazyStartingItems.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.cCrazyStartingItems.ForeColor = System.Drawing.Color.Black;
-            this.cCrazyStartingItems.Location = new System.Drawing.Point(28, 69);
-            this.cCrazyStartingItems.Name = "cCrazyStartingItems";
-            this.cCrazyStartingItems.Size = new System.Drawing.Size(119, 17);
-            this.cCrazyStartingItems.TabIndex = 17;
-            this.cCrazyStartingItems.Text = "Crazy Starting Items";
-            this.cCrazyStartingItems.UseVisualStyleBackColor = false;
-            this.cCrazyStartingItems.CheckedChanged += new System.EventHandler(this.cCrazyStartingItems_CheckedChanged);
-            // 
-            // cBottled
-            // 
-            this.cBottled.AutoSize = true;
-            this.cBottled.BackColor = System.Drawing.Color.Transparent;
-            this.cBottled.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.cBottled.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.cBottled.ForeColor = System.Drawing.Color.Black;
-            this.cBottled.Location = new System.Drawing.Point(14, 46);
-            this.cBottled.Name = "cBottled";
-            this.cBottled.Size = new System.Drawing.Size(133, 17);
-            this.cBottled.TabIndex = 5;
-            this.cBottled.Text = "Caught bottle contents";
-            this.cBottled.UseVisualStyleBackColor = false;
-            this.cBottled.CheckedChanged += new System.EventHandler(this.cBottled_CheckedChanged);
+            this.cNoStartingItems.AutoSize = true;
+            this.cNoStartingItems.BackColor = System.Drawing.Color.Transparent;
+            this.cNoStartingItems.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.cNoStartingItems.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.cNoStartingItems.ForeColor = System.Drawing.Color.Black;
+            this.cNoStartingItems.Location = new System.Drawing.Point(203, 19);
+            this.cNoStartingItems.Name = "cNoStartingItems";
+            this.cNoStartingItems.Size = new System.Drawing.Size(107, 17);
+            this.cNoStartingItems.TabIndex = 20;
+            this.cNoStartingItems.Text = "No Starting Items";
+            this.cNoStartingItems.UseVisualStyleBackColor = false;
+            this.cNoStartingItems.CheckedChanged += new System.EventHandler(this.cNoStartingItems_CheckedChanged);
             // 
             // cDEnt
             // 
@@ -384,7 +370,7 @@ namespace MMRando
             this.cDEnt.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.cDEnt.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cDEnt.ForeColor = System.Drawing.Color.Black;
-            this.cDEnt.Location = new System.Drawing.Point(27, 23);
+            this.cDEnt.Location = new System.Drawing.Point(29, 19);
             this.cDEnt.Name = "cDEnt";
             this.cDEnt.Size = new System.Drawing.Size(120, 17);
             this.cDEnt.TabIndex = 7;
@@ -399,7 +385,7 @@ namespace MMRando
             this.cEnemy.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.cEnemy.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cEnemy.ForeColor = System.Drawing.Color.Black;
-            this.cEnemy.Location = new System.Drawing.Point(41, 92);
+            this.cEnemy.Location = new System.Drawing.Point(204, 42);
             this.cEnemy.Name = "cEnemy";
             this.cEnemy.Size = new System.Drawing.Size(106, 17);
             this.cEnemy.TabIndex = 9;
@@ -407,22 +393,55 @@ namespace MMRando
             this.cEnemy.UseVisualStyleBackColor = false;
             this.cEnemy.CheckedChanged += new System.EventHandler(this.cEnemy_CheckedChanged);
             // 
+            // cMixSongs
+            // 
+            this.cMixSongs.AutoSize = true;
+            this.cMixSongs.BackColor = System.Drawing.Color.Transparent;
+            this.cMixSongs.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.cMixSongs.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.cMixSongs.ForeColor = System.Drawing.Color.Black;
+            this.cMixSongs.Location = new System.Drawing.Point(27, 42);
+            this.cMixSongs.Name = "cMixSongs";
+            this.cMixSongs.Size = new System.Drawing.Size(122, 17);
+            this.cMixSongs.TabIndex = 3;
+            this.cMixSongs.Text = "Mix songs with items";
+            this.cMixSongs.UseVisualStyleBackColor = false;
+            this.cMixSongs.CheckedChanged += new System.EventHandler(this.cMixSongs_CheckedChanged);
+            // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.lCustomItemAmount);
+            this.groupBox2.Controls.Add(this.tCustomItemList);
+            this.groupBox2.Controls.Add(this.bItemListEditor);
             this.groupBox2.Controls.Add(this.cSoS);
+            this.groupBox2.Controls.Add(this.cCrazyStartingItems);
             this.groupBox2.Controls.Add(this.cDChests);
+            this.groupBox2.Controls.Add(this.cBottled);
             this.groupBox2.Controls.Add(this.cNutChest);
             this.groupBox2.Controls.Add(this.cUserItems);
             this.groupBox2.Controls.Add(this.cShop);
-            this.groupBox2.Controls.Add(this.cMixSongs);
             this.groupBox2.Controls.Add(this.cAdditional);
             this.groupBox2.Controls.Add(this.cMoonItems);
             this.groupBox2.Location = new System.Drawing.Point(10, 49);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(162, 206);
+            this.groupBox2.Size = new System.Drawing.Size(325, 132);
             this.groupBox2.TabIndex = 15;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Item Pool Options";
+            // 
+            // bItemListEditor
+            // 
+            this.bItemListEditor.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.bItemListEditor.Location = new System.Drawing.Point(120, 53);
+            this.bItemListEditor.Name = "bItemListEditor";
+            this.bItemListEditor.Size = new System.Drawing.Size(86, 23);
+            this.bItemListEditor.TabIndex = 18;
+            this.bItemListEditor.Text = "Item List Editor";
+            this.bItemListEditor.UseVisualStyleBackColor = true;
+            this.bItemListEditor.Visible = false;
+            this.bItemListEditor.Click += new System.EventHandler(this.bItemListEditor_Click);
             // 
             // cSoS
             // 
@@ -431,13 +450,28 @@ namespace MMRando
             this.cSoS.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.cSoS.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cSoS.ForeColor = System.Drawing.Color.Black;
-            this.cSoS.Location = new System.Drawing.Point(6, 45);
+            this.cSoS.Location = new System.Drawing.Point(6, 30);
             this.cSoS.Name = "cSoS";
             this.cSoS.Size = new System.Drawing.Size(143, 17);
             this.cSoS.TabIndex = 10;
             this.cSoS.Text = "Exclude Song of Soaring";
             this.cSoS.UseVisualStyleBackColor = false;
             this.cSoS.CheckedChanged += new System.EventHandler(this.cSoS_CheckedChanged);
+            // 
+            // cCrazyStartingItems
+            // 
+            this.cCrazyStartingItems.AutoSize = true;
+            this.cCrazyStartingItems.BackColor = System.Drawing.Color.Transparent;
+            this.cCrazyStartingItems.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.cCrazyStartingItems.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.cCrazyStartingItems.ForeColor = System.Drawing.Color.Black;
+            this.cCrazyStartingItems.Location = new System.Drawing.Point(191, 99);
+            this.cCrazyStartingItems.Name = "cCrazyStartingItems";
+            this.cCrazyStartingItems.Size = new System.Drawing.Size(119, 17);
+            this.cCrazyStartingItems.TabIndex = 17;
+            this.cCrazyStartingItems.Text = "Crazy Starting Items";
+            this.cCrazyStartingItems.UseVisualStyleBackColor = false;
+            this.cCrazyStartingItems.CheckedChanged += new System.EventHandler(this.cCrazyStartingItems_CheckedChanged);
             // 
             // cDChests
             // 
@@ -446,13 +480,28 @@ namespace MMRando
             this.cDChests.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.cDChests.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cDChests.ForeColor = System.Drawing.Color.Black;
-            this.cDChests.Location = new System.Drawing.Point(52, 90);
+            this.cDChests.Location = new System.Drawing.Point(52, 53);
             this.cDChests.Name = "cDChests";
             this.cDChests.Size = new System.Drawing.Size(97, 17);
             this.cDChests.TabIndex = 4;
             this.cDChests.Text = "Dungeon items";
             this.cDChests.UseVisualStyleBackColor = false;
             this.cDChests.CheckedChanged += new System.EventHandler(this.cDChests_CheckedChanged);
+            // 
+            // cBottled
+            // 
+            this.cBottled.AutoSize = true;
+            this.cBottled.BackColor = System.Drawing.Color.Transparent;
+            this.cBottled.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.cBottled.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.cBottled.ForeColor = System.Drawing.Color.Black;
+            this.cBottled.Location = new System.Drawing.Point(16, 97);
+            this.cBottled.Name = "cBottled";
+            this.cBottled.Size = new System.Drawing.Size(133, 17);
+            this.cBottled.TabIndex = 5;
+            this.cBottled.Text = "Caught bottle contents";
+            this.cBottled.UseVisualStyleBackColor = false;
+            this.cBottled.CheckedChanged += new System.EventHandler(this.cBottled_CheckedChanged);
             // 
             // cNutChest
             // 
@@ -461,7 +510,7 @@ namespace MMRando
             this.cNutChest.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.cNutChest.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cNutChest.ForeColor = System.Drawing.Color.Black;
-            this.cNutChest.Location = new System.Drawing.Point(5, 182);
+            this.cNutChest.Location = new System.Drawing.Point(166, 76);
             this.cNutChest.Name = "cNutChest";
             this.cNutChest.Size = new System.Drawing.Size(144, 17);
             this.cNutChest.TabIndex = 16;
@@ -476,28 +525,13 @@ namespace MMRando
             this.cShop.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.cShop.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cShop.ForeColor = System.Drawing.Color.Black;
-            this.cShop.Location = new System.Drawing.Point(71, 113);
+            this.cShop.Location = new System.Drawing.Point(71, 76);
             this.cShop.Name = "cShop";
             this.cShop.Size = new System.Drawing.Size(78, 17);
             this.cShop.TabIndex = 6;
             this.cShop.Text = "Shop items";
             this.cShop.UseVisualStyleBackColor = false;
             this.cShop.CheckedChanged += new System.EventHandler(this.cShop_CheckedChanged);
-            // 
-            // cMixSongs
-            // 
-            this.cMixSongs.AutoSize = true;
-            this.cMixSongs.BackColor = System.Drawing.Color.Transparent;
-            this.cMixSongs.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.cMixSongs.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.cMixSongs.ForeColor = System.Drawing.Color.Black;
-            this.cMixSongs.Location = new System.Drawing.Point(27, 67);
-            this.cMixSongs.Name = "cMixSongs";
-            this.cMixSongs.Size = new System.Drawing.Size(122, 17);
-            this.cMixSongs.TabIndex = 3;
-            this.cMixSongs.Text = "Mix songs with items";
-            this.cMixSongs.UseVisualStyleBackColor = false;
-            this.cMixSongs.CheckedChanged += new System.EventHandler(this.cMixSongs_CheckedChanged);
             // 
             // cAdditional
             // 
@@ -506,7 +540,7 @@ namespace MMRando
             this.cAdditional.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.cAdditional.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cAdditional.ForeColor = System.Drawing.Color.Black;
-            this.cAdditional.Location = new System.Drawing.Point(51, 159);
+            this.cAdditional.Location = new System.Drawing.Point(212, 53);
             this.cAdditional.Name = "cAdditional";
             this.cAdditional.Size = new System.Drawing.Size(98, 17);
             this.cAdditional.TabIndex = 12;
@@ -521,7 +555,7 @@ namespace MMRando
             this.cMoonItems.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.cMoonItems.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cMoonItems.ForeColor = System.Drawing.Color.Black;
-            this.cMoonItems.Location = new System.Drawing.Point(69, 136);
+            this.cMoonItems.Location = new System.Drawing.Point(230, 30);
             this.cMoonItems.Name = "cMoonItems";
             this.cMoonItems.Size = new System.Drawing.Size(80, 17);
             this.cMoonItems.TabIndex = 15;
@@ -569,7 +603,9 @@ namespace MMRando
             this.cMode.FormattingEnabled = true;
             this.cMode.Items.AddRange(new object[] {
             "Casual",
-            "Using Glitches",
+            "Glitched (no setups)",
+            "Glitched (common tricks)",
+            "Glitched",
             "Vanilla Layout",
             "User Logic",
             "No Logic"});
@@ -581,7 +617,6 @@ namespace MMRando
             // 
             // tabGimmick
             // 
-            this.tabGimmick.Controls.Add(this.cRandomStartingItems);
             this.tabGimmick.Controls.Add(this.label7);
             this.tabGimmick.Controls.Add(this.cHideClock);
             this.tabGimmick.Controls.Add(this.label6);
@@ -601,21 +636,6 @@ namespace MMRando
             this.tabGimmick.TabIndex = 2;
             this.tabGimmick.Text = "Gimmicks";
             this.tabGimmick.UseVisualStyleBackColor = true;
-            // 
-            // cRandomStartingItems
-            // 
-            this.cRandomStartingItems.AutoSize = true;
-            this.cRandomStartingItems.BackColor = System.Drawing.Color.Transparent;
-            this.cRandomStartingItems.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.cRandomStartingItems.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.cRandomStartingItems.ForeColor = System.Drawing.Color.Black;
-            this.cRandomStartingItems.Location = new System.Drawing.Point(161, 224);
-            this.cRandomStartingItems.Name = "cRandomStartingItems";
-            this.cRandomStartingItems.Size = new System.Drawing.Size(133, 17);
-            this.cRandomStartingItems.TabIndex = 19;
-            this.cRandomStartingItems.Text = "Random Starting Items";
-            this.cRandomStartingItems.UseVisualStyleBackColor = false;
-            this.cRandomStartingItems.CheckedChanged += new System.EventHandler(this.cRandomStartingItems_CheckedChanged);
             // 
             // label7
             // 
@@ -833,7 +853,7 @@ namespace MMRando
             this.cEponaSword.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.cEponaSword.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cEponaSword.ForeColor = System.Drawing.Color.Black;
-            this.cEponaSword.Location = new System.Drawing.Point(39, 115);
+            this.cEponaSword.Location = new System.Drawing.Point(41, 115);
             this.cEponaSword.Name = "cEponaSword";
             this.cEponaSword.Size = new System.Drawing.Size(104, 17);
             this.cEponaSword.TabIndex = 22;
@@ -1134,8 +1154,7 @@ namespace MMRando
             // mCustomise
             // 
             this.mCustomise.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.mLogicEdit,
-            this.mItemIncl});
+            this.mLogicEdit});
             this.mCustomise.Name = "mCustomise";
             this.mCustomise.Size = new System.Drawing.Size(75, 20);
             this.mCustomise.Text = "Customize";
@@ -1143,16 +1162,9 @@ namespace MMRando
             // mLogicEdit
             // 
             this.mLogicEdit.Name = "mLogicEdit";
-            this.mLogicEdit.Size = new System.Drawing.Size(150, 22);
+            this.mLogicEdit.Size = new System.Drawing.Size(137, 22);
             this.mLogicEdit.Text = "Logic editor";
             this.mLogicEdit.Click += new System.EventHandler(this.mLogicEdit_Click);
-            // 
-            // mItemIncl
-            // 
-            this.mItemIncl.Name = "mItemIncl";
-            this.mItemIncl.Size = new System.Drawing.Size(150, 22);
-            this.mItemIncl.Text = "Item list editor";
-            this.mItemIncl.Click += new System.EventHandler(this.mItemIncl_Click);
             // 
             // mHelp
             // 
@@ -1351,6 +1363,26 @@ namespace MMRando
             this.bLoadPatch.UseVisualStyleBackColor = true;
             this.bLoadPatch.Click += new System.EventHandler(this.BLoadPatch_Click);
             // 
+            // tCustomItemList
+            // 
+            this.tCustomItemList.Location = new System.Drawing.Point(6, 82);
+            this.tCustomItemList.Name = "tCustomItemList";
+            this.tCustomItemList.Size = new System.Drawing.Size(313, 20);
+            this.tCustomItemList.TabIndex = 19;
+            this.tCustomItemList.Text = "-------";
+            this.tCustomItemList.Visible = false;
+            this.tCustomItemList.TextChanged += new System.EventHandler(this.tCustomItemList_TextChanged);
+            // 
+            // lCustomItemAmount
+            // 
+            this.lCustomItemAmount.AutoSize = true;
+            this.lCustomItemAmount.Location = new System.Drawing.Point(6, 109);
+            this.lCustomItemAmount.Name = "lCustomItemAmount";
+            this.lCustomItemAmount.Size = new System.Drawing.Size(108, 13);
+            this.lCustomItemAmount.TabIndex = 20;
+            this.lCustomItemAmount.Text = "0/0 items randomized";
+            this.lCustomItemAmount.Visible = false;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1454,7 +1486,6 @@ namespace MMRando
         private System.Windows.Forms.CheckBox cAdditional;
         private System.Windows.Forms.ToolStripMenuItem mCustomise;
         private System.Windows.Forms.ToolStripMenuItem mLogicEdit;
-        private System.Windows.Forms.ToolStripMenuItem mItemIncl;
         private System.Windows.Forms.CheckBox cUserItems;
         private System.Windows.Forms.OpenFileDialog openLogic;
         private System.Windows.Forms.ProgressBar pProgress;
@@ -1495,13 +1526,16 @@ namespace MMRando
         private System.Windows.Forms.CheckBox cShopAppearance;
         private System.Windows.Forms.CheckBox cNutChest;
         private System.Windows.Forms.CheckBox cCrazyStartingItems;
-        private System.Windows.Forms.CheckBox cRandomStartingItems;
         private System.Windows.Forms.CheckBox cEponaSword;
         private System.Windows.Forms.CheckBox cUpdateChests;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.GroupBox gGameOutput;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.GroupBox groupBox3;
+        private System.Windows.Forms.CheckBox cNoStartingItems;
+        private System.Windows.Forms.Button bItemListEditor;
+        private System.Windows.Forms.TextBox tCustomItemList;
+        private System.Windows.Forms.Label lCustomItemAmount;
     }
 }
 

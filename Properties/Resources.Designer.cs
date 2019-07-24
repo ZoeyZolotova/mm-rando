@@ -137,7 +137,7 @@ namespace MMRando.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to -version 5
+        ///   Looks up a localized string similar to -version 6
         ///- Deku Mask
         ///
         ///
@@ -150,7 +150,7 @@ namespace MMRando.Properties {
         ///0
         ///- Fire Arrow
         ///103
-        ///2,88,116;2,89,116;10,88;88,89,115,129;88,89,115,130;88,89,115,131;88,115,129,130;88,115,129,131;88,115,130,131;10,89
+        ///2,88,116;2,89,116;10,88;10,89;88,115,274;88,89,115,275
         ///0
         ///0
         ///- Ice Arrow
@@ -160,7 +160,7 @@ namespace MMRando.Properties {
         ///0
         ///- Light Arrow
         ///112
-        ///4,116,139;4,116,140;4,116,141;4,116,142;21,88,89,115,139,140,0;21,88,89,115,139,141,0;21,88,89,115,139,142,0;21,88,89,115,140,141,0;21,88,89,115,140,142,0;21,88,89,115,141,142,0
+        ///4,116,276;21,88,89,115,277
         ///0
         ///0
         ///- Bomb Bag (20)
@@ -172,7 +172,33 @@ namespace MMRando.Properties {
         ///99,0
         ///
         ///0
-        /// [rest of string was truncated]&quot;;.
+        ///0
+        ///- Powder Keg
+        ///102,2,88,116
+        ///
+        ///0
+        ///0
+        ///- Pictobox
+        ///278
+        ///
+        ///0
+        ///0
+        ///- Lens of Truth
+        ///102
+        ///9;91
+        ///0
+        ///0
+        ///- Hookshot
+        ///107
+        ///88,116;0,88;10,116;0,10
+        ///0
+        ///0
+        ///- Great Fairy&apos;s Sword
+        ///113,112,0,2,4,115,279,116,280
+        ///
+        ///0
+        ///0
+        ///- Wit [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string REQ_CASUAL {
             get {
@@ -181,7 +207,7 @@ namespace MMRando.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to -version 5
+        ///   Looks up a localized string similar to -version 6
         ///- Deku Mask
         ///
         ///
@@ -189,22 +215,22 @@ namespace MMRando.Properties {
         ///0
         ///- Hero&apos;s Bow
         ///100
-        ///5;24;25;10;125
+        ///0,125;275,284,285;10;0,116;115,116,284;116,266;125,266;115,266
         ///0
         ///0
         ///- Fire Arrow
         ///103
-        ///5;24;25
+        ///115,281;89,115,280;2,116;275,284,285;10;266,280
         ///0
         ///0
         ///- Ice Arrow
-        ///108,116,135
-        ///
+        ///108,135,278
+        ///275,284,285;88,285;89;115,266,285
         ///0
         ///0
         ///- Light Arrow
-        ///112,115,139,140
-        ///
+        ///112
+        ///275,282,284,285;4,116,282;21,88,97,115,272,273,283;21,88,89,97,115,283;0,21,88,89,97,283;10,275,282,284;21,88,97,266,283
         ///0
         ///0
         ///- Bomb Bag (20)
@@ -218,13 +244,60 @@ namespace MMRando.Properties {
         ///0
         ///0
         ///- Powder Keg
-        ///102
-        ///2;12;13;210;15;16;17
+        ///88,102
+        ///115,284,285;116;104;169, [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string REQ_GLITCH {
+            get {
+                return ResourceManager.GetString("REQ_GLITCH", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to -version 6
+        ///- Deku Mask
+        ///
+        ///
+        ///0
+        ///0
+        ///- Hero&apos;s Bow
+        ///100
+        ///0,125;275,284,285;10;0,116;115,266
+        ///0
+        ///0
+        ///- Fire Arrow
+        ///103
+        ///115,281;89,115,280;2,116;275,284,285;10;266,280
+        ///0
+        ///0
+        ///- Ice Arrow
+        ///108,135,278
+        ///275,284,285;89;115,266,285
+        ///0
+        ///0
+        ///- Light Arrow
+        ///112
+        ///89,275,282,284,285;4,116,282;21,88,97,115,272,273,283;21,88,89,97,115,283;0,21,88,89,97,283
+        ///0
+        ///0
+        ///- Bomb Bag (20)
+        ///
+        ///
+        ///0
+        ///0
+        ///- Magic Bean
+        ///99
+        ///
+        ///0
+        ///0
+        ///- Powder Keg
+        ///88,102
+        ///116;104;169,266,276
         ///0
         ///0
         ///- Pictobox
+        ///276
         ///
-        ///12;13;210;15;16;17
         ///0
         ///0
         ///- Lens of Truth
@@ -232,32 +305,71 @@ namespace MMRando.Properties {
         ///
         ///0
         ///0
-        ///- Hookshot
-        ///107
-        ///0;1;22;23
-        ///0
-        ///0
-        ///- Great Fairy&apos;s Sword
-        ///113,112,114,72
-        ///
-        ///0
-        ///0
-        ///- Witch Bottle
-        ///
-        ///
-        ///0
-        ///0
-        ///- Aliens Bottle
-        ///105,116
-        ///
-        ///0
-        ///2
-        ///- Gold Dust
-        ///104, [rest of string was truncated]&quot;;.
+        ///- Hook [rest of string was truncated]&quot;;.
         /// </summary>
-        internal static string REQ_GLITCH {
+        internal static string REQ_GLITCH_COMMONTRICKS {
             get {
-                return ResourceManager.GetString("REQ_GLITCH", resourceCulture);
+                return ResourceManager.GetString("REQ_GLITCH_COMMONTRICKS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to -version 6
+        ///- Deku Mask
+        ///
+        ///
+        ///0
+        ///0
+        ///- Hero&apos;s Bow
+        ///100
+        ///0,125;275,284,285;10;0,116;115,266
+        ///0
+        ///0
+        ///- Fire Arrow
+        ///103
+        ///88,115,281;89,115,280;2,88,116;88,275,284,285;10,89;89,266,280
+        ///0
+        ///0
+        ///- Ice Arrow
+        ///108,135,278
+        ///275,284,285;89;115,266,285
+        ///0
+        ///0
+        ///- Light Arrow
+        ///112
+        ///89,277,282,284,285;0,4,116,282;21,88,89,97,115,283;0,21,88,89,97,283;4,116,266,282
+        ///0
+        ///0
+        ///- Bomb Bag (20)
+        ///
+        ///
+        ///0
+        ///0
+        ///- Magic Bean
+        ///99
+        ///
+        ///0
+        ///0
+        ///- Powder Keg
+        ///88,102
+        ///116;104;169,266,276
+        ///0
+        ///0
+        ///- Pictobox
+        ///276
+        ///
+        ///0
+        ///0
+        ///- Lens of Truth
+        ///102
+        ///
+        ///0
+        ///0
+        /// [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string REQ_GLITCH_NOSETUPS {
+            get {
+                return ResourceManager.GetString("REQ_GLITCH_NOSETUPS", resourceCulture);
             }
         }
         

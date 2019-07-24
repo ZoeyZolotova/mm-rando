@@ -1910,14 +1910,14 @@ namespace MMRando.GameObjects
         [GetItemIndex(0xB4)]
         ItemTingleMapTown = 249,
 
-        [ItemName("Map: Woodfall"), LocationName("Woodfall Map Purchase"), RegionName("Southern Swamp")]
+        [ItemName("Map: Woodfall"), LocationName("Woodfall Map Purchase"), RegionName("Road to Southern Swamp")]
         [GossipLocationHint("a map maker", "a forest fairy"), GossipItemHint("a world map")]
         [ShopText("Map of the south.")]
         [ChestType(ChestTypeAttribute.ChestType.SmallWooden)]
         [GetItemIndex(0xB5)]
         ItemTingleMapWoodfall = 250,
 
-        [ItemName("Map: Snowhead"), LocationName("Snowhead Map Purchase"), RegionName("Southern Swamp")]
+        [ItemName("Map: Snowhead"), LocationName("Snowhead Map Purchase"), RegionName("Road to Southern Swamp")]
         [GossipLocationHint("a map maker", "a forest fairy"), GossipItemHint("a world map")]
         [ShopText("Map of the north.")]
         [ChestType(ChestTypeAttribute.ChestType.SmallWooden)]

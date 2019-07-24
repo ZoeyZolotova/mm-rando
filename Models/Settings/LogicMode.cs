@@ -3,6 +3,8 @@
     public enum LogicMode
     {
         Casual,
+        GlitchedNoSetups,
+        GlitchedCommonTricks,
         Glitched,
         Vanilla,
         UserLogic,

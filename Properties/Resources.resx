@@ -127,6 +127,12 @@
   <data name="REQ_GLITCH" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\REQ_GLITCH.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>
+  <data name="REQ_GLITCH_COMMONTRICKS" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\REQ_GLITCH_COMMONTRICKS.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
+  <data name="REQ_GLITCH_NOSETUPS" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\REQ_GLITCH_NOSETUPS.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
   <data name="SEQS" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\SEQS.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>

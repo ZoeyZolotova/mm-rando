@@ -47,6 +47,8 @@ namespace MMRando
             _randomizer = new Randomizer(_settings);
 
             ItemEditor = new ItemEditForm(_settings);
+            ItemEditor.FormClosing += ItemEditor_FormClosing;
+            UpdateCustomItemAmountLabel();
             LogicEditor = new LogicEditorForm();
             Manual = new ManualForm();
             About = new AboutForm();
@@ -87,7 +89,7 @@ namespace MMRando
             TooltipBuilder.SetTooltip(cFloors, "Select a floortype for every floor ingame:\n\n - Default: Vanilla floortypes.\n - Sand: Link sinks slowly into every floor, affecting movement speed.\n - Ice: Every floor is slippery.\n - Snow: Similar to sand. \n - Random: Any random floortypes of the above.");
             TooltipBuilder.SetTooltip(cClockSpeed, "Modify the speed of time.");
             TooltipBuilder.SetTooltip(cHideClock, "Clock UI will be hidden.");
-            TooltipBuilder.SetTooltip(cRandomStartingItems, "You will start with any randomized items obtained before or during first cycle.\nSuch as; Sword, Shield, Heart Containers, Song of Healing and Deku Mask.");
+            TooltipBuilder.SetTooltip(cNoStartingItems, "You will not start with any randomized starting items.");
 
             // Comforts/cosmetics
             TooltipBuilder.SetTooltip(cCutsc, "Enable shortened cutscenes.\n\nCertain cutscenes are skipped or otherwise shortened.\nDISCLAIMER: This may cause crashing in certain emulators.");
@@ -208,6 +210,7 @@ namespace MMRando
                 _settings.Update(tSString.Text);
                 UpdateCheckboxes();
                 ToggleCheckBoxes();
+                tSString.Text = _settings.ToString();
             }
             catch
             {
@@ -286,7 +289,7 @@ namespace MMRando
             cShopAppearance.Checked = _settings.UpdateShopAppearance;
             cNutChest.Checked = _settings.AddNutChest;
             cCrazyStartingItems.Checked = _settings.CrazyStartingItems;
-            cRandomStartingItems.Checked = _settings.RandomStartingItems;
+            cNoStartingItems.Checked = _settings.NoStartingItems;
             cEponaSword.Checked = _settings.FixEponaSword;
             cUpdateChests.Checked = _settings.UpdateChests;
 
@@ -312,21 +315,25 @@ namespace MMRando
         private void cUserItems_CheckedChanged(object sender, EventArgs e)
         {
 
-            cDChests.Checked = false;
+            cDChests.Visible = !cUserItems.Checked;
 
-            cShop.Checked = false;
+            cShop.Visible = !cUserItems.Checked;
 
-            cBottled.Checked = false;
+            cBottled.Visible = !cUserItems.Checked;
 
-            cSoS.Checked = false;
+            cSoS.Visible = !cUserItems.Checked;
 
-            cAdditional.Checked = false;
+            cAdditional.Visible = !cUserItems.Checked;
 
-            cMoonItems.Checked = false;
+            cMoonItems.Visible = !cUserItems.Checked;
 
-            cNutChest.Checked = false;
+            cNutChest.Visible = !cUserItems.Checked;
 
-            cCrazyStartingItems.Checked = false;
+            cCrazyStartingItems.Visible = !cUserItems.Checked;
+
+            bItemListEditor.Visible = cUserItems.Checked;
+            tCustomItemList.Visible = cUserItems.Checked;
+            lCustomItemAmount.Visible = cUserItems.Checked;
 
             UpdateSingleSetting(() => _settings.UseCustomItemList = cUserItems.Checked);
 
@@ -484,9 +491,9 @@ namespace MMRando
             UpdateSingleSetting(() => _settings.HideClock = cHideClock.Checked);
         }
 
-        private void cRandomStartingItems_CheckedChanged(object sender, EventArgs e)
+        private void cNoStartingItems_CheckedChanged(object sender, EventArgs e)
         {
-            UpdateSingleSetting(() => _settings.RandomStartingItems = cRandomStartingItems.Checked);
+            UpdateSingleSetting(() => _settings.NoStartingItems = cNoStartingItems.Checked);
         }
 
         private void cQText_CheckedChanged(object sender, EventArgs e)
@@ -517,23 +524,16 @@ namespace MMRando
                 return;
             }
 
-            switch (cMode.SelectedIndex)
-            {
-                case 0: _settings.LogicMode = LogicMode.Casual; break;
-                case 1: _settings.LogicMode = LogicMode.Glitched; break;
-                case 2: _settings.LogicMode = LogicMode.NoLogic; break;
-                case 3: _settings.LogicMode = LogicMode.UserLogic; break;
-                case 4: _settings.LogicMode = LogicMode.Vanilla; break;
-                default: return;
-            }
+            var logicMode = (LogicMode)cMode.SelectedIndex;
 
-            if (_settings.LogicMode == LogicMode.UserLogic
+            if (logicMode == LogicMode.UserLogic
                 && openLogic.ShowDialog() != DialogResult.OK)
             {
                 cMode.SelectedIndex = 0;
+                logicMode = LogicMode.Casual;
             }
 
-            UpdateSingleSetting(() => _settings.LogicMode = (LogicMode)cMode.SelectedIndex);
+            UpdateSingleSetting(() => _settings.LogicMode = logicMode);
             _settings.UserLogicFileName = openLogic.FileName;
         }
 
@@ -572,9 +572,33 @@ namespace MMRando
             LogicEditor.Show();
         }
 
-        private void mItemIncl_Click(object sender, EventArgs e)
+        private void bItemListEditor_Click(object sender, EventArgs e)
         {
             ItemEditor.Show();
+        }
+
+        private void tCustomItemList_TextChanged(object sender, EventArgs e)
+        {
+            ItemEditor.UpdateChecks(tCustomItemList.Text);
+            UpdateCustomItemAmountLabel();
+        }
+
+        private void ItemEditor_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            tCustomItemList.Text = _settings.CustomItemListString;
+            UpdateCustomItemAmountLabel();
+        }
+
+        private void UpdateCustomItemAmountLabel()
+        {
+            if (_settings.CustomItemList.Contains(-1))
+            {
+                lCustomItemAmount.Text = "Invalid custom item string";
+            }
+            else
+            {
+                lCustomItemAmount.Text = $"{_settings.CustomItemList.Count}/{Items.TotalNumberOfItems - Items.NumberOfAreasAndOther} items randomized";
+            }
         }
 
 
@@ -601,54 +625,34 @@ namespace MMRando
                 cMoonItems.Enabled = false;
                 cNutChest.Enabled = false;
                 cCrazyStartingItems.Enabled = false;
-                cRandomStartingItems.Enabled = false;
+                cNoStartingItems.Enabled = false;
             }
             else
             {
                 cMixSongs.Enabled = onMainTab;
-                cSoS.Enabled = onMainTab;
-                cDChests.Enabled = onMainTab;
                 cDEnt.Enabled = onMainTab;
-                cBottled.Enabled = onMainTab;
-                cShop.Enabled = onMainTab;
                 cSpoiler.Enabled = onMainTab;
                 cGossipHints.Enabled = onMainTab;
-                cAdditional.Enabled = onMainTab;
                 cUserItems.Enabled = onMainTab;
+
+                cSoS.Enabled = onMainTab;
+                cDChests.Enabled = onMainTab;
+                cBottled.Enabled = onMainTab;
+                cShop.Enabled = onMainTab;
+                cAdditional.Enabled = onMainTab;
                 cMoonItems.Enabled = onMainTab;
                 cNutChest.Enabled = onMainTab && _settings.LogicMode != LogicMode.Casual;
                 cCrazyStartingItems.Enabled = onMainTab;
-                cRandomStartingItems.Enabled = onMainTab;
+
+                cNoStartingItems.Enabled = onMainTab && (_settings.AddOther || _settings.UseCustomItemList);
+                if (!cNoStartingItems.Enabled)
+                {
+                    cNoStartingItems.Checked = false;
+                    _settings.NoStartingItems = false;
+                }
             }
 
             cHTMLLog.Enabled = onMainTab && _settings.GenerateSpoilerLog;
-
-            if (_settings.UseCustomItemList)
-            {
-                cSoS.Enabled = false;
-                cDChests.Enabled = false;
-                cBottled.Enabled = false;
-                cShop.Enabled = false;
-                cAdditional.Enabled = false;
-                cMoonItems.Enabled = false;
-                cNutChest.Enabled = false;
-                cCrazyStartingItems.Enabled = false;
-            }
-            else
-            {
-                if (_settings.LogicMode != LogicMode.Vanilla)
-                {
-                    cSoS.Enabled = onMainTab;
-                    cDChests.Enabled = onMainTab;
-                    cBottled.Enabled = onMainTab;
-                    cShop.Enabled = onMainTab;
-                    cAdditional.Enabled = onMainTab;
-                    cMoonItems.Enabled = onMainTab;
-                    cNutChest.Enabled = onMainTab && _settings.LogicMode != LogicMode.Casual;
-                    cCrazyStartingItems.Enabled = onMainTab;
-                    cRandomStartingItems.Enabled = onMainTab;
-                }
-            }
 
             if (_settings.GossipHintStyle == GossipHintStyle.Default || _settings.LogicMode == LogicMode.Vanilla)
             {
@@ -725,7 +729,7 @@ namespace MMRando
             cMoonItems.Enabled = v;
             cNutChest.Enabled = v;
             cCrazyStartingItems.Enabled = v;
-            cRandomStartingItems.Enabled = v;
+            cNoStartingItems.Enabled = v;
             cPatch.Enabled = v;
             bApplyPatch.Enabled = v;
             cUpdateChests.Enabled = v;
@@ -763,6 +767,8 @@ namespace MMRando
             cCutsc.Checked = true;
             cQText.Checked = true;
             cUpdateChests.Checked = true;
+            cAdditional.Checked = true;
+            cNoStartingItems.Checked = true;
 
             bTunic.BackColor = Color.FromArgb(0x1E, 0x69, 0x1B);
 
@@ -775,6 +781,8 @@ namespace MMRando
             _settings.ShortenCutscenes = true;
             _settings.QuickTextEnabled = true;
             _settings.UpdateChests = true;
+            _settings.AddOther = true;
+            _settings.NoStartingItems = true;
             _settings.TunicColor = bTunic.BackColor;
             _settings.Seed = Math.Abs(Environment.TickCount);
 
@@ -912,7 +920,6 @@ namespace MMRando
             cFloors.Enabled = v;
             cClockSpeed.Enabled = v;
             cHideClock.Enabled = v;
-            cRandomStartingItems.Enabled = v;
 
 
             // Comfort/Cosmetics

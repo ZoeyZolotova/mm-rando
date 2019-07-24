@@ -162,6 +162,90 @@ namespace MMRando.Models.Settings
         public bool RandomizeEnemies { get; set; }
 
         /// <summary>
+        /// Prevents player starting with any items that are randomized.
+        /// </summary>
+        public bool NoStartingItems { get; set; }
+
+
+        /// <summary>
+        ///  Custom item list selections
+        /// </summary>
+        public List<int> CustomItemList { get; set; } = new List<int>();
+
+        /// <summary>
+        ///  Custom item list string
+        /// </summary>
+        public string CustomItemListString { get; set; }
+
+        #endregion
+
+        #region Gimmicks
+
+        /// <summary>
+        /// Modifies the damage value when Link is damaged
+        /// </summary>
+        public DamageMode DamageMode { get; set; }
+
+        /// <summary>
+        /// Adds an additional effect when Link is damaged
+        /// </summary>
+        public DamageEffect DamageEffect { get; set; }
+
+        /// <summary>
+        /// Modifies Link's movement
+        /// </summary>
+        public MovementMode MovementMode { get; set; }
+
+        /// <summary>
+        /// Sets the type of floor globally
+        /// </summary>
+        public FloorType FloorType { get; set; }
+
+        /// <summary>
+        /// Sets the clock speed.
+        /// </summary>
+        public ClockSpeed ClockSpeed { get; set; } = ClockSpeed.Default;
+
+        /// <summary>
+        /// Hides the clock UI.
+        /// </summary>
+        public bool HideClock { get; set; }
+
+        #endregion
+
+        #region Comfort / Cosmetics
+
+        /// <summary>
+        /// Certain cutscenes will play shorter, or will be skipped
+        /// </summary>
+        public bool ShortenCutscenes { get; set; }
+
+        /// <summary>
+        /// Text is fast-forwarded
+        /// </summary>
+        public bool QuickTextEnabled { get; set; }
+
+        /// <summary>
+        /// The color of Link's tunic
+        /// </summary>
+        public Color TunicColor { get; set; }
+
+        /// <summary>
+        /// Replaces Link's default model
+        /// </summary>
+        public Character Character { get; set; }
+
+        /// <summary>
+        /// Replaces Tatl's colors
+        /// </summary>
+        public TatlColorSchema TatlColorSchema { get; set; }
+
+        /// <summary>
+        /// Method to write the gossip stone hints.
+        /// </summary>
+        public GossipHintStyle GossipHintStyle { get; set; }
+
+        /// <summary>
         /// Randomize background music (includes bgm from other video games)
         /// </summary>
         public bool RandomizeBGM { get; set; }
@@ -203,90 +287,6 @@ namespace MMRando.Models.Settings
 
         #endregion
 
-        #region Gimmicks
-
-        /// <summary>
-        /// Modifies the damage value when Link is damaged
-        /// </summary>
-        public DamageMode DamageMode { get; set; }
-
-        /// <summary>
-        /// Adds an additional effect when Link is damaged
-        /// </summary>
-        public DamageEffect DamageEffect { get; set; }
-
-        /// <summary>
-        /// Modifies Link's movement
-        /// </summary>
-        public MovementMode MovementMode { get; set; }
-
-        /// <summary>
-        /// Sets the type of floor globally
-        /// </summary>
-        public FloorType FloorType { get; set; }
-
-        /// <summary>
-        /// Sets the clock speed.
-        /// </summary>
-        public ClockSpeed ClockSpeed { get; set; } = ClockSpeed.Default;
-
-        /// <summary>
-        /// Hides the clock UI.
-        /// </summary>
-        public bool HideClock { get; set; }
-
-        /// <summary>
-        /// Prevents player starting with any items that are randomized.
-        /// </summary>
-        public bool RandomStartingItems { get; set; }
-
-        #endregion
-
-        #region Comfort / Cosmetics
-
-        /// <summary>
-        /// Certain cutscenes will play shorter, or will be skipped
-        /// </summary>
-        public bool ShortenCutscenes { get; set; }
-
-        /// <summary>
-        /// Text is fast-forwarded
-        /// </summary>
-        public bool QuickTextEnabled { get; set; }
-
-        /// <summary>
-        /// The color of Link's tunic
-        /// </summary>
-        public Color TunicColor { get; set; }
-
-        /// <summary>
-        /// Replaces Link's default model
-        /// </summary>
-        public Character Character { get; set; }
-
-        /// <summary>
-        /// Replaces Tatl's colors
-        /// </summary>
-        public TatlColorSchema TatlColorSchema { get; set; }
-
-        /// <summary>
-        /// Method to write the gossip stone hints.
-        /// </summary>
-        public GossipHintStyle GossipHintStyle { get; set; }
-
-
-        /// <summary>
-        ///  Custom item list selections
-        /// </summary>
-        public List<int> CustomItemList { get; set; } = new List<int>();
-
-        /// <summary>
-        ///  Custom item list string
-        /// </summary>
-        public string CustomItemListString { get; set; }
-
-        #endregion
-
         // Functions
 
         public void Update(string settings)
@@ -299,33 +299,50 @@ namespace MMRando.Models.Settings
             {
                 throw new ArgumentException(nameof(settings));
             }
-
+            //xfe8z--16psr-
             int part1 = (int)parts[0];
             int part2 = (int)parts[1];
             int part3 = (int)parts[2];
             int part4 = (int)parts[3];
 
+            UseCustomItemList = (part1 & 8192) > 0;
+
+            if (UseCustomItemList)
+            {
+                CrazyStartingItems = false;
+                AddNutChest = false;
+                AddMoonItems = false;
+                AddOther = false;
+                ExcludeSongOfSoaring = false;
+                RandomizeBottleCatchContents = false;
+                AddDungeonItems = false;
+                AddShopItems = false;
+            }
+            else
+            {
+                CrazyStartingItems = (part1 & 4194304) > 0;
+                AddNutChest = (part1 & 2097152) > 0;
+                AddMoonItems = (part1 & 32768) > 0;
+                AddOther = (part1 & 4096) > 0;
+                ExcludeSongOfSoaring = (part1 & 1024) > 0;
+                RandomizeBottleCatchContents = (part1 & 128) > 0;
+                AddDungeonItems = (part1 & 64) > 0;
+                AddShopItems = (part1 & 32) > 0;
+            }
+
             UpdateChests = (part1 & 33554432) > 0;
             FixEponaSword = (part1 & 16777216) > 0;
-            RandomStartingItems = (part1 & 8388608) > 0;
-            CrazyStartingItems = (part1 & 4194304) > 0;
-            AddNutChest = (part1 & 2097152) > 0;
+            NoStartingItems = (UseCustomItemList || AddOther) && (part1 & 8388608) > 0;
             UpdateShopAppearance = (part1 & 1048576) > 0;
             PreventDowngrades = (part1 & 524288) > 0;
             NoBGM = (part1 & 262144) > 0;
             HideClock = (part1 & 131072) > 0;
             ClearHints = (part1 & 65536) > 0;
-            AddMoonItems = (part1 & 32768) > 0;
             FreeHints = (part1 & 16384) > 0;
-            UseCustomItemList = (part1 & 8192) > 0;
-            AddOther = (part1 & 4096) > 0;
+            // 8192 - UseCustomItemList, see above
             // 2048
-            ExcludeSongOfSoaring = (part1 & 1024) > 0;
             GenerateSpoilerLog = (part1 & 512) > 0;
             AddSongs = (part1 & 256) > 0;
-            RandomizeBottleCatchContents = (part1 & 128) > 0;
-            AddDungeonItems = (part1 & 64) > 0;
-            AddShopItems = (part1 & 32) > 0;
             RandomizeDungeonEntrances = (part1 & 16) > 0;
             RandomizeBGM = (part1 & 8) > 0;
             RandomizeEnemies = (part1 & 4) > 0;
@@ -366,27 +383,33 @@ namespace MMRando.Models.Settings
         {
             int[] parts = new int[4];
 
+            if (UseCustomItemList)
+            {
+                parts[0] += 8192;
+            }
+            else
+            {
+                if (CrazyStartingItems) { parts[0] += 4194304; }
+                if (AddNutChest) { parts[0] += 2097152; }
+                if (AddMoonItems) { parts[0] += 32768; }
+                if (AddOther) { parts[0] += 4096; }
+                if (ExcludeSongOfSoaring) { parts[0] += 1024; }
+                if (RandomizeBottleCatchContents) { parts[0] += 128; }
+                if (AddDungeonItems) { parts[0] += 64; }
+                if (AddShopItems) { parts[0] += 32; }
+            }
             if (UpdateChests) { parts[0] += 33554432; }
             if (FixEponaSword) { parts[0] += 16777216; }
-            if (RandomStartingItems) { parts[0] += 8388608; }
-            if (CrazyStartingItems) { parts[0] += 4194304; }
-            if (AddNutChest) { parts[0] += 2097152; }
+            if (NoStartingItems && (UseCustomItemList || AddOther)) { parts[0] += 8388608; }
             if (UpdateShopAppearance) { parts[0] += 1048576; }
             if (PreventDowngrades) { parts[0] += 524288; }
             if (NoBGM) { parts[0] += 262144; }
             if (HideClock) { parts[0] += 131072; };
             if (ClearHints) { parts[0] += 65536; };
-            if (AddMoonItems) { parts[0] += 32768; };
             if (FreeHints) { parts[0] += 16384; };
-            if (UseCustomItemList) { parts[0] += 8192; };
-            if (AddOther) { parts[0] += 4096; };
             // 2048
-            if (ExcludeSongOfSoaring) { parts[0] += 1024; };
             if (GenerateSpoilerLog) { parts[0] += 512; };
             if (AddSongs) { parts[0] += 256; };
-            if (RandomizeBottleCatchContents) { parts[0] += 128; };
-            if (AddDungeonItems) { parts[0] += 64; };
-            if (AddShopItems) { parts[0] += 32; };
             if (RandomizeDungeonEntrances) { parts[0] += 16; };
             if (RandomizeBGM) { parts[0] += 8; };
             if (RandomizeEnemies) { parts[0] += 4; };

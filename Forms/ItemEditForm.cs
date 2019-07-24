@@ -156,7 +156,7 @@ namespace MMRando.Forms
             {
                 e.Cancel = true;
                 Hide();
-            };
+            }
         }
 
         private void UpdateString(List<int> selections)
@@ -175,13 +175,10 @@ namespace MMRando.Forms
             _settings.CustomItemListString = TSetting.Text;
         }
 
-        private void UpdateChecks(string c)
+        public void UpdateChecks(string c)
         {
-            _settings.CustomItemListString = c;
-            _settings.CustomItemList.Clear();
-            string[] v = c.Split('-');
-            int[] vi = new int[8];
-            for (int i = 0; i < 8; i++)
+            updating = true;
+            try
             {
                 if (v[7 - i] != "") { vi[i] = Convert.ToInt32(v[7 - i], 16); };
             };

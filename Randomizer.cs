@@ -322,6 +322,8 @@ namespace MMRando
             ItemList = new List<ItemObject>();
 
             if (_settings.LogicMode == LogicMode.Casual
+                || _settings.LogicMode == LogicMode.GlitchedNoSetups
+                || _settings.LogicMode == LogicMode.GlitchedCommonTricks
                 || _settings.LogicMode == LogicMode.Glitched
                 || _settings.LogicMode == LogicMode.UserLogic)
             {
@@ -464,6 +466,14 @@ namespace MMRando
             if (mode == LogicMode.Casual)
             {
                 lines = Properties.Resources.REQ_CASUAL.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
+            }
+            else if (mode == LogicMode.GlitchedNoSetups)
+            {
+                lines = Properties.Resources.REQ_GLITCH_NOSETUPS.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
+            }
+            else if (mode == LogicMode.GlitchedCommonTricks)
+            {
+                lines = Properties.Resources.REQ_GLITCH_COMMONTRICKS.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
             }
             else if (mode == LogicMode.Glitched)
             {
@@ -927,6 +937,17 @@ namespace MMRando
 
         private bool CheckMatch(Item currentItem, Item target)
         {
+            if (ItemUtils.IsStartingLocation(target) && ForbiddenStartingItems.Contains(currentItem))
+            {
+                Debug.WriteLine($"{currentItem} cannot be a starting item.");
+                return false;
+            }
+
+            if (_settings.LogicMode == LogicMode.NoLogic)
+            {
+                return true;
+            }
+
             if (ForbiddenPlacedAt.ContainsKey(currentItem)
                 && ForbiddenPlacedAt[currentItem].Contains(target))
             {
@@ -943,12 +964,6 @@ namespace MMRando
             if (currentItem.IsTemporary() && ItemUtils.IsMoonLocation(target))
             {
                 Debug.WriteLine($"{currentItem} cannot be placed on the moon.");
-                return false;
-            }
-
-            if (ItemUtils.IsStartingLocation(target) && ForbiddenStartingItems.Contains(currentItem))
-            {
-                Debug.WriteLine($"{currentItem} cannot be a starting item.");
                 return false;
             }
 
@@ -1195,9 +1210,9 @@ namespace MMRando
                 Item.StartingHeartContainer1,
                 Item.StartingHeartContainer2,
             };
-            var availableStartingItems = (_settings.RandomStartingItems
-                ? ItemUtils.StartingItems()
-                : ItemUtils.AllRupees())
+            var availableStartingItems = (_settings.NoStartingItems
+                ? ItemUtils.AllRupees()
+                : ItemUtils.StartingItems())
                 .Where(item => !ItemList[(int)item].NewLocation.HasValue && !ForbiddenStartingItems.Contains(item))
                 .Cast<Item?>()
                 .ToList();
@@ -1469,6 +1484,10 @@ namespace MMRando
         /// </summary>
         private void ApplyCustomItemList()
         {
+            if (_settings.CustomItemList.Contains(-1))
+            {
+                throw new InvalidDataException("Invalid custom item string.");
+            }
             for (int i = 0; i < _settings.CustomItemList.Count; i++)
             {
                 int selectedItem = _settings.CustomItemList[i];

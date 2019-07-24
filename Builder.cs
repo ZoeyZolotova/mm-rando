@@ -369,7 +369,7 @@ namespace MMRando
             foreach (var item in itemList)
             {
                 var startingItemValues = item.GetAttributes<StartingItemAttribute>();
-                if (!startingItemValues.Any() && _settings.RandomStartingItems)
+                if (!startingItemValues.Any() && !_settings.NoStartingItems)
                 {
                     throw new Exception($@"Invalid starting item ""{item}""");
                 }
@@ -392,6 +392,10 @@ namespace MMRando
             {
                 freeItems.Add(Item.MaskDeku);
                 freeItems.Add(Item.SongHealing);
+                freeItems.Add(Item.StartingSword);
+                freeItems.Add(Item.StartingShield);
+                freeItems.Add(Item.StartingHeartContainer1);
+                freeItems.Add(Item.StartingHeartContainer2);
 
                 if (_settings.ShortenCutscenes)
                 {
@@ -417,7 +421,10 @@ namespace MMRando
             ItemSwapUtils.ReplaceGetItemTable(Values.ModsDirectory);
             ItemSwapUtils.InitItems();
 
-            ResourceUtils.ApplyHack(Values.ModsDirectory + "fix-epona");
+            if (_settings.FixEponaSword)
+            {
+                ResourceUtils.ApplyHack(Values.ModsDirectory + "fix-epona");
+            }
             if (_settings.PreventDowngrades)
             {
                 ResourceUtils.ApplyHack(Values.ModsDirectory + "fix-downgrades");
@@ -439,7 +446,7 @@ namespace MMRando
                 else
                 {
                     ChestTypeAttribute.ChestType? overrideChestType = null;
-                    if (item.Item.Name().Contains("Bombchu") && _randomized.Logic.Any(il => il.RequiredItemIds?.Contains(item.ID) == true || il.ConditionalItemIds?.Any(c => c.Contains(item.ID)) == true))
+                    if ((item.Item.Name().Contains("Bombchu") || item.Item.Name().Contains("Shield")) && _randomized.Logic.Any(il => il.RequiredItemIds?.Contains(item.ID) == true || il.ConditionalItemIds?.Any(c => c.Contains(item.ID)) == true))
                     {
                         overrideChestType = ChestTypeAttribute.ChestType.LargeGold;
                     }
