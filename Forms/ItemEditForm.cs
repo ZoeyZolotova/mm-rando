@@ -338,7 +338,7 @@ namespace MMRando.Forms
 
         private void SelectAllToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            TSetting.Text = "7ffff-ffffffff-ffffffff-ffffffff-ffffffff-ffffffff-ffffffff-ffffffff";
+            TSetting.Text = "3fffff-ffffffff-ffffffff-ffffffff-ffffffff-ffffffff-ffffffff-ffffffff";
             UpdateChecks(TSetting.Text);
         }
 
