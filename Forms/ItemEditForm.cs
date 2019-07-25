@@ -175,7 +175,7 @@ namespace MMRando.Forms
                 int k = selections[i] % 32;
                 n[j] |= (int)(1 << k);
                 ns[j] = Convert.ToString(n[j], 16);
-            };
+            }
             TSetting.Text = ns[7] + "-" + ns[6] + "-" + ns[5] + "-" + ns[4] + "-"
                 + ns[3] + "-" + ns[2] + "-" + ns[1] + "-" + ns[0];
             _settings.CustomItemListString = TSetting.Text;
@@ -255,7 +255,7 @@ namespace MMRando.Forms
                 updating = true;
                 UpdateChecks(TSetting.Text);
                 updating = false;
-            };
+            }
         }
 
         private void ItemListEditorTree_AfterCheck(object sender, TreeViewEventArgs e)
