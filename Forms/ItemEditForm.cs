@@ -1,7 +1,9 @@
 ﻿using MMRando.Models;
 using MMRando.Models.Settings;
+using MMRando.Utils;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Forms;
 
 
@@ -180,9 +182,49 @@ namespace MMRando.Forms
             updating = true;
             try
             {
-                if (v[7 - i] != "") { vi[i] = Convert.ToInt32(v[7 - i], 16); };
-            };
-            for (int i = 0; i < 255; i++)
+                tSetting.Text = c;
+                _settings.CustomItemListString = c;
+                _settings.CustomItemList.Clear();
+                string[] v = c.Split('-');
+                int[] vi = new int[8];
+                if (v.Length != vi.Length)
+                {
+                    _settings.CustomItemList.Add(-1);
+                    return;
+                }
+                for (int i = 0; i < 8; i++)
+                {
+                    if (v[7 - i] != "")
+                    {
+                        vi[i] = Convert.ToInt32(v[7 - i], 16);
+                    }
+                }
+                for (int i = 0; i < 256; i++)
+                {
+                    int j = i / 32;
+                    int k = i % 32;
+                    if (((vi[j] >> k) & 1) > 0)
+                    {
+                        if (i >= ItemUtils.AllLocations().Count())
+                        {
+                            throw new IndexOutOfRangeException();
+                        }
+                        _settings.CustomItemList.Add(i);
+                    }
+                }
+                foreach (ListViewItem l in lItems.Items)
+                {
+                    if (_settings.CustomItemList.Contains(l.Index))
+                    {
+                        l.Checked = true;
+                    }
+                    else
+                    {
+                        l.Checked = false;
+                    }
+                }
+            }
+            catch
             {
                 int j = i / 32;
                 int k = i % 32;

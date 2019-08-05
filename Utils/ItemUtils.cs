@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using MMRando.Extensions;
 using MMRando.Attributes;
+using System.Collections.ObjectModel;
 
 namespace MMRando.Utils
 {
@@ -112,13 +113,11 @@ namespace MMRando.Utils
                 .Cast<Item>()
                 .Where(item => item.Name()?.Contains("Rupee") == true);
         }
-
-        // todo cache
+        
+        private static List<Item> _allLocations;
         public static IEnumerable<Item> AllLocations()
         {
-            return Enum.GetValues(typeof(Item))
-                .Cast<Item>()
-                .Where(item => item.Location() != null);
+            return _allLocations ?? (_allLocations = Enum.GetValues(typeof(Item)).Cast<Item>().Where(item => item.Location() != null).ToList());
         }
 
         // todo cache
@@ -138,5 +137,39 @@ namespace MMRando.Utils
                 .Where(item => item.HasAttribute<GetBottleItemIndicesAttribute>())
                 .SelectMany(item => item.GetAttribute<GetBottleItemIndicesAttribute>().Indices);
         }
+
+        public static readonly ReadOnlyCollection<ReadOnlyCollection<Item>> ForbiddenStartTogether = new List<List<Item>>()
+        {
+            new List<Item>
+            {
+                Item.ItemBow,
+                Item.UpgradeBigQuiver,
+                Item.UpgradeBiggestQuiver,
+            },
+            new List<Item>
+            {
+                Item.ItemBombBag,
+                Item.UpgradeBigBombBag,
+                Item.UpgradeBiggestBombBag,
+            },
+            new List<Item>
+            {
+                Item.UpgradeAdultWallet,
+                Item.UpgradeGiantWallet,
+            },
+            new List<Item>
+            {
+                Item.StartingSword,
+                Item.UpgradeRazorSword,
+                Item.UpgradeGildedSword,
+            },
+            new List<Item>
+            {
+                Item.StartingShield,
+                Item.ShopItemTradingPostShield,
+                Item.ShopItemZoraShield,
+                Item.UpgradeMirrorShield,
+            },
+        }.Select(list => list.AsReadOnly()).ToList().AsReadOnly();
     }
 }

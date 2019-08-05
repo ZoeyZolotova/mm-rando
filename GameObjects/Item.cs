@@ -1562,7 +1562,7 @@ namespace MMRando.GameObjects
         [ItemName("Purple Rupee"), LocationName("Well Right Path Chest"), RegionName("Beneath the Well")]
         [GossipLocationHint("a frightful exchange"), GossipItemHint("currency", "money", "cash", "wealth", "riches and stuff")]
         [ShopText("This is worth 50 rupees.")]
-        [ChestType(ChestTypeAttribute.ChestType.SmallWooden), Chest(0x029F0000 + 0xE6, ChestAttribute.AppearanceType.Invisible)]
+        [ChestType(ChestTypeAttribute.ChestType.SmallWooden), Chest(0x029EA000 + 0xE6, ChestAttribute.AppearanceType.AppearsSwitch)]
         [GetItemIndex(0xF8)]
         ChestWellRightPurpleRupee = 207,
 
@@ -1570,7 +1570,7 @@ namespace MMRando.GameObjects
         [ItemName("Purple Rupee"), LocationName("Well Left Path Chest"), RegionName("Beneath the Well")]
         [GossipLocationHint("a frightful exchange"), GossipItemHint("currency", "money", "cash", "wealth", "riches and stuff")]
         [ShopText("This is worth 50 rupees.")]
-        [ChestType(ChestTypeAttribute.ChestType.SmallWooden), Chest(0x029EA000 + 0x106, ChestAttribute.AppearanceType.AppearsSwitch)]
+        [ChestType(ChestTypeAttribute.ChestType.SmallWooden), Chest(0x029F0000 + 0x106, ChestAttribute.AppearanceType.Invisible)]
         [GetItemIndex(0xF9)]
         ChestWellLeftPurpleRupee = 208,
 

@@ -12,8 +12,5 @@ namespace MMRando
         /// areas and other (epona, explosive, arrow). In total they make up 23 entries.
         /// </summary>
         public const int NumberOfAreasAndOther = 23;
-
-        internal static readonly int TotalNumberOfItems = 274; // todo remove this
-
     }
 }

@@ -64,39 +64,6 @@ namespace MMRando
             .Concat(Enumerable.Range((int)Item.TradeItemMoonTear, Item.TradeItemMamaLetter - Item.TradeItemMoonTear + 1).Cast<Item>())
             .Concat(Enumerable.Range((int)Item.ItemBottleWitch, Item.ItemBottleMadameAroma - Item.ItemBottleWitch + 1).Cast<Item>())
             .ToList();
-        private readonly ReadOnlyCollection<ReadOnlyCollection<Item>> ForbiddenStartTogether = new List<List<Item>>()
-        {
-            new List<Item>
-            {
-                Item.ItemBow,
-                Item.UpgradeBigQuiver,
-                Item.UpgradeBiggestQuiver,
-            },
-            new List<Item>
-            {
-                Item.ItemBombBag,
-                Item.UpgradeBigBombBag,
-                Item.UpgradeBiggestBombBag,
-            },
-            new List<Item>
-            {
-                Item.UpgradeAdultWallet,
-                Item.UpgradeGiantWallet,
-            },
-            new List<Item>
-            {
-                Item.StartingSword,
-                Item.UpgradeRazorSword,
-                Item.UpgradeGildedSword,
-            },
-            new List<Item>
-            {
-                Item.UpgradeMirrorShield,
-                Item.StartingShield,
-                Item.ShopItemTradingPostShield,
-                Item.ShopItemZoraShield,
-            },
-        }.Select(list => list.AsReadOnly()).ToList().AsReadOnly();
 
         private readonly Dictionary<Item, List<Item>> ForbiddenReplacedBy = new Dictionary<Item, List<Item>>
         {
@@ -341,12 +308,11 @@ namespace MMRando
         /// </summary>
         private void PopulateItemListWithoutLogic()
         {
-            for (var i = 0; i < Items.TotalNumberOfItems; i++)
+            foreach (var item in Enum.GetValues(typeof(Item)).Cast<Item>())
             {
-                var item = (Item)i;
                 var currentItem = new ItemObject
                 {
-                    ID = i,
+                    ID = (int)item,
                     Name = item.Name() ?? item.ToString(),
                     TimeAvailable = 63
                 };
@@ -1013,6 +979,7 @@ namespace MMRando
                 if (CheckMatch(currentItem, targetLocation))
                 {
                     currentItemObject.NewLocation = targetLocation;
+                    currentItemObject.IsRandomized = true;
 
                     Debug.WriteLine($"----Placed {currentItem.Name()} at {targetLocation.Location()}----");
 
@@ -1227,12 +1194,13 @@ namespace MMRando
                         throw new Exception("Failed to replace a starting item.");
                     }
                     ItemList[(int)placedItem].NewLocation = location;
+                    ItemList[(int)placedItem].IsRandomized = true;
                     itemPool.Remove(location);
                     availableStartingItems.Remove(placedItem.Value);
                 }
 
 
-                var forbiddenStartTogether = ForbiddenStartTogether.FirstOrDefault(list => list.Contains(placedItem.Value));
+                var forbiddenStartTogether = ItemUtils.ForbiddenStartTogether.FirstOrDefault(list => list.Contains(placedItem.Value));
                 if (forbiddenStartTogether != null)
                 {
                     availableStartingItems.RemoveAll(item => forbiddenStartTogether.Contains(item.Value));
@@ -1563,13 +1531,13 @@ namespace MMRando
                             break;
                         }
 
-                        found = true;
                         conditionalRequirements.Add((Item)conditionalItemId);
                         conditionalRequirements.AddRange(requiredChildren);
                     }
 
                     if (conditionalRequirements != null)
                     {
+                        found = true;
                         result.AddRange(conditionalRequirements);
                     }
                 }
