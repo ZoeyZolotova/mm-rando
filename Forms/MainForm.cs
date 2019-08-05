@@ -580,7 +580,10 @@ namespace MMRando
 
         private void tCustomItemList_TextChanged(object sender, EventArgs e)
         {
-            ItemEditor.UpdateChecks(tCustomItemList.Text);
+            if (!ItemEditor.UpdateChecks(tCustomItemList.Text))
+            {
+                tCustomItemList.Text = "-------";
+            }
             UpdateCustomItemAmountLabel();
         }
 

@@ -148,8 +148,14 @@ namespace MMRando.Forms
                 ItemListEditorTree.Nodes[10].Nodes[i].Tag = OTHER_ITEMS[1, i];
                 ItemListEditorTree.Nodes[10].Text = "Other Items (" + (i + 1) + ")";
             }
-            if (_settings.CustomItemList != null) { UpdateString(_settings.CustomItemList); }
-            else { TSetting.Text = "0-0-0-0"; }
+            if (_settings.CustomItemList != null)
+            {
+                UpdateString(_settings.CustomItemList);
+            }
+            else
+            {
+                TSetting.Text = "-------";
+            }
         }
 
         private void fItemEdit_FormClosing(object sender, FormClosingEventArgs e)
@@ -171,75 +177,77 @@ namespace MMRando.Forms
                 int k = selections[i] % 32;
                 n[j] |= (int)(1 << k);
                 ns[j] = Convert.ToString(n[j], 16);
-            };
+            }
             TSetting.Text = ns[7] + "-" + ns[6] + "-" + ns[5] + "-" + ns[4] + "-"
                 + ns[3] + "-" + ns[2] + "-" + ns[1] + "-" + ns[0];
             _settings.CustomItemListString = TSetting.Text;
         }
 
-        public void UpdateChecks(string c)
+        public bool UpdateChecks(string c)
         {
-            updating = true;
-            try
+            _settings.CustomItemListString = c;
+            _settings.CustomItemList.Clear();
+            string[] v = c.Split('-');
+            int[] vi = new int[8];
+            if (v.Length < 7)
             {
-                tSetting.Text = c;
-                _settings.CustomItemListString = c;
-                _settings.CustomItemList.Clear();
-                string[] v = c.Split('-');
-                int[] vi = new int[8];
-                if (v.Length != vi.Length)
+                stringErr("Incorrect number of deviders (-)");
+                return false;
+            }
+            for (int i = 0; i < 8; i++)
+            {
+                if (v[7 - i].Length > 8)
                 {
-                    _settings.CustomItemList.Add(-1);
-                    return;
+                    stringErr("Too many values in section " + i);
+                    return false;
                 }
-                for (int i = 0; i < 8; i++)
+                else
                 {
                     if (v[7 - i] != "")
                     {
-                        vi[i] = Convert.ToInt32(v[7 - i], 16);
-                    }
-                }
-                for (int i = 0; i < 256; i++)
-                {
-                    int j = i / 32;
-                    int k = i % 32;
-                    if (((vi[j] >> k) & 1) > 0)
-                    {
-                        if (i >= ItemUtils.AllLocations().Count())
+                        try
                         {
-                            throw new IndexOutOfRangeException();
+                            vi[i] = Convert.ToInt32(v[7 - i], 16);
                         }
-                        _settings.CustomItemList.Add(i);
-                    }
-                }
-                foreach (ListViewItem l in lItems.Items)
-                {
-                    if (_settings.CustomItemList.Contains(l.Index))
-                    {
-                        l.Checked = true;
-                    }
-                    else
-                    {
-                        l.Checked = false;
+                        catch
+                        {
+                            stringErr("Invalid number");
+                            return false;
+                        }
                     }
                 }
             }
-            catch
+            for (int i = 0; i < 256; i++)
             {
                 int j = i / 32;
                 int k = i % 32;
-                if (((vi[j] >> k) & 1) > 0) { _settings.CustomItemList.Add(i); };
-            };
+                if (((vi[j] >> k) & 1) > 0)
+                {
+                    if (i >= (Items.TotalNumberOfItems - Items.NumberOfAreasAndOther))
+                    {
+                        stringErr("Value too high");
+                        return false;
+                    }
+                    _settings.CustomItemList.Add(i);
+                }
+            }
             for (int s = 0; s < ItemListEditorTree.Nodes.Count; s++)
             {
                 foreach (TreeNode n in ItemListEditorTree.Nodes[s].Nodes)
                 {
                     int index = System.Convert.ToInt32(n.Tag);
-                    if (_settings.CustomItemList.Contains(index)) { n.Checked = true; }
-                    else { n.Checked = false; };
+                    if (_settings.CustomItemList.Contains(index))
+                    {
+                        n.Checked = true;
+                    }
+                    else
+                    {
+                        n.Checked = false;
+                    }
                     CheckParents(n.Parent);
-                };
+                }
             }
+            return true;
         }
 
         private void TSetting_KeyDown(object sender, KeyEventArgs e)
@@ -249,7 +257,7 @@ namespace MMRando.Forms
                 updating = true;
                 UpdateChecks(TSetting.Text);
                 updating = false;
-            };
+            }
         }
 
         private void ItemListEditorTree_AfterCheck(object sender, TreeViewEventArgs e)
@@ -261,10 +269,19 @@ namespace MMRando.Forms
                 {
                     CheckParents(e.Node.Parent);
                     if (updating) { return; };
-                    if (e.Node.Checked) { _settings.CustomItemList.Add(index); }
-                    else { _settings.CustomItemList.Remove(index); }
+                    if (e.Node.Checked)
+                    {
+                        _settings.CustomItemList.Add(index);
+                    }
+                    else
+                    {
+                        _settings.CustomItemList.Remove(index);
+                    }
                 }
-                else { RecursiveChildCheck(e.Node, e.Node.Checked); }
+                else
+                {
+                    RecursiveChildCheck(e.Node, e.Node.Checked);
+                }
                 updating = false;
             }
             UpdateString(_settings.CustomItemList);
@@ -285,7 +302,10 @@ namespace MMRando.Forms
                     childNode.Checked = false;
                     _settings.CustomItemList.Remove(index);
                 }
-                if (childNode.Nodes.Count > 0) { RecursiveChildCheck(childNode, parentChecked); }
+                if (childNode.Nodes.Count > 0)
+                {
+                    RecursiveChildCheck(childNode, parentChecked);
+                }
             }
         }
 
@@ -293,25 +313,34 @@ namespace MMRando.Forms
         {
             bool check = true;
             for (int sn = 0; sn < eNode.Nodes.Count; sn++)
-            { if (!eNode.Nodes[sn].Checked) { check = false; } }
+            {
+                if (!eNode.Nodes[sn].Checked)
+                {
+                    check = false;
+                }
+            }
             eNode.Checked = check;
         }
 
         private void ExpandAllToolStripMenuItem_Click(object sender, EventArgs e)
         {
             for (int n = 0; n < ItemListEditorTree.Nodes.Count; n++)
-            { ItemListEditorTree.Nodes[n].Expand(); }
+            {
+                ItemListEditorTree.Nodes[n].Expand();
+            }
         }
 
         private void CollapseAllToolStripMenuItem_Click(object sender, EventArgs e)
         {
             for (int n = 0; n < ItemListEditorTree.Nodes.Count; n++)
-            { ItemListEditorTree.Nodes[n].Collapse(); }
+            {
+                ItemListEditorTree.Nodes[n].Collapse();
+            }
         }
 
         private void SelectAllToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            TSetting.Text = "7ffff-ffffffff-ffffffff-ffffffff-ffffffff-ffffffff-ffffffff-ffffffff";
+            TSetting.Text = "3fffff-ffffffff-ffffffff-ffffffff-ffffffff-ffffffff-ffffffff-ffffffff";
             UpdateChecks(TSetting.Text);
         }
 
@@ -319,6 +348,14 @@ namespace MMRando.Forms
         {
             TSetting.Text = "-------";
             UpdateChecks(TSetting.Text);
+        }
+
+        public void stringErr(string r)
+        {
+            MessageBox.Show("Invalid custom item string: \n" + r);
+            TSetting.Text = "-------";
+            _settings.CustomItemListString = "-------";
+            _settings.CustomItemList.Clear();
         }
     }
 }

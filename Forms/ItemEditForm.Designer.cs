@@ -1,5 +1,21 @@
 ﻿namespace MMRando.Forms
 {
+    public class ItemTreeView : System.Windows.Forms.TreeView
+    {
+        protected override void WndProc(ref System.Windows.Forms.Message m)
+        {
+            if (m.Msg == 0x0203 && this.CheckBoxes)
+            {
+                var localPos = this.PointToClient(MousePosition);
+                var hitTestInfo = this.HitTest(localPos);
+                if (hitTestInfo.Location == System.Windows.Forms.TreeViewHitTestLocations.StateImage)
+                {
+                    m.Msg = 0x0201;
+                }
+            }
+            base.WndProc(ref m);
+        }
+    }
     partial class ItemEditForm
     {
         /// <summary>
@@ -40,7 +56,7 @@
             System.Windows.Forms.TreeNode treeNode10 = new System.Windows.Forms.TreeNode("Shop Items");
             System.Windows.Forms.TreeNode treeNode11 = new System.Windows.Forms.TreeNode("Other Items");
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ItemEditForm));
-            this.ItemListEditorTree = new System.Windows.Forms.TreeView();
+            this.ItemListEditorTree = new ItemTreeView();
             this.TSetting = new System.Windows.Forms.TextBox();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.expandAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -177,7 +193,7 @@
 
         #endregion
 
-        private System.Windows.Forms.TreeView ItemListEditorTree;
+        private ItemTreeView ItemListEditorTree;
         private System.Windows.Forms.TextBox TSetting;
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem expandAllToolStripMenuItem;
