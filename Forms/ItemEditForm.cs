@@ -15,10 +15,10 @@ namespace MMRando.Forms
         readonly string[,] STARTING_ITEMS = new string[,] { { "Starting Sword", "Starting Sheild", "Starting Heart 1", "Starting Heart 2" }, { "242", "243", "244", "245" } };
         /* Collectable Items */
         readonly string[,] ITEM_NAMES = new string[,]  {  {"Hero's Bow", "Fire Arrow", "Ice Arrow", "Light Arrow", "Bomb Bag", "Magic Bean", "Powder Keg", "Pictobox", "Lens of Truth", "Hookshot",
-            "Great Fairy's Sword", "Witch Bottle", "Aliens Bottle", "Gold Dust Bottle", "Beaver Race Bottle", "Dampe Bottle", "Chateau Bottle", "Bombers' Notebook", "Razor Sword", "Gilded Sword",
+            "Witch Bottle", "Aliens Bottle", "Gold Dust Bottle", "Beaver Race Bottle", "Dampe Bottle", "Chateau Bottle", "Bombers' Notebook", "Razor Sword", "Gilded Sword",
             "Mirror Shield", "Town Archery Quiver", "Swamp Archery Quiver", "Town Bomb Bag", "Mountain Bomb Bag", "Town Wallet", "Ocean Wallet", "Moon's Tear", "Land Title Deed",
             "Swamp Title Deed", "Mountain Title Deed", "Ocean Title Deed", "Room Key", "Letter to Kafei", "Pendant of Memories", "Letter to Mama" },
-            { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25",
+            { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25",
                 "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "36" }  };
         /* Masks */
         readonly string[,] MASK_NAMES = new string[,] { {"Deku Mask", "Postman's Hat", "All Night Mask", "Blast Mask", "Stone Mask", "Great Fairy's Mask", "Keaton Mask", "Bremen Mask", "Bunny Hood",
@@ -64,6 +64,9 @@ namespace MMRando.Forms
             "Trading Post Arrow 30", "Trading Post Nut 10", "Trading Post Arrow 50", "Witch Shop Blue Potion", "Witch Shop Red Potion", "Witch Shop Green Potion", "Bomb Shop Bomb 10",
             "Bomb Shop Chu 10", "Goron Shop Bomb 10", "Goron Shop Arrow 10", "Goron Shop Red Potion", "Zora Shop Shield", "Zora Shop Arrow 10", "Zora Shop Red Potion" },
             { "120", "121", "122", "123", "124", "125", "126", "127", "128", "129", "130", "131", "132", "133", "134", "135", "136", "137", "138" } };
+        /* Bottled Items */
+        readonly string[,] FAIRY_REWARDS = new string[,]  { {"Great Fairy Magic Meter", "Great Fairy Spin Attack", "Great Fairy Extended Magic", "Great Fairy Double Defense", "Great Fairy's Sword" }, 
+            { "246", "247", "248", "249", "11" } };
         /* Anything that didn't fit in the above categories */
         readonly string[,] OTHER_ITEMS = new string[,]  { { "Graveyard Bad Bats", "Ikana Grotto", "Termina Bombchu Grotto", "Great Bay Coast Grotto", "Great Bay Cape Ledge (1)",
                 "Great Bay Cape Ledge (2)", "Great Bay Cape Grotto", "Great Bay Cape Underwater", "Path to Swamp Grotto", "Graveyard Grotto", "Swamp Grotto", "Mountain Village Chest (Spring)",
@@ -142,11 +145,17 @@ namespace MMRando.Forms
                 ItemListEditorTree.Nodes[9].Nodes[i].Tag = SHOP_ITEMS[1, i];
                 ItemListEditorTree.Nodes[9].Text = "Shop Items (" + (i + 1) + ")";
             }
+            for (int i = 0; i < FAIRY_REWARDS.GetLength(1); i++)
+            {
+                ItemListEditorTree.Nodes[10].Nodes.Add(FAIRY_REWARDS[0, i]);
+                ItemListEditorTree.Nodes[10].Nodes[i].Tag = FAIRY_REWARDS[1, i];
+                ItemListEditorTree.Nodes[10].Text = "Great Fairy Rewards (" + (i + 1) + ")";
+            }
             for (int i = 0; i < OTHER_ITEMS.GetLength(1); i++)
             {
-                ItemListEditorTree.Nodes[10].Nodes.Add(OTHER_ITEMS[0, i]);
-                ItemListEditorTree.Nodes[10].Nodes[i].Tag = OTHER_ITEMS[1, i];
-                ItemListEditorTree.Nodes[10].Text = "Other Items (" + (i + 1) + ")";
+                ItemListEditorTree.Nodes[11].Nodes.Add(OTHER_ITEMS[0, i]);
+                ItemListEditorTree.Nodes[11].Nodes[i].Tag = OTHER_ITEMS[1, i];
+                ItemListEditorTree.Nodes[11].Text = "Other Items (" + (i + 1) + ")";
             }
             if (_settings.CustomItemList != null)
             {
@@ -154,7 +163,7 @@ namespace MMRando.Forms
             }
             else
             {
-                TSetting.Text = "-------";
+                tSetting.Text = "-------";
             }
         }
 
@@ -178,9 +187,9 @@ namespace MMRando.Forms
                 n[j] |= (int)(1 << k);
                 ns[j] = Convert.ToString(n[j], 16);
             }
-            TSetting.Text = ns[7] + "-" + ns[6] + "-" + ns[5] + "-" + ns[4] + "-"
+            tSetting.Text = ns[7] + "-" + ns[6] + "-" + ns[5] + "-" + ns[4] + "-"
                 + ns[3] + "-" + ns[2] + "-" + ns[1] + "-" + ns[0];
-            _settings.CustomItemListString = TSetting.Text;
+            _settings.CustomItemListString = tSetting.Text;
         }
 
         public bool UpdateChecks(string c)
@@ -223,7 +232,7 @@ namespace MMRando.Forms
                 int k = i % 32;
                 if (((vi[j] >> k) & 1) > 0)
                 {
-                    if (i >= (Items.TotalNumberOfItems - Items.NumberOfAreasAndOther))
+                    if (i >= ItemUtils.AllLocations().Count())
                     {
                         stringErr("Value too high");
                         return false;
@@ -250,14 +259,31 @@ namespace MMRando.Forms
             return true;
         }
 
-        private void TSetting_KeyDown(object sender, KeyEventArgs e)
+        private void tSetting_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyData == Keys.Enter)
             {
-                updating = true;
-                UpdateChecks(TSetting.Text);
-                updating = false;
+                UpdateChecks(tSetting.Text);
             }
+        }
+
+        private void lItems_ItemChecked(object sender, ItemCheckedEventArgs e)
+        {
+            if (updating)
+            {
+                return;
+            }
+            updating = true;
+            if (e.Item.Checked)
+            {
+                _settings.CustomItemList.Add(e.Item.Index);
+            }
+            else
+            {
+                _settings.CustomItemList.Remove(e.Item.Index);
+            }
+            UpdateString(_settings.CustomItemList);
+            updating = false;
         }
 
         private void ItemListEditorTree_AfterCheck(object sender, TreeViewEventArgs e)
@@ -340,20 +366,20 @@ namespace MMRando.Forms
 
         private void SelectAllToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            TSetting.Text = "3fffff-ffffffff-ffffffff-ffffffff-ffffffff-ffffffff-ffffffff-ffffffff";
-            UpdateChecks(TSetting.Text);
+            tSetting.Text = "3ffffff-ffffffff-ffffffff-ffffffff-ffffffff-ffffffff-ffffffff-ffffffff";
+            UpdateChecks(tSetting.Text);
         }
 
         private void SelectNoneToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            TSetting.Text = "-------";
-            UpdateChecks(TSetting.Text);
+            tSetting.Text = "-------";
+            UpdateChecks(tSetting.Text);
         }
 
         public void stringErr(string r)
         {
             MessageBox.Show("Invalid custom item string: \n" + r);
-            TSetting.Text = "-------";
+            tSetting.Text = "-------";
             _settings.CustomItemListString = "-------";
             _settings.CustomItemList.Clear();
         }
