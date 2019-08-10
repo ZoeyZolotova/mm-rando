@@ -44,12 +44,13 @@ namespace MMRando.Models
 
         public int[] NewDestinationIndices { get; set; }
 
-        public string[] Destinations { get; set; } = new string[]
+        public Item[] Entrances { get; set; } = new Item[]
         {
-            "Woodfall", "Snowhead", "Inverted Stone Tower", "Great Bay"
+            Item.AreaWoodFallTempleAccess,
+            Item.AreaSnowheadTempleAccess,
+            Item.AreaInvertedStoneTowerTempleAccess,
+            Item.AreaGreatBayTempleAccess,
         };
-
-        
     }
 }
 

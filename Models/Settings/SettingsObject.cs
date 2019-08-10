@@ -127,6 +127,11 @@ namespace MMRando.Models.Settings
         public bool AddMoonItems { get; set; }
 
         /// <summary>
+        /// Add great fairy rewards to the randomization pool
+        /// </summary>
+        public bool AddFairyRewards { get; set; }
+
+        /// <summary>
         /// Add everything else to the randomization pool
         /// </summary>
         public bool AddOther { get; set; }
@@ -312,6 +317,7 @@ namespace MMRando.Models.Settings
                 CrazyStartingItems = false;
                 AddNutChest = false;
                 AddMoonItems = false;
+                AddFairyRewards = false;
                 AddOther = false;
                 ExcludeSongOfSoaring = false;
                 RandomizeBottleCatchContents = false;
@@ -320,6 +326,7 @@ namespace MMRando.Models.Settings
             }
             else
             {
+                AddFairyRewards = (part1 & 67108864) > 0;
                 CrazyStartingItems = (part1 & 4194304) > 0;
                 AddNutChest = (part1 & 2097152) > 0;
                 AddMoonItems = (part1 & 32768) > 0;
@@ -389,6 +396,7 @@ namespace MMRando.Models.Settings
             }
             else
             {
+                if (AddFairyRewards) { parts[0] += 67108864; }
                 if (CrazyStartingItems) { parts[0] += 4194304; }
                 if (AddNutChest) { parts[0] += 2097152; }
                 if (AddMoonItems) { parts[0] += 32768; }

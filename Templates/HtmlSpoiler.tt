@@ -3,6 +3,7 @@
 <#@ import namespace="System.Linq" #>
 <#@ import namespace="System.Text" #>
 <#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="MMRando.Extensions" #>
 <html>
 <head>
 <style>
@@ -19,33 +20,34 @@
 </head>
 <label><b>Version: </b></label><span><#= spoiler.Version #></span><br/>
 <label><b>Settings String: </b></label><span><#= spoiler.SettingsString #></span><br/>
-<label><b>Seed: </b></label><span><#= spoiler.Seed #><span><br/>
+<label><b>Seed: </b></label><span><#= spoiler.Seed #></span><br/>
 <# if (spoiler.CustomItemListString != null) { #>
-<label><b>Custom Item List: </b></label><span><#= spoiler.CustomItemListString #><span><br/>
+<label><b>Custom Item List: </b></label><span><#= spoiler.CustomItemListString #></span><br/>
 <# } #>
 <br/>
 <# if (spoiler.RandomizeDungeonEntrances) { 
 #>
 <h2>Dungeon Entrance Replacements</h2>
-<table border="1">
+<table border="1" class="item-replacements">
 	<tr>
 		<th>Entrance</th>
+	    <th></th>
 		<th>New Destination</th>
 	</tr>
-<#		 for (int i = 0; i < 4; i++) { 
-			int newEntranceIndex = spoiler.NewDestinationIndices[i]; 
-			string destination = spoiler.Destinations[i];
-			string newDestination = spoiler.Destinations[newEntranceIndex];#>
-	<tr>
-		<td><#= destination #></td>
-		<td class="spoiler"><span data-content="<#= newDestination #>"></span></td>
+<#		 for (int i = 0; i < 4; i++) {
+            var entrance = spoiler.Entrances[i];
+            var destination = spoiler.Entrances[spoiler.NewDestinationIndices[i]];#>
+	<tr data-id="<#= (int)destination #>" data-newlocationid="<#= (int)destination #>" class="unavailable">
+		<td class="newlocation"><#= entrance.Entrance() #></td>
+	    <td><input type="checkbox"/></td>
+		<td class="spoiler itemname"><span data-content="<#= destination.Entrance() #>"></span></td>
 	</tr>
 <# } #>
 </table>
 <# } #>
 <h2>Item Replacements</h2>
 <input type="checkbox" id="highlight-checks"/> Highlight available checks
-<table border="1" id="item-replacements">
+<table border="1" class="item-replacements">
  <tr>
      <th>Location</th>
 	 <th></th>
@@ -135,7 +137,7 @@
 				recalculate = true;
 			}
         
-			var locationRow = document.querySelector("#item-replacements tr[data-newlocationid='" + item.ItemId + "']");
+			var locationRow = document.querySelector(".item-replacements tr[data-newlocationid='" + i + "']");
 			if (locationRow) {
 				locationRow.className = "";
 				locationRow.classList.add(item.IsAvailable ? "available" : "unavailable");
@@ -149,7 +151,7 @@
 				}
 			}
         
-			var itemRow = document.querySelector("#item-locations tr[data-id='" + item.ItemId + "']");
+			var itemRow = document.querySelector("#item-locations tr[data-id='" + i + "']");
 			if (itemRow) {
 				var itemName = itemRow.querySelector(".newlocation");
                 var checkbox = itemRow.querySelector("input");
@@ -166,7 +168,7 @@
 		}
 	}
 
-    var startingLocations = [0, 90, 270, 271, 272, 273];
+    var startingLocations = [0, 94, 274, 275, 276, 277];
     for (var id of startingLocations) {
 	    logic[id].Checked = true;
 	    logic[document.querySelector("tr[data-newlocationid='" + id + "']").dataset.id].Acquired = true;
@@ -192,7 +194,14 @@
 	}
 
 	document.querySelector("#highlight-checks").addEventListener("click", function(e) {
-		document.querySelector("table#item-replacements").className = e.target.checked ? "show-highlight" : "";
+        var tables = document.querySelectorAll("table.item-replacements");
+        for (var i = 0; i < tables.length; i++) {
+            if (e.target.checked) {
+                tables[i].classList.add("show-highlight");
+            } else {
+                tables[i].classList.remove("show-highlight");
+            }
+        }
 	});
 </script>
 </html>

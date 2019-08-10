@@ -80,6 +80,7 @@ namespace MMRando
             TooltipBuilder.SetTooltip(cAdditional, "Enable miscellaneous items being placed in the randomization pool.\n\nAmong the miscellaneous items are:\nFreestanding heartpieces, overworld chests, (hidden) grotto chests, Tingle's maps and bank heartpiece.");
             TooltipBuilder.SetTooltip(cEnemy, "Enable randomization of enemies. May cause softlocks in some circumstances, use at your own risk.");
             TooltipBuilder.SetTooltip(cMoonItems, "Enable moon items being placed in the randomization pool.\n\nIncludes the four Moon Trial Heart Pieces, Fierce Deity's Mask and the two Link Trial chests.");
+            TooltipBuilder.SetTooltip(cFairyRewards, "Enable great fairy rewards being placed in the randomization pool.\n\nIncludes Magic Power, Great Spin Attack, Extended Magic Power, Double Defense, Great Fairy's Sword and Great Fairy's Mask.");
             TooltipBuilder.SetTooltip(cNutChest, "Enable randomization of the pre-clocktown deku nut chest. Not available when using Casual logic.");
             TooltipBuilder.SetTooltip(cCrazyStartingItems, "Enable randomization of starting Sword, Shield, and two Heart Containers.");
 
@@ -283,6 +284,7 @@ namespace MMRando
             cQText.Checked = _settings.QuickTextEnabled;
             cFreeHints.Checked = _settings.FreeHints;
             cMoonItems.Checked = _settings.AddMoonItems;
+            cFairyRewards.Checked = _settings.AddFairyRewards;
             cClearHints.Checked = _settings.ClearHints;
             cHideClock.Checked = _settings.HideClock;
             cClockSpeed.SelectedIndex = (int) _settings.ClockSpeed;
@@ -327,6 +329,8 @@ namespace MMRando
             cAdditional.Visible = !cUserItems.Checked;
 
             cMoonItems.Visible = !cUserItems.Checked;
+
+            cFairyRewards.Visible = !cUserItems.Checked;
 
             cNutChest.Visible = !cUserItems.Checked;
 
@@ -380,6 +384,11 @@ namespace MMRando
         private void cMoonItems_CheckedChanged(object sender, EventArgs e)
         {
             UpdateSingleSetting(() => _settings.AddMoonItems = cMoonItems.Checked);
+        }
+
+        private void cFairyRewards_CheckedChanged(object sender, EventArgs e)
+        {
+            UpdateSingleSetting(() => _settings.AddFairyRewards = cFairyRewards.Checked);
         }
 
         private void cNutChest_CheckedChanged(object sender, EventArgs e)
@@ -627,6 +636,7 @@ namespace MMRando
                 cAdditional.Enabled = false;
                 cUserItems.Enabled = false;
                 cMoonItems.Enabled = false;
+                cFairyRewards.Enabled = false;
                 cNutChest.Enabled = false;
                 cCrazyStartingItems.Enabled = false;
                 cNoStartingItems.Enabled = false;
@@ -645,6 +655,7 @@ namespace MMRando
                 cShop.Enabled = onMainTab;
                 cAdditional.Enabled = onMainTab;
                 cMoonItems.Enabled = onMainTab;
+                cFairyRewards.Enabled = onMainTab;
                 cNutChest.Enabled = onMainTab && _settings.LogicMode != LogicMode.Casual;
                 cCrazyStartingItems.Enabled = onMainTab;
 
@@ -731,6 +742,7 @@ namespace MMRando
             cHTMLLog.Enabled = v;
             cN64.Enabled = v;
             cMoonItems.Enabled = v;
+            cFairyRewards.Enabled = v;
             cNutChest.Enabled = v;
             cCrazyStartingItems.Enabled = v;
             cNoStartingItems.Enabled = v;

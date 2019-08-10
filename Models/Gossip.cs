@@ -28,7 +28,7 @@ namespace MMRando.Models
                 "brings",
                 "holds",
                 "conceals",
-                "posesses"
+                "possesses"
             });
 
 

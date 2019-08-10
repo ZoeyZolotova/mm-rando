@@ -41,55 +41,9 @@ namespace MMRando.Utils
                     }
                 }
 
-                // skip non-randomized items.
-                if (randomizedResult.Settings.UseCustomItemList)
+                if (!item.IsRandomized)
                 {
-                    if (!randomizedResult.Settings.CustomItemList.Contains(ItemUtils.SubtractItemOffset(item.ID)))
-                    {
-                        continue;
-                    }
-                }
-                else
-                {
-                    if (randomizedResult.Settings.ExcludeSongOfSoaring && item.Item == Item.SongSoaring)
-                    {
-                        continue;
-                    }
-
-                    if (!randomizedResult.Settings.AddDungeonItems && ItemUtils.IsDungeonItem(item.Item))
-                    {
-                        continue;
-                    }
-
-                    if (!randomizedResult.Settings.AddShopItems && ItemUtils.IsShopItem(item.Item))
-                    {
-                        continue;
-                    }
-
-                    if (!randomizedResult.Settings.AddOther && ItemUtils.IsOtherItem(item.Item))
-                    {
-                        continue;
-                    }
-
-                    if (!randomizedResult.Settings.RandomizeBottleCatchContents && ItemUtils.IsBottleCatchContent(item.Item))
-                    {
-                        continue;
-                    }
-
-                    if (!randomizedResult.Settings.AddMoonItems && ItemUtils.IsMoonLocation(item.Item))
-                    {
-                        continue;
-                    }
-
-                    if (!randomizedResult.Settings.AddNutChest && item.Item == Item.ChestPreClocktownDekuNut)
-                    {
-                        continue;
-                    }
-
-                    if (!randomizedResult.Settings.CrazyStartingItems && ItemUtils.IsStartingLocation(item.Item))
-                    {
-                        continue;
-                    }
+                    continue;
                 }
 
                 var itemName = item.Item.Name();

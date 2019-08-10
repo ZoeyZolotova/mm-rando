@@ -12,6 +12,7 @@ namespace MMRando.Templates
     using System.Linq;
     using System.Text;
     using System.Collections.Generic;
+    using MMRando.Extensions;
     using System;
     
     /// <summary>
@@ -45,37 +46,42 @@ namespace MMRando.Templates
             this.Write(this.ToStringHelper.ToStringWithCulture(spoiler.SettingsString));
             this.Write("</span><br/>\r\n<label><b>Seed: </b></label><span>");
             this.Write(this.ToStringHelper.ToStringWithCulture(spoiler.Seed));
-            this.Write("<span><br/>\r\n");
+            this.Write("</span><br/>\r\n");
  if (spoiler.CustomItemListString != null) { 
             this.Write("<label><b>Custom Item List: </b></label><span>");
             this.Write(this.ToStringHelper.ToStringWithCulture(spoiler.CustomItemListString));
-            this.Write("<span><br/>\r\n");
+            this.Write("</span><br/>\r\n");
  } 
             this.Write("<br/>\r\n");
  if (spoiler.RandomizeDungeonEntrances) { 
 
-            this.Write("<h2>Dungeon Entrance Replacements</h2>\r\n<table border=\"1\">\r\n\t<tr>\r\n\t\t<th>Entrance" +
-                    "</th>\r\n\t\t<th>New Destination</th>\r\n\t</tr>\r\n");
-		 for (int i = 0; i < 4; i++) { 
-			int newEntranceIndex = spoiler.NewDestinationIndices[i]; 
-			string destination = spoiler.Destinations[i];
-			string newDestination = spoiler.Destinations[newEntranceIndex];
-            this.Write("\t<tr>\r\n\t\t<td>");
-            this.Write(this.ToStringHelper.ToStringWithCulture(destination));
-            this.Write("</td>\r\n\t\t<td class=\"spoiler\"><span data-content=\"");
-            this.Write(this.ToStringHelper.ToStringWithCulture(newDestination));
+            this.Write("<h2>Dungeon Entrance Replacements</h2>\r\n<table border=\"1\" class=\"item-replacement" +
+                    "s\">\r\n\t<tr>\r\n\t\t<th>Entrance</th>\r\n\t    <th></th>\r\n\t\t<th>New Destination</th>\r\n\t</" +
+                    "tr>\r\n");
+		 for (int i = 0; i < 4; i++) {
+            var entrance = spoiler.Entrances[i];
+            var destination = spoiler.Entrances[spoiler.NewDestinationIndices[i]];
+            this.Write("\t<tr data-id=\"");
+            this.Write(this.ToStringHelper.ToStringWithCulture((int)destination));
+            this.Write("\" data-newlocationid=\"");
+            this.Write(this.ToStringHelper.ToStringWithCulture((int)destination));
+            this.Write("\" class=\"unavailable\">\r\n\t\t<td class=\"newlocation\">");
+            this.Write(this.ToStringHelper.ToStringWithCulture(entrance.Entrance()));
+            this.Write("</td>\r\n\t    <td><input type=\"checkbox\"/></td>\r\n\t\t<td class=\"spoiler itemname\"><sp" +
+                    "an data-content=\"");
+            this.Write(this.ToStringHelper.ToStringWithCulture(destination.Entrance()));
             this.Write("\"></span></td>\r\n\t</tr>\r\n");
  } 
             this.Write("</table>\r\n");
  } 
             this.Write("<h2>Item Replacements</h2>\r\n<input type=\"checkbox\" id=\"highlight-checks\"/> Highli" +
-                    "ght available checks\r\n<table border=\"1\" id=\"item-replacements\">\r\n <tr>\r\n     <th" +
-                    ">Location</th>\r\n\t <th></th>\r\n     <th>Item</th>\r\n </tr>\r\n");
+                    "ght available checks\r\n<table border=\"1\" class=\"item-replacements\">\r\n <tr>\r\n     " +
+                    "<th>Location</th>\r\n\t <th></th>\r\n     <th>Item</th>\r\n </tr>\r\n");
  foreach (var region in spoiler.ItemList.GroupBy(item => item.Region).OrderBy(g => g.Key)) {
 
-            this.Write("\n <tr class=\"region\"><td colspan=\"3\">");
+            this.Write(" <tr class=\"region\"><td colspan=\"3\">");
             this.Write(this.ToStringHelper.ToStringWithCulture(region.Key));
-            this.Write("</td></tr>\n ");
+            this.Write("</td></tr>\r\n ");
  foreach (var item in region.OrderBy(item => item.NewLocationName)) { 
             this.Write(" <tr data-id=\"");
             this.Write(this.ToStringHelper.ToStringWithCulture(item.Id));
@@ -86,7 +92,7 @@ namespace MMRando.Templates
             this.Write("</td>\r\n\t<td><input type=\"checkbox\"/></td>\r\n\t<td class=\"spoiler itemname\"> <span d" +
                     "ata-content=\"");
             this.Write(this.ToStringHelper.ToStringWithCulture(item.Name));
-            this.Write("\"></span></td>\r\n </tr>\n ");
+            this.Write("\"></span></td>\r\n </tr>\r\n ");
  } 
  } 
             this.Write("</table>\r\n<h2>Item Locations</h2>\r\n<table border=\"1\" id=\"item-locations\">\r\n <tr>\r" +
@@ -134,34 +140,36 @@ namespace MMRando.Templates
                     "ed && item.IsFakeItem && item.IsAvailable) {\r\n\t\t\t\titem.Acquired = true;\r\n\t\t\t\trec" +
                     "alculate = true;\r\n\t\t\t}\r\n\t\t\tif (item.Acquired && item.IsFakeItem && !item.IsAvail" +
                     "able) {\r\n\t\t\t\titem.Acquired = false;\r\n\t\t\t\trecalculate = true;\r\n\t\t\t}\r\n        \r\n\t\t" +
-                    "\tvar locationRow = document.querySelector(\"#item-replacements tr[data-newlocatio" +
-                    "nid=\'\" + item.ItemId + \"\']\");\r\n\t\t\tif (locationRow) {\r\n\t\t\t\tlocationRow.className " +
-                    "= \"\";\r\n\t\t\t\tlocationRow.classList.add(item.IsAvailable ? \"available\" : \"unavailab" +
-                    "le\");\r\n\t\t\t\tvar itemName = locationRow.querySelector(\".itemname\");\r\n             " +
-                    "   var checkbox = locationRow.querySelector(\"input\");\r\n                checkbox." +
-                    "checked = item.Checked;\r\n\t\t\t\tif (item.Checked) {\r\n\t\t\t\t\titemName.classList.remove" +
-                    "(\"spoiler\");\r\n\t\t\t\t} else {\r\n\t\t\t\t\titemName.classList.add(\"spoiler\");\r\n\t\t\t\t}\r\n\t\t\t}" +
-                    "\r\n        \r\n\t\t\tvar itemRow = document.querySelector(\"#item-locations tr[data-id=" +
-                    "\'\" + item.ItemId + \"\']\");\r\n\t\t\tif (itemRow) {\r\n\t\t\t\tvar itemName = itemRow.querySe" +
-                    "lector(\".newlocation\");\r\n                var checkbox = itemRow.querySelector(\"i" +
-                    "nput\");\r\n                checkbox.checked = item.Acquired;\r\n\t\t\t\tif (item.Acquire" +
-                    "d) {\r\n\t\t\t\t\titemName.classList.remove(\"spoiler\");\r\n\t\t\t\t} else {\r\n\t\t\t\t\titemName.cl" +
-                    "assList.add(\"spoiler\");\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t}\r\n\t\tif (recalculate) {\r\n\t\t\trecalculateI" +
-                    "tems();\r\n\t\t}\r\n\t}\n\n    var startingLocations = [0, 90, 270, 271, 272, 273];\n    f" +
-                    "or (var id of startingLocations) {\r\n\t    logic[id].Checked = true;\r\n\t    logic[d" +
-                    "ocument.querySelector(\"tr[data-newlocationid=\'\" + id + \"\']\").dataset.id].Acquire" +
-                    "d = true;\r\n\t    document.querySelector(\"tr[data-newlocationid=\'\" + id + \"\'] inpu" +
-                    "t\").checked = true;\n    }\r\n\r\n\trecalculateItems();\r\n\r\n\tvar rows = document.queryS" +
-                    "electorAll(\"tr\");\r\n\tfor (var i = 1; i < rows.length; i++) {\r\n\t\tvar row = rows[i]" +
-                    ";\r\n\t\tvar checkbox = row.querySelector(\"input\");\r\n\t\tif (checkbox) {\r\n\t\t\tcheckbox." +
-                    "addEventListener(\"click\", function(e) {\r\n\t\t\t\tvar row = e.target.closest(\"tr\");\r\n" +
-                    "                var rowId = parseInt(row.dataset.id);\r\n\t\t\t\tvar newLocationId = p" +
-                    "arseInt(row.dataset.newlocationid);\r\n\t\t\t\tlogic[newLocationId].Checked = e.target" +
-                    ".checked;\r\n                logic[rowId].Acquired = e.target.checked;\r\n\t\t\t\trecalc" +
-                    "ulateItems();\r\n\t\t\t});\r\n\t\t}\r\n\t}\r\n\r\n\tdocument.querySelector(\"#highlight-checks\").a" +
-                    "ddEventListener(\"click\", function(e) {\r\n\t\tdocument.querySelector(\"table#item-rep" +
-                    "lacements\").className = e.target.checked ? \"show-highlight\" : \"\";\r\n\t});\r\n</scrip" +
-                    "t>\r\n</html>");
+                    "\tvar locationRow = document.querySelector(\".item-replacements tr[data-newlocatio" +
+                    "nid=\'\" + i + \"\']\");\r\n\t\t\tif (locationRow) {\r\n\t\t\t\tlocationRow.className = \"\";\r\n\t\t\t" +
+                    "\tlocationRow.classList.add(item.IsAvailable ? \"available\" : \"unavailable\");\r\n\t\t\t" +
+                    "\tvar itemName = locationRow.querySelector(\".itemname\");\r\n                var che" +
+                    "ckbox = locationRow.querySelector(\"input\");\r\n                checkbox.checked = " +
+                    "item.Checked;\r\n\t\t\t\tif (item.Checked) {\r\n\t\t\t\t\titemName.classList.remove(\"spoiler\"" +
+                    ");\r\n\t\t\t\t} else {\r\n\t\t\t\t\titemName.classList.add(\"spoiler\");\r\n\t\t\t\t}\r\n\t\t\t}\r\n        " +
+                    "\r\n\t\t\tvar itemRow = document.querySelector(\"#item-locations tr[data-id=\'\" + i + \"" +
+                    "\']\");\r\n\t\t\tif (itemRow) {\r\n\t\t\t\tvar itemName = itemRow.querySelector(\".newlocation" +
+                    "\");\r\n                var checkbox = itemRow.querySelector(\"input\");\r\n           " +
+                    "     checkbox.checked = item.Acquired;\r\n\t\t\t\tif (item.Acquired) {\r\n\t\t\t\t\titemName." +
+                    "classList.remove(\"spoiler\");\r\n\t\t\t\t} else {\r\n\t\t\t\t\titemName.classList.add(\"spoiler" +
+                    "\");\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t}\r\n\t\tif (recalculate) {\r\n\t\t\trecalculateItems();\r\n\t\t}\r\n\t}\r\n\r\n" +
+                    "    var startingLocations = [0, 94, 274, 275, 276, 277];\r\n    for (var id of sta" +
+                    "rtingLocations) {\r\n\t    logic[id].Checked = true;\r\n\t    logic[document.querySele" +
+                    "ctor(\"tr[data-newlocationid=\'\" + id + \"\']\").dataset.id].Acquired = true;\r\n\t    d" +
+                    "ocument.querySelector(\"tr[data-newlocationid=\'\" + id + \"\'] input\").checked = tru" +
+                    "e;\r\n    }\r\n\r\n\trecalculateItems();\r\n\r\n\tvar rows = document.querySelectorAll(\"tr\")" +
+                    ";\r\n\tfor (var i = 1; i < rows.length; i++) {\r\n\t\tvar row = rows[i];\r\n\t\tvar checkbo" +
+                    "x = row.querySelector(\"input\");\r\n\t\tif (checkbox) {\r\n\t\t\tcheckbox.addEventListener" +
+                    "(\"click\", function(e) {\r\n\t\t\t\tvar row = e.target.closest(\"tr\");\r\n                " +
+                    "var rowId = parseInt(row.dataset.id);\r\n\t\t\t\tvar newLocationId = parseInt(row.data" +
+                    "set.newlocationid);\r\n\t\t\t\tlogic[newLocationId].Checked = e.target.checked;\r\n     " +
+                    "           logic[rowId].Acquired = e.target.checked;\r\n\t\t\t\trecalculateItems();\r\n\t" +
+                    "\t\t});\r\n\t\t}\r\n\t}\r\n\r\n\tdocument.querySelector(\"#highlight-checks\").addEventListener(" +
+                    "\"click\", function(e) {\n        var tables = document.querySelectorAll(\"table.ite" +
+                    "m-replacements\");\n        for (var i = 0; i < tables.length; i++) {\n            " +
+                    "if (e.target.checked) {\n                tables[i].classList.add(\"show-highlight\"" +
+                    ");\n            } else {\n                tables[i].classList.remove(\"show-highlig" +
+                    "ht\");\n            }\n        }\r\n\t});\r\n</script>\r\n</html>");
             return this.GenerationEnvironment.ToString();
         }
     }

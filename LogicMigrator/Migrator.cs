@@ -7,7 +7,7 @@ namespace MMRando.LogicMigrator
 {
     public static partial class Migrator
     {
-        public const int CurrentVersion = 6;
+        public const int CurrentVersion = 8;
 
         public static string ApplyMigrations(string logic)
         {
@@ -46,6 +46,16 @@ namespace MMRando.LogicMigrator
             if (GetVersion(lines) < 6)
             {
                 AddPreClocktownChestLinkTrialChestsAndStartingItems(lines);
+            }
+
+            if (GetVersion(lines) < 7)
+            {
+                AddGreatFairies(lines);
+            }
+
+            if (GetVersion(lines) < 8)
+            {
+                AddMagicRequirements(lines);
             }
 
             return string.Join("\r\n", lines);
@@ -408,6 +418,162 @@ namespace MMRando.LogicMigrator
                 lines.Insert(item.ID * 5 + 3, string.Join(";", item.Conditionals.Select(c => string.Join(",", c))));
                 lines.Insert(item.ID * 5 + 4, "0");
                 lines.Insert(item.ID * 5 + 5, "0");
+            }
+        }
+
+        private static void AddGreatFairies(List<string> lines)
+        {
+            lines[0] = "-version 7";
+            var newItems = new MigrationItem[]
+            {
+                new MigrationItem
+                {
+                    ID = 11,
+                    Conditionals = new List<List<int>>
+                    {
+                        new List<int> { 0 },
+                        new List<int> { 92 },
+                        new List<int> { 93 },
+                    }
+                },
+                new MigrationItem
+                {
+                    ID = 12,
+                    DependsOnItems = new List<int> { 104 },
+                },
+                new MigrationItem
+                {
+                    ID = 13,
+                    DependsOnItems = new List<int> { 107 },
+                },
+                new MigrationItem
+                {
+                    ID = 14,
+                    DependsOnItems = new List<int> { 112 },
+                },
+            };
+            var itemNames = new string[]
+            {
+                "Great Fairy Magic Meter",
+                "Great Fairy Spin Attack",
+                "Great Fairy Extended Magic",
+                "Great Fairy Double Defense"
+            };
+            for (var i = 0; i < lines.Count; i++)
+            {
+                var line = lines[i];
+                if (line.StartsWith("-") || string.IsNullOrWhiteSpace(line))
+                {
+                    continue;
+                }
+                var updatedItemSections = line
+                    .Split(';')
+                    .Select(section => section.Split(',').Select(id =>
+                    {
+                        var itemId = int.Parse(id);
+                        if (itemId >= 11)
+                        {
+                            itemId += newItems.Length;
+                        }
+                        return itemId;
+                    }).ToList()).ToList();
+                lines[i] = string.Join(";", updatedItemSections.Select(section => string.Join(",", section)));
+            }
+            foreach (var item in newItems)
+            {
+                lines.Insert(item.ID * 5 + 1, $"- {itemNames[item.ID - 11]}");
+                lines.Insert(item.ID * 5 + 2, string.Join(",", item.DependsOnItems));
+                lines.Insert(item.ID * 5 + 3, string.Join(";", item.Conditionals.Select(c => string.Join(",", c))));
+                lines.Insert(item.ID * 5 + 4, "0");
+                lines.Insert(item.ID * 5 + 5, "0");
+            }
+
+            var updateItems = new MigrationItem[]
+            {
+                new MigrationItem
+                {
+                    ID = 76, // Great Fairy's Mask
+                    // remove requirements
+                }
+            };
+            foreach (var item in updateItems)
+            {
+                lines[item.ID * 5 + 2] = string.Join(",", item.DependsOnItems);
+                lines[item.ID * 5 + 3] = string.Join(";", item.Conditionals.Select(c => string.Join(",", c)));
+            }
+        }
+
+        private static void AddMagicRequirements(List<string> lines)
+        {
+            lines[0] = "-version 8";
+            var newItems = new MigrationItem[]
+            {
+                new MigrationItem
+                {
+                    ID = 278,
+                    Conditionals = new List<List<int>>
+                    {
+                        new List<int> { 11 },
+                        new List<int> { 13 },
+                    }
+                },
+            };
+            var itemNames = new string[]
+            {
+                "Magic Meter"
+            };
+            for (var i = 0; i < lines.Count; i++)
+            {
+                var line = lines[i];
+                if (line.StartsWith("-") || string.IsNullOrWhiteSpace(line))
+                {
+                    continue;
+                }
+                var updatedItemSections = line
+                    .Split(';')
+                    .Select(section => section.Split(',').Select(id =>
+                    {
+                        var itemId = int.Parse(id);
+                        if (itemId >= 278)
+                        {
+                            itemId += newItems.Length;
+                        }
+                        return itemId;
+                    }).ToList()).ToList();
+                lines[i] = string.Join(";", updatedItemSections.Select(section => string.Join(",", section)));
+            }
+            foreach (var item in newItems)
+            {
+                lines.Insert(item.ID * 5 + 1, $"- {itemNames[item.ID - 278]}");
+                lines.Insert(item.ID * 5 + 2, string.Join(",", item.DependsOnItems));
+                lines.Insert(item.ID * 5 + 3, string.Join(";", item.Conditionals.Select(c => string.Join(",", c))));
+                lines.Insert(item.ID * 5 + 4, "0");
+                lines.Insert(item.ID * 5 + 5, "0");
+            }
+            
+            var requireMagic = new int[] { 2, 3, 4, 9 }; // fire arrow, ice arrow, light arrow, lens of truth
+            for (var i = 0; i < lines.Count; i++)
+            {
+                if (i%5 != 2 && i%5 != 3)
+                {
+                    continue;
+                }
+                var line = lines[i];
+                if (line.StartsWith("-") || string.IsNullOrWhiteSpace(line))
+                {
+                    continue;
+                }
+                var updatedItemSections = line
+                    .Split(';')
+                    .Select(section =>
+                    {
+                        if (section.Split(',').Select(int.Parse).Intersect(requireMagic).Any())
+                        {
+                            section += ",278";
+                        }
+                        return section;
+                    }).ToList();
+                lines[i] = string.Join(";", updatedItemSections.Select(section => string.Join(",", section)));
             }
         }
 

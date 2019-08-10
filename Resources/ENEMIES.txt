@@ -52,7 +52,7 @@ fffd,fffe,ffff
 0000
 0
 1
-
+1b,21,60
 -shabom
 001d
 000e
@@ -66,7 +66,7 @@ fffd,fffe,ffff
 003f,007f,0004
 3
 0
-27,28
+1b,27,28,49
 -death armos - crash, link to paths?
 -002d
 -001d
@@ -86,7 +86,7 @@ ffff
 0000
 0
 0
-
+1b
 -mad scrub
 003b
 0040
@@ -239,7 +239,7 @@ ff34,ff02,ff01,ff03,ff9f,019f,0102,0103
 ff00,6404,7804,7800,2800,3200,9605,3205,6405,ff01,ff05,c200,fa00,fa01,8c05
 4
 1
-
+1b
 -real bombchu
 016f
 0181

@@ -32,7 +32,7 @@ namespace MMRando.Models
             ItemId = itemObject.ID;
             RequiredItemIds = itemObject.DependsOnItems?.Cast<int>().ToList();
             ConditionalItemIds = itemObject.Conditionals?.Select(c => c.Cast<int>().ToList()).ToList();
-            IsFakeItem = itemObject.Item.IsFake();
+            IsFakeItem = itemObject.Item.IsFake() && (itemObject.Item.Entrance() == null || !itemObject.IsRandomized);
 
             // Remove fake requirements
             switch (itemObject.Item)
