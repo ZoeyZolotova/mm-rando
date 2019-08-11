@@ -92,82 +92,77 @@ namespace MMRando.Forms
             {
                 ItemListEditorTree.Nodes[0].Nodes.Add(STARTING_ITEMS[0, i]);
                 ItemListEditorTree.Nodes[0].Nodes[i].Tag = STARTING_ITEMS[1, i];
-                ItemListEditorTree.Nodes[0].Text = "Starting Items (" + (i + 1) + ")";
             }
             for (int i = 0; i < ITEM_LIST.GetLength(1); i++)
             {
                 ItemListEditorTree.Nodes[1].Nodes.Add(ITEM_LIST[0, i]);
                 ItemListEditorTree.Nodes[1].Nodes[i].Tag = ITEM_LIST[1, i];
-                ItemListEditorTree.Nodes[1].Text = "Items (" + (i + 1) + ")";
             }
             for (int i = 0; i < MASK_LIST.GetLength(1); i++)
             {
                 ItemListEditorTree.Nodes[2].Nodes.Add(MASK_LIST[0, i]);
                 ItemListEditorTree.Nodes[2].Nodes[i].Tag = MASK_LIST[1, i];
-                ItemListEditorTree.Nodes[2].Text = "Masks (" + (i + 1) + ")";
             }
             for (int i = 0; i < HEART_LOCATIONS.GetLength(1); i++)
             {
                 ItemListEditorTree.Nodes[3].Nodes.Add(HEART_LOCATIONS[0, i]);
                 ItemListEditorTree.Nodes[3].Nodes[i].Tag = HEART_LOCATIONS[1, i];
-                ItemListEditorTree.Nodes[3].Text = "Hearts (" + (i + 1) + ")";
             }
             for (int i = 0; i < RUPIE_LOCATIONS.GetLength(1); i++)
             {
                 ItemListEditorTree.Nodes[4].Nodes.Add(RUPIE_LOCATIONS[0, i]);
                 ItemListEditorTree.Nodes[4].Nodes[i].Tag = RUPIE_LOCATIONS[1, i];
-                ItemListEditorTree.Nodes[4].Text = "Rupies (" + (i + 1) + ")";
             }
             for (int i = 0; i < TINGLE_MAPS.GetLength(1); i++)
             {
                 ItemListEditorTree.Nodes[5].Nodes.Add(TINGLE_MAPS[0, i]);
                 ItemListEditorTree.Nodes[5].Nodes[i].Tag = TINGLE_MAPS[1, i];
-                ItemListEditorTree.Nodes[5].Text = "Tingle Maps (" + (i + 1) + ")";
             }
             for (int i = 0; i < SONG_LIST.GetLength(1); i++)
             {
                 ItemListEditorTree.Nodes[6].Nodes.Add(SONG_LIST[0, i]);
                 ItemListEditorTree.Nodes[6].Nodes[i].Tag = SONG_LIST[1, i];
-                ItemListEditorTree.Nodes[6].Text = "Songs (" + (i + 1) + ")";
             }
             for (int i = 0; i < DUNGEON_ITEMS.GetLength(1); i++)
             {
                 ItemListEditorTree.Nodes[7].Nodes.Add(DUNGEON_ITEMS[0, i]);
                 ItemListEditorTree.Nodes[7].Nodes[i].Tag = DUNGEON_ITEMS[1, i];
-                ItemListEditorTree.Nodes[7].Text = "Dungeon Items (" + (i + 1) + ")";
             }
             for (int i = 0; i < BOTTLED_ITEMS.GetLength(1); i++)
             {
                 ItemListEditorTree.Nodes[8].Nodes.Add(BOTTLED_ITEMS[0, i]);
                 ItemListEditorTree.Nodes[8].Nodes[i].Tag = BOTTLED_ITEMS[1, i];
-                ItemListEditorTree.Nodes[8].Text = "Bottled Items (" + (i + 1) + ")";
             }
             for (int i = 0; i < SHOP_ITEMS.GetLength(1); i++)
             {
                 ItemListEditorTree.Nodes[9].Nodes.Add(SHOP_ITEMS[0, i]);
                 ItemListEditorTree.Nodes[9].Nodes[i].Tag = SHOP_ITEMS[1, i];
-                ItemListEditorTree.Nodes[9].Text = "Shop Items (" + (i + 1) + ")";
             }
             for (int i = 0; i < FAIRY_REWARDS.GetLength(1); i++)
             {
                 ItemListEditorTree.Nodes[10].Nodes.Add(FAIRY_REWARDS[0, i]);
                 ItemListEditorTree.Nodes[10].Nodes[i].Tag = FAIRY_REWARDS[1, i];
-                ItemListEditorTree.Nodes[10].Text = "Great Fairy Rewards (" + (i + 1) + ")";
             }
             for (int i = 0; i < OTHER_ITEMS.GetLength(1); i++)
             {
                 ItemListEditorTree.Nodes[11].Nodes.Add(OTHER_ITEMS[0, i]);
                 ItemListEditorTree.Nodes[11].Nodes[i].Tag = OTHER_ITEMS[1, i];
-                ItemListEditorTree.Nodes[11].Text = "Other Items (" + (i + 1) + ")";
             }
-            if (_settings.CustomItemList != null)
-            {
-                UpdateString(_settings.CustomItemList);
-            }
-            else
-            {
-                tSetting.Text = "-------";
-            }
+            ItemListEditorTree.Nodes[0].Text = "Starting Items (" + (STARTING_ITEMS.GetLength(1) + 1) + ")";
+            ItemListEditorTree.Nodes[1].Text = "Items (" + (ITEM_LIST.GetLength(1) + 1) + ")";
+            ItemListEditorTree.Nodes[2].Text = "Masks (" + (MASK_LIST.GetLength(1) + 1) + ")";
+            ItemListEditorTree.Nodes[3].Text = "Hearts (" + (HEART_LOCATIONS.GetLength(1) + 1) + ")";
+            ItemListEditorTree.Nodes[4].Text = "Rupies (" + (RUPIE_LOCATIONS.GetLength(1) + 1) + ")";
+            ItemListEditorTree.Nodes[5].Text = "Tingle Maps (" + (TINGLE_MAPS.GetLength(1) + 1) + ")";
+            ItemListEditorTree.Nodes[6].Text = "Songs (" + (SONG_LIST.GetLength(1) + 1) + ")";
+            ItemListEditorTree.Nodes[7].Text = "Dungeon Items (" + (DUNGEON_ITEMS.GetLength(1) + 1) + ")";
+            ItemListEditorTree.Nodes[8].Text = "Bottled Items (" + (BOTTLED_ITEMS.GetLength(1) + 1) + ")";
+            ItemListEditorTree.Nodes[9].Text = "Shop Items (" + (SHOP_ITEMS.GetLength(1) + 1) + ")";
+            ItemListEditorTree.Nodes[10].Text = "Great Fairy Rewards (" + (FAIRY_REWARDS.GetLength(1) + 1) + ")";
+            ItemListEditorTree.Nodes[11].Text = "Other Items (" + (OTHER_ITEMS.GetLength(1) + 1) + ")";
+
+            if (_settings.CustomItemList != null) { UpdateString(_settings.CustomItemList); }
+            else { tSetting.Text = "-------"; }
         }
 
         private void fItemEdit_FormClosing(object sender, FormClosingEventArgs e)
@@ -248,14 +243,8 @@ namespace MMRando.Forms
                 foreach (TreeNode n in ItemListEditorTree.Nodes[s].Nodes)
                 {
                     int index = System.Convert.ToInt32(n.Tag);
-                    if (_settings.CustomItemList.Contains(index))
-                    {
-                        n.Checked = true;
-                    }
-                    else
-                    {
-                        n.Checked = false;
-                    }
+                    if (_settings.CustomItemList.Contains(index)) { n.Checked = true; }
+                    else { n.Checked = false; }
                     CheckParents(n.Parent);
                 }
             }
@@ -264,27 +253,15 @@ namespace MMRando.Forms
 
         private void tSetting_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.KeyData == Keys.Enter)
-            {
-                UpdateChecks(tSetting.Text);
-            }
+            if (e.KeyData == Keys.Enter) { UpdateChecks(tSetting.Text); }
         }
 
         private void lItems_ItemChecked(object sender, ItemCheckedEventArgs e)
         {
-            if (updating)
-            {
-                return;
-            }
+            if (updating) { return; }
             updating = true;
-            if (e.Item.Checked)
-            {
-                _settings.CustomItemList.Add(e.Item.Index);
-            }
-            else
-            {
-                _settings.CustomItemList.Remove(e.Item.Index);
-            }
+            if (e.Item.Checked) { _settings.CustomItemList.Add(e.Item.Index); }
+            else { _settings.CustomItemList.Remove(e.Item.Index); }
             UpdateString(_settings.CustomItemList);
             updating = false;
         }
@@ -298,19 +275,10 @@ namespace MMRando.Forms
                 {
                     CheckParents(e.Node.Parent);
                     if (updating) { return; };
-                    if (e.Node.Checked)
-                    {
-                        _settings.CustomItemList.Add(index);
-                    }
-                    else
-                    {
-                        _settings.CustomItemList.Remove(index);
-                    }
+                    if (e.Node.Checked) { _settings.CustomItemList.Add(index); }
+                    else { _settings.CustomItemList.Remove(index); }
                 }
-                else
-                {
-                    RecursiveChildCheck(e.Node, e.Node.Checked);
-                }
+                else { RecursiveChildCheck(e.Node, e.Node.Checked); }
                 updating = false;
             }
             UpdateString(_settings.CustomItemList);
@@ -332,9 +300,7 @@ namespace MMRando.Forms
                     _settings.CustomItemList.Remove(index);
                 }
                 if (childNode.Nodes.Count > 0)
-                {
-                    RecursiveChildCheck(childNode, parentChecked);
-                }
+                { RecursiveChildCheck(childNode, parentChecked); }
             }
         }
 
@@ -343,10 +309,7 @@ namespace MMRando.Forms
             bool check = true;
             for (int sn = 0; sn < eNode.Nodes.Count; sn++)
             {
-                if (!eNode.Nodes[sn].Checked)
-                {
-                    check = false;
-                }
+                if (!eNode.Nodes[sn].Checked) { check = false; }
             }
             eNode.Checked = check;
         }
@@ -354,17 +317,13 @@ namespace MMRando.Forms
         private void ExpandAllToolStripMenuItem_Click(object sender, EventArgs e)
         {
             for (int n = 0; n < ItemListEditorTree.Nodes.Count; n++)
-            {
-                ItemListEditorTree.Nodes[n].Expand();
-            }
+            { ItemListEditorTree.Nodes[n].Expand(); }
         }
 
         private void CollapseAllToolStripMenuItem_Click(object sender, EventArgs e)
         {
             for (int n = 0; n < ItemListEditorTree.Nodes.Count; n++)
-            {
-                ItemListEditorTree.Nodes[n].Collapse();
-            }
+            { ItemListEditorTree.Nodes[n].Collapse(); }
         }
 
         private void SelectAllToolStripMenuItem_Click(object sender, EventArgs e)
