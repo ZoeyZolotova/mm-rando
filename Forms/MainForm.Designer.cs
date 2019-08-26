@@ -53,6 +53,7 @@ namespace MMRando
             this.cEnemy = new System.Windows.Forms.CheckBox();
             this.cMixSongs = new System.Windows.Forms.CheckBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.cFairyRewards = new System.Windows.Forms.CheckBox();
             this.lCustomItemAmount = new System.Windows.Forms.Label();
             this.tCustomItemList = new System.Windows.Forms.TextBox();
             this.bItemListEditor = new System.Windows.Forms.Button();
@@ -133,7 +134,8 @@ namespace MMRando
             this.tpPatchSettings = new System.Windows.Forms.TabPage();
             this.tPatch = new System.Windows.Forms.TextBox();
             this.bLoadPatch = new System.Windows.Forms.Button();
-            this.cFairyRewards = new System.Windows.Forms.CheckBox();
+            this.label8 = new System.Windows.Forms.Label();
+            this.cBlastCooldown = new System.Windows.Forms.ComboBox();
             this.tSettings.SuspendLayout();
             this.tabROMSettings.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -431,6 +433,21 @@ namespace MMRando
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Item Pool Options";
             // 
+            // cFairyRewards
+            // 
+            this.cFairyRewards.AutoSize = true;
+            this.cFairyRewards.BackColor = System.Drawing.Color.Transparent;
+            this.cFairyRewards.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.cFairyRewards.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.cFairyRewards.ForeColor = System.Drawing.Color.Black;
+            this.cFairyRewards.Location = new System.Drawing.Point(188, 53);
+            this.cFairyRewards.Name = "cFairyRewards";
+            this.cFairyRewards.Size = new System.Drawing.Size(122, 17);
+            this.cFairyRewards.TabIndex = 21;
+            this.cFairyRewards.Text = "Great Fairy Rewards";
+            this.cFairyRewards.UseVisualStyleBackColor = false;
+            this.cFairyRewards.CheckedChanged += new System.EventHandler(this.cFairyRewards_CheckedChanged);
+            // 
             // lCustomItemAmount
             // 
             this.lCustomItemAmount.AutoSize = true;
@@ -639,6 +656,8 @@ namespace MMRando
             // 
             // tabGimmick
             // 
+            this.tabGimmick.Controls.Add(this.cBlastCooldown);
+            this.tabGimmick.Controls.Add(this.label8);
             this.tabGimmick.Controls.Add(this.label7);
             this.tabGimmick.Controls.Add(this.cHideClock);
             this.tabGimmick.Controls.Add(this.label6);
@@ -663,7 +682,7 @@ namespace MMRando
             // 
             this.label7.AutoSize = true;
             this.label7.ForeColor = System.Drawing.SystemColors.ActiveBorder;
-            this.label7.Location = new System.Drawing.Point(13, 200);
+            this.label7.Location = new System.Drawing.Point(13, 228);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(325, 13);
             this.label7.TabIndex = 18;
@@ -676,7 +695,7 @@ namespace MMRando
             this.cHideClock.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.cHideClock.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cHideClock.ForeColor = System.Drawing.Color.Black;
-            this.cHideClock.Location = new System.Drawing.Point(55, 224);
+            this.cHideClock.Location = new System.Drawing.Point(55, 252);
             this.cHideClock.Name = "cHideClock";
             this.cHideClock.Size = new System.Drawing.Size(92, 17);
             this.cHideClock.TabIndex = 17;
@@ -1385,20 +1404,31 @@ namespace MMRando
             this.bLoadPatch.UseVisualStyleBackColor = true;
             this.bLoadPatch.Click += new System.EventHandler(this.BLoadPatch_Click);
             // 
-            // cFairyRewards
+            // label8
             // 
-            this.cFairyRewards.AutoSize = true;
-            this.cFairyRewards.BackColor = System.Drawing.Color.Transparent;
-            this.cFairyRewards.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.cFairyRewards.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.cFairyRewards.ForeColor = System.Drawing.Color.Black;
-            this.cFairyRewards.Location = new System.Drawing.Point(188, 53);
-            this.cFairyRewards.Name = "cFairyRewards";
-            this.cFairyRewards.Size = new System.Drawing.Size(122, 17);
-            this.cFairyRewards.TabIndex = 21;
-            this.cFairyRewards.Text = "Great Fairy Rewards";
-            this.cFairyRewards.UseVisualStyleBackColor = false;
-            this.cFairyRewards.CheckedChanged += new System.EventHandler(this.cFairyRewards_CheckedChanged);
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(9, 205);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(112, 13);
+            this.label8.TabIndex = 19;
+            this.label8.Text = "Blast Mask Cooldown:";
+            // 
+            // cBlastCooldown
+            // 
+            this.cBlastCooldown.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cBlastCooldown.FormattingEnabled = true;
+            this.cBlastCooldown.Items.AddRange(new object[] {
+            "Default",
+            "Instant",
+            "Very short",
+            "Short",
+            "Long",
+            "Very Long"});
+            this.cBlastCooldown.Location = new System.Drawing.Point(127, 203);
+            this.cBlastCooldown.Name = "cBlastCooldown";
+            this.cBlastCooldown.Size = new System.Drawing.Size(158, 21);
+            this.cBlastCooldown.TabIndex = 20;
+            this.cBlastCooldown.SelectedIndexChanged += new System.EventHandler(this.cBlastCooldown_SelectedIndexChanged);
             // 
             // MainForm
             // 
@@ -1554,6 +1584,8 @@ namespace MMRando
         private System.Windows.Forms.TextBox tCustomItemList;
         private System.Windows.Forms.Label lCustomItemAmount;
         private System.Windows.Forms.CheckBox cFairyRewards;
+        private System.Windows.Forms.ComboBox cBlastCooldown;
+        private System.Windows.Forms.Label label8;
     }
 }
 
