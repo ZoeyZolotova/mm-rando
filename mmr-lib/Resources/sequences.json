@@ -1,0 +1,1918 @@
+[
+  {
+    "Name": "mm-terminafield",
+    "SequenceId": 2,
+    "Type": [
+      0
+    ],
+    "Instrument": 3,
+    "Replaceable": true
+  },
+  {
+    "Name": "mm-snowhead",
+    "SequenceId": 19,
+    "Type": [
+      0,
+      1
+    ],
+    "Instrument": 21,
+    "Replaceable": true
+  },
+  {
+    "Name": "mm-greatbay",
+    "SequenceId": 16,
+    "Type": [
+      0,
+      1
+    ],
+    "Instrument": 29,
+    "Replaceable": true
+  },
+  {
+    "Name": "mm-ikanacanyon",
+    "SequenceId": 17,
+    "Type": [
+      0,
+      1
+    ],
+    "Instrument": 30,
+    "Replaceable": true
+  },
+  {
+    "Name": "mm-swamp",
+    "SequenceId": 12,
+    "Type": [
+      0,
+      1
+    ],
+    "Instrument": 28,
+    "Replaceable": true
+  },
+  {
+    "Name": "mm-clocktown1",
+    "SequenceId": 21,
+    "Type": [
+      1
+    ],
+    "Instrument": 25,
+    "Replaceable": true
+  },
+  {
+    "Name": "mm-clocktown2",
+    "SequenceId": 22,
+    "Type": [
+      1
+    ],
+    "Instrument": 25,
+    "Replaceable": true
+  },
+  {
+    "Name": "mm-clocktown3",
+    "SequenceId": 23,
+    "Type": [
+      1
+    ],
+    "Instrument": 25,
+    "Replaceable": true
+  },
+  {
+    "Name": "mm-goronshrine",
+    "SequenceId": 48,
+    "Type": [
+      1
+    ],
+    "Instrument": 38,
+    "Replaceable": true
+  },
+  {
+    "Name": "mm-romaniranch",
+    "SequenceId": 47,
+    "Type": [
+      1
+    ],
+    "Instrument": 7,
+    "Replaceable": true
+  },
+  {
+    "Name": "mm-zorahall",
+    "SequenceId": 54,
+    "Type": [
+      1
+    ],
+    "Instrument": 11,
+    "Replaceable": true
+  },
+  {
+    "Name": "mm-dekupalace",
+    "SequenceId": 18,
+    "Type": [
+      1
+    ],
+    "Instrument": 25,
+    "Replaceable": true
+  },
+  {
+    "Name": "mm-caves",
+    "SequenceId": 59,
+    "Type": [
+      2
+    ],
+    "Instrument": 26,
+    "Replaceable": true
+  },
+  {
+    "Name": "mm-snowheadtemple",
+    "SequenceId": 101,
+    "Type": [
+      2
+    ],
+    "Instrument": 21,
+    "Replaceable": true
+  },
+  {
+    "Name": "mm-greatbaytemple",
+    "SequenceId": 102,
+    "Type": [
+      2
+    ],
+    "Instrument": 22,
+    "Replaceable": true
+  },
+  {
+    "Name": "mm-piratefortress",
+    "SequenceId": 20,
+    "Type": [
+      2,
+      0
+    ],
+    "Instrument": 3,
+    "Replaceable": true
+  },
+  {
+    "Name": "mm-ikanacastle",
+    "SequenceId": 111,
+    "Type": [
+      2,
+      0
+    ],
+    "Instrument": 33,
+    "Replaceable": true
+  },
+  {
+    "Name": "mm-stonetower",
+    "SequenceId": 6,
+    "Type": [
+      2
+    ],
+    "Instrument": 25,
+    "Replaceable": true
+  },
+  {
+    "Name": "mm-invertedstonetower",
+    "SequenceId": 7,
+    "Type": [
+      2
+    ],
+    "Instrument": 25,
+    "Replaceable": true
+  },
+  {
+    "Name": "mm-woodfalltemple",
+    "SequenceId": 28,
+    "Type": [
+      2
+    ],
+    "Instrument": 20,
+    "Replaceable": true
+  },
+  {
+    "Name": "mm-clocktower",
+    "SequenceId": 5,
+    "Type": [
+      3
+    ],
+    "Instrument": 23,
+    "Replaceable": true
+  },
+  {
+    "Name": "mm-guruguru",
+    "SequenceId": 46,
+    "Type": [
+      3
+    ],
+    "Instrument": 5,
+    "Replaceable": true
+  },
+  {
+    "Name": "mm-milkbar",
+    "SequenceId": 60,
+    "Type": [
+      3,
+      4
+    ],
+    "Instrument": 32,
+    "Replaceable": true
+  },
+  {
+    "Name": "mm-house",
+    "SequenceId": 31,
+    "Type": [
+      3
+    ],
+    "Instrument": 3,
+    "Replaceable": true
+  },
+  {
+    "Name": "mm-shop",
+    "SequenceId": 68,
+    "Type": [
+      3
+    ],
+    "Instrument": 12,
+    "Replaceable": true
+  },
+  {
+    "Name": "mm-shootinggallery",
+    "SequenceId": 70,
+    "Type": [
+      3,
+      4
+    ],
+    "Instrument": 10,
+    "Replaceable": true
+  },
+  {
+    "Name": "mm-laboratory",
+    "SequenceId": 44,
+    "Type": [
+      3,
+      6
+    ],
+    "Instrument": 13,
+    "Replaceable": true
+  },
+  {
+    "Name": "mm-observatory",
+    "SequenceId": 58,
+    "Type": [
+      3
+    ],
+    "Instrument": 23,
+    "Replaceable": true
+  },
+  {
+    "Name": "mm-musicbox",
+    "SequenceId": 39,
+    "Type": [
+      3,
+      4,
+      6
+    ],
+    "Instrument": 5,
+    "Replaceable": true
+  },
+  {
+    "Name": "mm-goronrace",
+    "SequenceId": 38,
+    "Type": [
+      4
+    ],
+    "Instrument": 38,
+    "Replaceable": true
+  },
+  {
+    "Name": "mm-minigame",
+    "SequenceId": 37,
+    "Type": [
+      4
+    ],
+    "Instrument": 3,
+    "Replaceable": true
+  },
+  {
+    "Name": "mm-wagonride",
+    "SequenceId": 114,
+    "Type": [
+      4,
+      3,
+      6
+    ],
+    "Instrument": 8,
+    "Replaceable": true
+  },
+  {
+    "Name": "mm-boatcruise",
+    "SequenceId": 14,
+    "Type": [
+      4,
+      3,
+      6
+    ],
+    "Instrument": 5,
+    "Replaceable": true
+  },
+  {
+    "Name": "mm-horserace",
+    "SequenceId": 64,
+    "Type": [
+      4
+    ],
+    "Instrument": 8,
+    "Replaceable": true
+  },
+  {
+    "Name": "mm-meeting",
+    "SequenceId": 49,
+    "Type": [
+      5,
+      6,
+      3
+    ],
+    "Instrument": 3,
+    "Replaceable": true
+  },
+  {
+    "Name": "mm-aliens",
+    "SequenceId": 13,
+    "Type": [
+      5,
+      6
+    ],
+    "Instrument": 22,
+    "Replaceable": true
+  },
+  {
+    "Name": "mm-swordschool",
+    "SequenceId": 80,
+    "Type": [
+      5,
+      3
+    ],
+    "Instrument": 24,
+    "Replaceable": true
+  },
+  {
+    "Name": "mm-sharp",
+    "SequenceId": 15,
+    "Type": [
+      5,
+      6
+    ],
+    "Instrument": 3,
+    "Replaceable": true
+  },
+  {
+    "Name": "mm-chase",
+    "SequenceId": 3,
+    "Type": [
+      5
+    ],
+    "Instrument": 3,
+    "Replaceable": true
+  },
+  {
+    "Name": "mm-skullkid",
+    "SequenceId": 4,
+    "Type": [
+      5,
+      6
+    ],
+    "Instrument": 17,
+    "Replaceable": true
+  },
+  {
+    "Name": "mm-maskreveal",
+    "SequenceId": 123,
+    "Type": [
+      5
+    ],
+    "Instrument": 17,
+    "Replaceable": true
+  },
+  {
+    "Name": "mm-fairyfountain",
+    "SequenceId": 40,
+    "Type": [
+      6,
+      1,
+      3
+    ],
+    "Instrument": 6,
+    "Replaceable": true
+  },
+  {
+    "Name": "mm-fileselect",
+    "SequenceId": 24,
+    "Type": [
+      6
+    ],
+    "Instrument": 6,
+    "Replaceable": true
+  },
+  {
+    "Name": "mm-keaton",
+    "SequenceId": 115,
+    "Type": [
+      6
+    ],
+    "Instrument": 39,
+    "Replaceable": true
+  },
+  {
+    "Name": "mm-kaepora",
+    "SequenceId": 69,
+    "Type": [
+      6
+    ],
+    "Instrument": 16,
+    "Replaceable": true
+  },
+  {
+    "Name": "mm-witches",
+    "SequenceId": 67,
+    "Type": [
+      6,
+      3
+    ],
+    "Instrument": 14,
+    "Replaceable": true
+  },
+  {
+    "Name": "mm-gormanbros",
+    "SequenceId": 66,
+    "Type": [
+      6,
+      1
+    ],
+    "Instrument": 8,
+    "Replaceable": true
+  },
+  {
+    "Name": "mm-mysterywoods",
+    "SequenceId": 62,
+    "Type": [
+      6,
+      1,
+      3,
+      4
+    ],
+    "Instrument": 4,
+    "Replaceable": true
+  },
+  {
+    "Name": "mm-zelda",
+    "SequenceId": 41,
+    "Type": [
+      6,
+      1,
+      3
+    ],
+    "Instrument": 6,
+    "Replaceable": true
+  },
+  {
+    "Name": "mm-reunion",
+    "SequenceId": 125,
+    "Type": [
+      6
+    ],
+    "Instrument": 33,
+    "Replaceable": true
+  },
+  {
+    "Name": "mm-healed",
+    "SequenceId": 11,
+    "Type": [
+      6,
+      3
+    ],
+    "Instrument": 23,
+    "Replaceable": true
+  },
+  {
+    "Name": "mm-giants",
+    "SequenceId": 45,
+    "Type": [
+      6,
+      3
+    ],
+    "Instrument": 18,
+    "Replaceable": true
+  },
+  {
+    "Name": "mm-miniboss",
+    "SequenceId": 56,
+    "Type": [
+      7
+    ],
+    "Instrument": 3,
+    "Replaceable": true
+  },
+  {
+    "Name": "mm-boss",
+    "SequenceId": 27,
+    "Type": [
+      7
+    ],
+    "Instrument": 3,
+    "Replaceable": true
+  },
+  {
+    "Name": "mm-mask",
+    "SequenceId": 107,
+    "Type": [
+      7
+    ],
+    "Instrument": 17,
+    "Replaceable": true
+  },
+  {
+    "Name": "mm-incarnation",
+    "SequenceId": 106,
+    "Type": [
+      7
+    ],
+    "Instrument": 17,
+    "Replaceable": true
+  },
+  {
+    "Name": "mm-wrath",
+    "SequenceId": 105,
+    "Type": [
+      7
+    ],
+    "Instrument": 17,
+    "Replaceable": true
+  },
+  {
+    "Name": "mm-f-chasefail",
+    "SequenceId": 8,
+    "Type": [
+      9
+    ],
+    "Instrument": 3,
+    "Replaceable": true
+  },
+  {
+    "Name": "mm-f-fail",
+    "SequenceId": 9,
+    "Type": [
+      9
+    ],
+    "Instrument": 3,
+    "Replaceable": true
+  },
+  {
+    "Name": "mm-f-clearshort",
+    "SequenceId": 25,
+    "Type": [
+      8
+    ],
+    "Instrument": 3,
+    "Replaceable": true
+  },
+  {
+    "Name": "mm-f-gameover",
+    "SequenceId": 32,
+    "Type": [
+      9
+    ],
+    "Instrument": 15,
+    "Replaceable": true
+  },
+  {
+    "Name": "mm-f-bossdown",
+    "SequenceId": 33,
+    "Type": [
+      10,
+      9
+    ],
+    "Instrument": 3,
+    "Replaceable": true
+  },
+  {
+    "Name": "mm-f-gotitem",
+    "SequenceId": 34,
+    "Type": [
+      8
+    ],
+    "Instrument": 15,
+    "Replaceable": true
+  },
+  {
+    "Name": "mm-f-heart",
+    "SequenceId": 36,
+    "Type": [
+      8
+    ],
+    "Instrument": 15,
+    "Replaceable": true
+  },
+  {
+    "Name": "mm-f-mask",
+    "SequenceId": 55,
+    "Type": [
+      8
+    ],
+    "Instrument": 15,
+    "Replaceable": true
+  },
+  {
+    "Name": "mm-f-smallitem",
+    "SequenceId": 57,
+    "Type": [
+      8
+    ],
+    "Instrument": 15,
+    "Replaceable": true
+  },
+  {
+    "Name": "mm-f-meet",
+    "SequenceId": 61,
+    "Type": [
+      8
+    ],
+    "Instrument": 3,
+    "Replaceable": true
+  },
+  {
+    "Name": "mm-f-goronwin",
+    "SequenceId": 63,
+    "Type": [
+      8
+    ],
+    "Instrument": 38,
+    "Replaceable": true
+  },
+  {
+    "Name": "mm-f-horsewin",
+    "SequenceId": 65,
+    "Type": [
+      8
+    ],
+    "Instrument": 8,
+    "Replaceable": true
+  },
+  {
+    "Name": "mm-f-song",
+    "SequenceId": 82,
+    "Type": [
+      8
+    ],
+    "Instrument": 6,
+    "Replaceable": true
+  },
+  {
+    "Name": "mm-f-soar",
+    "SequenceId": 85,
+    "Type": [
+      8,
+      9
+    ],
+    "Instrument": 9,
+    "Replaceable": true
+  },
+  {
+    "Name": "mm-f-dungeonopen",
+    "SequenceId": 119,
+    "Type": [
+      9,
+      8
+    ],
+    "Instrument": 15,
+    "Replaceable": true
+  },
+  {
+    "Name": "mm-f-dungeonclearshort",
+    "SequenceId": 120,
+    "Type": [
+      10
+    ],
+    "Instrument": 15,
+    "Replaceable": true
+  },
+  {
+    "Name": "mm-f-dungeonclearlong",
+    "SequenceId": 121,
+    "Type": [
+      10
+    ],
+    "Instrument": 15,
+    "Replaceable": true
+  },
+  {
+    "Name": "mm-f-moonclear",
+    "SequenceId": 126,
+    "Type": [
+      10
+    ],
+    "Instrument": 33,
+    "Replaceable": true
+  },
+  {
+    "Name": "mm-f-giantsleave",
+    "SequenceId": 124,
+    "Type": [
+      10
+    ],
+    "Instrument": 33,
+    "Replaceable": true
+  },
+  {
+    "Name": "mm-c-giantscs",
+    "SequenceId": 112,
+    "Type": [
+      16
+    ],
+    "Instrument": 33,
+    "Replaceable": true
+  },
+  {
+    "Name": "mm-c-titlescreen",
+    "SequenceId": 118,
+    "Type": [
+      16
+    ],
+    "Instrument": 35,
+    "Replaceable": true
+  },
+  {
+    "Name": "oot-kokiriforest",
+    "SequenceId": -1,
+    "Type": [
+      1,
+      3
+    ],
+    "Instrument": 3,
+    "Replaceable": false
+  },
+  {
+    "Name": "oot-market",
+    "SequenceId": -1,
+    "Type": [
+      1,
+      3
+    ],
+    "Instrument": 4,
+    "Replaceable": false
+  },
+  {
+    "Name": "oot-kakariko1",
+    "SequenceId": -1,
+    "Type": [
+      1,
+      3
+    ],
+    "Instrument": 5,
+    "Replaceable": false
+  },
+  {
+    "Name": "oot-kakariko2",
+    "SequenceId": -1,
+    "Type": [
+      1,
+      3
+    ],
+    "Instrument": 3,
+    "Replaceable": false
+  },
+  {
+    "Name": "oot-gerudovalley",
+    "SequenceId": -1,
+    "Type": [
+      1,
+      0
+    ],
+    "Instrument": 12,
+    "Replaceable": false
+  },
+  {
+    "Name": "oot-insidedekutree",
+    "SequenceId": -1,
+    "Type": [
+      2
+    ],
+    "Instrument": 11,
+    "Replaceable": false
+  },
+  {
+    "Name": "oot-dodongocavern",
+    "SequenceId": -1,
+    "Type": [
+      2
+    ],
+    "Instrument": 26,
+    "Replaceable": false
+  },
+  {
+    "Name": "oot-jabu",
+    "SequenceId": -1,
+    "Type": [
+      2
+    ],
+    "Instrument": 21,
+    "Replaceable": false
+  },
+  {
+    "Name": "oot-foresttemple",
+    "SequenceId": -1,
+    "Type": [
+      2
+    ],
+    "Instrument": 22,
+    "Replaceable": false
+  },
+  {
+    "Name": "oot-firetemple",
+    "SequenceId": -1,
+    "Type": [
+      2
+    ],
+    "Instrument": 25,
+    "Replaceable": false
+  },
+  {
+    "Name": "oot-icecavern",
+    "SequenceId": -1,
+    "Type": [
+      2
+    ],
+    "Instrument": 21,
+    "Replaceable": false
+  },
+  {
+    "Name": "oot-watertemple",
+    "SequenceId": -1,
+    "Type": [
+      2
+    ],
+    "Instrument": 25,
+    "Replaceable": false
+  },
+  {
+    "Name": "oot-shadowtemple",
+    "SequenceId": -1,
+    "Type": [
+      2
+    ],
+    "Instrument": 14,
+    "Replaceable": false
+  },
+  {
+    "Name": "oot-spirittemple",
+    "SequenceId": -1,
+    "Type": [
+      2
+    ],
+    "Instrument": 17,
+    "Replaceable": false
+  },
+  {
+    "Name": "oot-ganoncastle",
+    "SequenceId": -1,
+    "Type": [
+      2
+    ],
+    "Instrument": 3,
+    "Replaceable": false
+  },
+  {
+    "Name": "oot-templeoftime",
+    "SequenceId": -1,
+    "Type": [
+      3,
+      1
+    ],
+    "Instrument": 6,
+    "Replaceable": false
+  },
+  {
+    "Name": "oot-chamberofsages",
+    "SequenceId": -1,
+    "Type": [
+      3,
+      1,
+      6
+    ],
+    "Instrument": 33,
+    "Replaceable": false
+  },
+  {
+    "Name": "oot-castlecourtyard",
+    "SequenceId": -1,
+    "Type": [
+      3,
+      4,
+      6
+    ],
+    "Instrument": 3,
+    "Replaceable": false
+  },
+  {
+    "Name": "oot-ganondorf",
+    "SequenceId": -1,
+    "Type": [
+      5
+    ],
+    "Instrument": 3,
+    "Replaceable": false
+  },
+  {
+    "Name": "oot-castlecollapse",
+    "SequenceId": -1,
+    "Type": [
+      5
+    ],
+    "Instrument": 3,
+    "Replaceable": false
+  },
+  {
+    "Name": "oot-dekutree",
+    "SequenceId": -1,
+    "Type": [
+      6,
+      1
+    ],
+    "Instrument": 6,
+    "Replaceable": false
+  },
+  {
+    "Name": "oot-navi",
+    "SequenceId": -1,
+    "Type": [
+      6,
+      4
+    ],
+    "Instrument": 3,
+    "Replaceable": false
+  },
+  {
+    "Name": "oot-sheik",
+    "SequenceId": -1,
+    "Type": [
+      6,
+      3
+    ],
+    "Instrument": 6,
+    "Replaceable": false
+  },
+  {
+    "Name": "oot-miniboss",
+    "SequenceId": -1,
+    "Type": [
+      7
+    ],
+    "Instrument": 3,
+    "Replaceable": false
+  },
+  {
+    "Name": "oot-boss",
+    "SequenceId": -1,
+    "Type": [
+      7
+    ],
+    "Instrument": 3,
+    "Replaceable": false
+  },
+  {
+    "Name": "oot-dinosaur",
+    "SequenceId": -1,
+    "Type": [
+      7
+    ],
+    "Instrument": 3,
+    "Replaceable": false
+  },
+  {
+    "Name": "oot-ganondorfbattle",
+    "SequenceId": -1,
+    "Type": [
+      7
+    ],
+    "Instrument": 3,
+    "Replaceable": false
+  },
+  {
+    "Name": "oot-ganon",
+    "SequenceId": -1,
+    "Type": [
+      7
+    ],
+    "Instrument": 3,
+    "Replaceable": false
+  },
+  {
+    "Name": "oot-c-goddess",
+    "SequenceId": -1,
+    "Type": [
+      16
+    ],
+    "Instrument": 33,
+    "Replaceable": false
+  },
+  {
+    "Name": "sf64-corneria",
+    "SequenceId": -1,
+    "Type": [
+      0,
+      1
+    ],
+    "Instrument": 3,
+    "Replaceable": false
+  },
+  {
+    "Name": "sf64-fichina",
+    "SequenceId": -1,
+    "Type": [
+      0,
+      1
+    ],
+    "Instrument": 3,
+    "Replaceable": false
+  },
+  {
+    "Name": "sf64-meteo",
+    "SequenceId": -1,
+    "Type": [
+      0,
+      1
+    ],
+    "Instrument": 3,
+    "Replaceable": false
+  },
+  {
+    "Name": "sf64-katarina",
+    "SequenceId": -1,
+    "Type": [
+      0,
+      1
+    ],
+    "Instrument": 3,
+    "Replaceable": false
+  },
+  {
+    "Name": "sf64-starwolf",
+    "SequenceId": -1,
+    "Type": [
+      0,
+      1,
+      7
+    ],
+    "Instrument": 3,
+    "Replaceable": false
+  },
+  {
+    "Name": "sf64-bolse",
+    "SequenceId": -1,
+    "Type": [
+      5
+    ],
+    "Instrument": 3,
+    "Replaceable": false
+  },
+  {
+    "Name": "sf64-boss1",
+    "SequenceId": -1,
+    "Type": [
+      7
+    ],
+    "Instrument": 3,
+    "Replaceable": false
+  },
+  {
+    "Name": "sf64-boss3",
+    "SequenceId": -1,
+    "Type": [
+      5,
+      7
+    ],
+    "Instrument": 3,
+    "Replaceable": false
+  },
+  {
+    "Name": "sf64-boss2",
+    "SequenceId": -1,
+    "Type": [
+      7
+    ],
+    "Instrument": 3,
+    "Replaceable": false
+  },
+  {
+    "Name": "sm64-battlefield",
+    "SequenceId": -1,
+    "Type": [
+      0,
+      1,
+      4
+    ],
+    "Instrument": 36,
+    "Replaceable": false
+  },
+  {
+    "Name": "sm64-castle",
+    "SequenceId": -1,
+    "Type": [
+      3,
+      1
+    ],
+    "Instrument": 3,
+    "Replaceable": false
+  },
+  {
+    "Name": "sm64-fileselect",
+    "SequenceId": -1,
+    "Type": [
+      3,
+      1
+    ],
+    "Instrument": 11,
+    "Replaceable": false
+  },
+  {
+    "Name": "sm64-slide",
+    "SequenceId": -1,
+    "Type": [
+      4,
+      6
+    ],
+    "Instrument": 36,
+    "Replaceable": false
+  },
+  {
+    "Name": "sm64-lullaby",
+    "SequenceId": -1,
+    "Type": [
+      6,
+      3
+    ],
+    "Instrument": 3,
+    "Replaceable": false
+  },
+  {
+    "Name": "sm64-boss",
+    "SequenceId": -1,
+    "Type": [
+      7
+    ],
+    "Instrument": 3,
+    "Replaceable": false
+  },
+  {
+    "Name": "sm64-finalbowser",
+    "SequenceId": -1,
+    "Type": [
+      7
+    ],
+    "Instrument": 3,
+    "Replaceable": false
+  },
+  {
+    "Name": "uc-minigame",
+    "SequenceId": -1,
+    "Type": [
+      3,
+      4
+    ],
+    "Instrument": 36,
+    "Replaceable": false
+  },
+  {
+    "Name": "smg2-skystation",
+    "SequenceId": -1,
+    "Type": [
+      0,
+      1
+    ],
+    "Instrument": 3,
+    "Replaceable": false
+  },
+  {
+    "Name": "uc-boss",
+    "SequenceId": -1,
+    "Type": [
+      7
+    ],
+    "Instrument": 3,
+    "Replaceable": false
+  },
+  {
+    "Name": "uc-dekutree",
+    "SequenceId": -1,
+    "Type": [
+      6
+    ],
+    "Instrument": 3,
+    "Replaceable": false
+  },
+  {
+    "Name": "uc-dream",
+    "SequenceId": -1,
+    "Type": [
+      3,
+      1
+    ],
+    "Instrument": 3,
+    "Replaceable": false
+  },
+  {
+    "Name": "uc-fileselect",
+    "SequenceId": -1,
+    "Type": [
+      3
+    ],
+    "Instrument": 6,
+    "Replaceable": false
+  },
+  {
+    "Name": "uc-field",
+    "SequenceId": -1,
+    "Type": [
+      0
+    ],
+    "Instrument": 3,
+    "Replaceable": false
+  },
+  {
+    "Name": "uc-mountain",
+    "SequenceId": -1,
+    "Type": [
+      0
+    ],
+    "Instrument": 3,
+    "Replaceable": false
+  },
+  {
+    "Name": "uc-predungeon",
+    "SequenceId": -1,
+    "Type": [
+      0,
+      1
+    ],
+    "Instrument": 3,
+    "Replaceable": false
+  },
+  {
+    "Name": "uc-dungeon",
+    "SequenceId": -1,
+    "Type": [
+      2
+    ],
+    "Instrument": 3,
+    "Replaceable": false
+  },
+  {
+    "Name": "uc-village",
+    "SequenceId": -1,
+    "Type": [
+      1
+    ],
+    "Instrument": 3,
+    "Replaceable": false
+  },
+  {
+    "Name": "uc-snowfieldold",
+    "SequenceId": -1,
+    "Type": [
+      0,
+      2,
+      6,
+      1
+    ],
+    "Instrument": 3,
+    "Replaceable": false
+  },
+  {
+    "Name": "uc-miniboss",
+    "SequenceId": -1,
+    "Type": [
+      7
+    ],
+    "Instrument": 3,
+    "Replaceable": false
+  },
+  {
+    "Name": "uc-navi",
+    "SequenceId": -1,
+    "Type": [
+      6
+    ],
+    "Instrument": 3,
+    "Replaceable": false
+  },
+  {
+    "Name": "uc-zelda",
+    "SequenceId": -1,
+    "Type": [
+      6
+    ],
+    "Instrument": 6,
+    "Replaceable": false
+  },
+  {
+    "Name": "uc-dekuforest",
+    "SequenceId": -1,
+    "Type": [
+      1
+    ],
+    "Instrument": 3,
+    "Replaceable": false
+  },
+  {
+    "Name": "uc-snowfield",
+    "SequenceId": -1,
+    "Type": [
+      0,
+      1,
+      3
+    ],
+    "Instrument": 3,
+    "Replaceable": false
+  },
+  {
+    "Name": "uc-zora",
+    "SequenceId": -1,
+    "Type": [
+      3,
+      6
+    ],
+    "Instrument": 36,
+    "Replaceable": false
+  },
+  {
+    "Name": "pm-field",
+    "SequenceId": -1,
+    "Type": [
+      0
+    ],
+    "Instrument": 3,
+    "Replaceable": false
+  },
+  {
+    "Name": "uc-foresttemple",
+    "SequenceId": -1,
+    "Type": [
+      2
+    ],
+    "Instrument": 36,
+    "Replaceable": false
+  },
+  {
+    "Name": "pa-ikanacastle",
+    "SequenceId": -1,
+    "Type": [
+      2
+    ],
+    "Instrument": 3,
+    "Replaceable": false
+  },
+  {
+    "Name": "uc-gerudobay",
+    "SequenceId": -1,
+    "Type": [
+      1
+    ],
+    "Instrument": 36,
+    "Replaceable": false
+  },
+  {
+    "Name": "botw-hyrulecastle",
+    "SequenceId": -1,
+    "Type": [
+      2,
+      0
+    ],
+    "Instrument": 3,
+    "Replaceable": false
+  },
+  {
+    "Name": "sf64-venom",
+    "SequenceId": -1,
+    "Type": [
+      0,
+      7
+    ],
+    "Instrument": 3,
+    "Replaceable": false
+  },
+  {
+    "Name": "sf64-aquas",
+    "SequenceId": -1,
+    "Type": [
+      2
+    ],
+    "Instrument": 33,
+    "Replaceable": false
+  },
+  {
+    "Name": "sf64-area6",
+    "SequenceId": -1,
+    "Type": [
+      0,
+      1
+    ],
+    "Instrument": 3,
+    "Replaceable": false
+  },
+  {
+    "Name": "sf64-titania",
+    "SequenceId": -1,
+    "Type": [
+      0,
+      1
+    ],
+    "Instrument": 3,
+    "Replaceable": false
+  },
+  {
+    "Name": "sf64-sectorx",
+    "SequenceId": -1,
+    "Type": [
+      0,
+      3
+    ],
+    "Instrument": 3,
+    "Replaceable": false
+  },
+  {
+    "Name": "sf64-sectory",
+    "SequenceId": -1,
+    "Type": [
+      0,
+      2
+    ],
+    "Instrument": 3,
+    "Replaceable": false
+  },
+  {
+    "Name": "sf64-zoness",
+    "SequenceId": -1,
+    "Type": [
+      1,
+      3
+    ],
+    "Instrument": 3,
+    "Replaceable": false
+  },
+  {
+    "Name": "sm64-ccm",
+    "SequenceId": -1,
+    "Type": [
+      1,
+      3
+    ],
+    "Instrument": 37,
+    "Replaceable": false
+  },
+  {
+    "Name": "sm64-hmc",
+    "SequenceId": -1,
+    "Type": [
+      2
+    ],
+    "Instrument": 36,
+    "Replaceable": false
+  },
+  {
+    "Name": "sm64-bitdw",
+    "SequenceId": -1,
+    "Type": [
+      2
+    ],
+    "Instrument": 36,
+    "Replaceable": false
+  },
+  {
+    "Name": "sm64-lll",
+    "SequenceId": -1,
+    "Type": [
+      1,
+      3
+    ],
+    "Instrument": 31,
+    "Replaceable": false
+  },
+  {
+    "Name": "sm64-jrb",
+    "SequenceId": -1,
+    "Type": [
+      1,
+      3
+    ],
+    "Instrument": 36,
+    "Replaceable": false
+  },
+  {
+    "Name": "sm64-steps",
+    "SequenceId": -1,
+    "Type": [
+      5,
+      3
+    ],
+    "Instrument": 14,
+    "Replaceable": false
+  },
+  {
+    "Name": "oot-f-ganondorf",
+    "SequenceId": -1,
+    "Type": [
+      9
+    ],
+    "Instrument": 3,
+    "Replaceable": false
+  },
+  {
+    "Name": "oot-f-stone",
+    "SequenceId": -1,
+    "Type": [
+      8,
+      10
+    ],
+    "Instrument": 3,
+    "Replaceable": false
+  },
+  {
+    "Name": "oot-f-medallion",
+    "SequenceId": -1,
+    "Type": [
+      8,
+      10
+    ],
+    "Instrument": 3,
+    "Replaceable": false
+  },
+  {
+    "Name": "oot-f-timetravel",
+    "SequenceId": -1,
+    "Type": [
+      8
+    ],
+    "Instrument": 3,
+    "Replaceable": false
+  },
+  {
+    "Name": "oot-f-opendot",
+    "SequenceId": -1,
+    "Type": [
+      8,
+      10
+    ],
+    "Instrument": 6,
+    "Replaceable": false
+  },
+  {
+    "Name": "sm64-bbh",
+    "SequenceId": -1,
+    "Type": [
+      2,
+      3
+    ],
+    "Instrument": 21,
+    "Replaceable": false
+  },
+  {
+    "Name": "sm64-mgr",
+    "SequenceId": -1,
+    "Type": [
+      3,
+      4,
+      6
+    ],
+    "Instrument": 5,
+    "Replaceable": false
+  },
+  {
+    "Name": "sm64-f-bitsclear",
+    "SequenceId": -1,
+    "Type": [
+      10
+    ],
+    "Instrument": 3,
+    "Replaceable": false
+  },
+  {
+    "Name": "sm64-f-bowserclear",
+    "SequenceId": -1,
+    "Type": [
+      8
+    ],
+    "Instrument": 3,
+    "Replaceable": false
+  },
+  {
+    "Name": "sm64-f-race",
+    "SequenceId": -1,
+    "Type": [
+      8
+    ],
+    "Instrument": 3,
+    "Replaceable": false
+  },
+  {
+    "Name": "sm64-f-intro",
+    "SequenceId": -1,
+    "Type": [
+      10
+    ],
+    "Instrument": 3,
+    "Replaceable": false
+  },
+  {
+    "Name": "sm64-f-lakitu",
+    "SequenceId": -1,
+    "Type": [
+      8,
+      9
+    ],
+    "Instrument": 3,
+    "Replaceable": false
+  },
+  {
+    "Name": "sm64-f-starget",
+    "SequenceId": -1,
+    "Type": [
+      8
+    ],
+    "Instrument": 36,
+    "Replaceable": false
+  },
+  {
+    "Name": "sm64-f-peach",
+    "SequenceId": -1,
+    "Type": [
+      8
+    ],
+    "Instrument": 23,
+    "Replaceable": false
+  },
+  {
+    "Name": "sm64-f-savepeach",
+    "SequenceId": -1,
+    "Type": [
+      10
+    ],
+    "Instrument": 23,
+    "Replaceable": false
+  },
+  {
+    "Name": "sm64-f-bowser",
+    "SequenceId": -1,
+    "Type": [
+      9
+    ],
+    "Instrument": 3,
+    "Replaceable": false
+  },
+  {
+    "Name": "sm64-f-toad",
+    "SequenceId": -1,
+    "Type": [
+      8
+    ],
+    "Instrument": 3,
+    "Replaceable": false
+  },
+  {
+    "Name": "sm64-f-solved",
+    "SequenceId": -1,
+    "Type": [
+      8
+    ],
+    "Instrument": 3,
+    "Replaceable": false
+  },
+  {
+    "Name": "sm64-f-star",
+    "SequenceId": -1,
+    "Type": [
+      8
+    ],
+    "Instrument": 3,
+    "Replaceable": false
+  },
+  {
+    "Name": "sm64-f-unlock",
+    "SequenceId": -1,
+    "Type": [
+      8
+    ],
+    "Instrument": 36,
+    "Replaceable": false
+  },
+  {
+    "Name": "uc-goronvillage",
+    "SequenceId": -1,
+    "Type": [
+      1
+    ],
+    "Instrument": 3,
+    "Replaceable": false
+  },
+  {
+    "Name": "botw-kass",
+    "SequenceId": -1,
+    "Type": [
+      6
+    ],
+    "Instrument": 5,
+    "Replaceable": false
+  },
+  {
+    "Name": "mmr-f-sot",
+    "SequenceId": -1,
+    "Type": [
+      8
+    ],
+    "Instrument": 3,
+    "Replaceable": false
+  },
+  {
+    "Name": "ss-groose",
+    "SequenceId": -1,
+    "Type": [
+      6
+    ],
+    "Instrument": 3,
+    "Replaceable": false
+  },
+  {
+    "Name": "mmr-theme",
+    "SequenceId": -1,
+    "Type": [
+      1,
+      3,
+      6
+    ],
+    "Instrument": 36,
+    "Replaceable": false
+  },
+  {
+    "Name": "mmr-jazz",
+    "SequenceId": -1,
+    "Type": [
+      1,
+      2,
+      3,
+      6
+    ],
+    "Instrument": 36,
+    "Replaceable": false
+  },
+  {
+    "Name": "mk64-lr",
+    "SequenceId": -1,
+    "Type": [
+      0,
+      1
+    ],
+    "Instrument": 36,
+    "Replaceable": false
+  },
+  {
+    "Name": "mk64-rr",
+    "SequenceId": -1,
+    "Type": [
+      0,
+      1
+    ],
+    "Instrument": 36,
+    "Replaceable": false
+  },
+  {
+    "Name": "mk64-ceremony",
+    "SequenceId": -1,
+    "Type": [
+      6
+    ],
+    "Instrument": 36,
+    "Replaceable": false
+  },
+  {
+    "Name": "mk64-ceremony-loss",
+    "SequenceId": -1,
+    "Type": [
+      6
+    ],
+    "Instrument": 36,
+    "Replaceable": false
+  },
+  {
+    "Name": "mk64-kd",
+    "SequenceId": -1,
+    "Type": [
+      0,
+      1
+    ],
+    "Instrument": 36,
+    "Replaceable": false
+  },
+  {
+    "Name": "mk64-tt",
+    "SequenceId": -1,
+    "Type": [
+      0,
+      1
+    ],
+    "Instrument": 36,
+    "Replaceable": false
+  },
+  {
+    "Name": "mk64-menu",
+    "SequenceId": -1,
+    "Type": [
+      3,
+      6
+    ],
+    "Instrument": 36,
+    "Replaceable": false
+  },
+  {
+    "Name": "mk64-star",
+    "SequenceId": -1,
+    "Type": [
+      4
+    ],
+    "Instrument": 36,
+    "Replaceable": false
+  },
+  {
+    "Name": "mk64-battle",
+    "SequenceId": -1,
+    "Type": [
+      1,
+      3
+    ],
+    "Instrument": 36,
+    "Replaceable": false
+  },
+  {
+    "Name": "mk64-cm",
+    "SequenceId": -1,
+    "Type": [
+      3,
+      4
+    ],
+    "Instrument": 8,
+    "Replaceable": false
+  },
+  {
+    "Name": "mk64-fs",
+    "SequenceId": -1,
+    "Type": [
+      0,
+      1
+    ],
+    "Instrument": 36,
+    "Replaceable": false
+  },
+  {
+    "Name": "mk64-kb",
+    "SequenceId": -1,
+    "Type": [
+      0,
+      1
+    ],
+    "Instrument": 29,
+    "Replaceable": false
+  },
+  {
+    "Name": "mk64-mmf",
+    "SequenceId": -1,
+    "Type": [
+      3,
+      4
+    ],
+    "Instrument": 8,
+    "Replaceable": false
+  },
+  {
+    "Name": "mk64-bc",
+    "SequenceId": -1,
+    "Type": [
+      2,
+      5
+    ],
+    "Instrument": 37,
+    "Replaceable": false
+  },
+  {
+    "Name": "mk64-bb",
+    "SequenceId": -1,
+    "Type": [
+      2,
+      5
+    ],
+    "Instrument": 3,
+    "Replaceable": false
+  },
+  {
+    "Name": "mk64-dkjp",
+    "SequenceId": -1,
+    "Type": [
+      0,
+      1
+    ],
+    "Instrument": 3,
+    "Replaceable": false
+  }
+]

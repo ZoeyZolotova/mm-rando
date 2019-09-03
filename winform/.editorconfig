@@ -1,0 +1,11 @@
+# To learn more about .editorconfig see https://aka.ms/editorconfigdocs
+root = true
+
+# All files
+[*]
+indent_style = space
+end_of_line = lf
+
+# Xml files
+[*.xml]
+indent_size = 2
