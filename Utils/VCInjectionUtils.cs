@@ -38,7 +38,7 @@ namespace MMRando.Utils
             GetApp5(ROM, VCDir);
             ProcessStartInfo p = new ProcessStartInfo
             {
-                FileName = "wadpacker.exe",
+                FileName = VCDir + "wadpacker",
                 Arguments = "mm.tik mm.tmd mm.cert \"" + FileName + "\" -i NMRE",
                 WorkingDirectory = VCDir
             };

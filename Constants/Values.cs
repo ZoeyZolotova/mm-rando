@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.Windows.Forms;
+using System.IO;
 
 namespace MMRando.Constants
 {
@@ -7,11 +8,11 @@ namespace MMRando.Constants
     {
 
         public static string MainDirectory = Application.StartupPath;
-        public static string MusicDirectory = MainDirectory + @"\Resources\music\";
-        public static string ModsDirectory = MainDirectory + @"\Resources\mods\";
-        public static string AddrsDirectory = MainDirectory + @"\Resources\addresses\";
-        public static string ObjsDirectory = MainDirectory + @"\Resources\models\";
-        public static string VCDirectory = MainDirectory + @"\vc\";
+        public static string MusicDirectory = Path.Combine(MainDirectory, "Resources", "music") + Path.DirectorySeparatorChar;
+        public static string ModsDirectory = Path.Combine(MainDirectory, "Resources", "mods") + Path.DirectorySeparatorChar;
+        public static string AddrsDirectory = Path.Combine(MainDirectory, "Resources", "addresses") + Path.DirectorySeparatorChar;
+        public static string ObjsDirectory = Path.Combine(MainDirectory, "Resources", "models") + Path.DirectorySeparatorChar;
+        public static string VCDirectory = Path.Combine(MainDirectory, "vc") + Path.DirectorySeparatorChar;
 
         public const byte VanillaClockSpeed = 3;
 
