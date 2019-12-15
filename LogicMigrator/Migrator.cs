@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Forms;
 using MMRando.Extensions;
 
 namespace MMRando.LogicMigrator
@@ -148,11 +149,12 @@ namespace MMRando.LogicMigrator
                 "Pirates' Fortress HP", "Zora Hall Scrub HP", "Path to Snowhead HP", "Great Bay Coast HP", "Ikana Scrub HP", "Ikana Castle HP",
                 "Odolwa Heart Container", "Goht Heart Container", "Gyorg Heart Container", "Twinmold Heart Container", "Map: Clock Town", "Map: Woodfall",
                 "Map: Snowhead", "Map: Romani Ranch", "Map: Great Bay", "Map: Stone Tower", "Goron Racetrack Grotto" };
+
             for (var i = 0; i < itemNames.Length; i++)
             {
                 lines.Insert(i * 5, $"- {itemNames[i]}");
             }
-            lines.Insert(0, "-version 1");
+            lines.Insert(0, "-version 1");  
         }
 
         private static void AddMoonItems(List<string> lines)

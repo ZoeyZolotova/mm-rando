@@ -46,6 +46,7 @@ namespace MMRando
         {
             InitializeComponent();
             InitializeSettings();
+            InitializeLogic();
             InitializeTooltips();
 
             _randomizer = new Randomizer(_settings);
@@ -131,6 +132,24 @@ namespace MMRando
             TooltipBuilder.SetTooltip(cFasterLabFish, "Change Lab Fish to only need to be fed one fish.");
         }
 
+
+        public void InitializeLogic()
+        {
+            String[] Logics = Directory.GetFiles("./Logic/");
+            String Display = "";
+
+            foreach (String logic in Logics)
+            {
+
+                Display = logic.Remove(logic.Length - 4);
+
+                cMode.Items.Add(Display.Substring(8));
+
+            }
+
+        }
+
+
         #region Forms Code
 
         private void mmrMain_Load(object sender, EventArgs e)
@@ -191,12 +210,28 @@ namespace MMRando
             tROMName.Text = _settings.InputROMFilename;
         }
 
-        private void bLoadLogic_Click(object sender, EventArgs e)
+
+        private void ImportCustomLogicToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if(openLogic.ShowDialog() == DialogResult.OK)
             {
                 _settings.UserLogicFileName = openLogic.FileName;
-                tbUserLogic.Text = Path.GetFileNameWithoutExtension(_settings.UserLogicFileName);
+
+                if(File.Exists("./logic/" + Path.GetFileName(_settings.UserLogicFileName)))
+                {
+                    DialogResult dialogResult = MessageBox.Show(Path.GetFileName(_settings.UserLogicFileName) + "\nThis logic file already exists! Do you want to overwrite it?", "File Already Exists", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                    if (dialogResult == DialogResult.Yes)
+                    {
+                        System.IO.File.Delete("./logic/" + Path.GetFileName(_settings.UserLogicFileName));
+                        System.IO.File.Copy(_settings.UserLogicFileName, "./logic/" + Path.GetFileName(_settings.UserLogicFileName));
+                    }
+                }
+                else
+                {
+                    System.IO.File.Copy(_settings.UserLogicFileName, "./logic/" + Path.GetFileName(_settings.UserLogicFileName));
+                    cMode.Items.Add(Path.GetFileNameWithoutExtension(_settings.UserLogicFileName));
+                    cMode.SelectedIndex = cMode.Items.Count - 1;
+                }
             }
         }
 
@@ -204,7 +239,7 @@ namespace MMRando
         {
             if (_settings.GenerateROM && !ValidateInputFile()) return;
 
-            if (_settings.LogicMode == LogicMode.UserLogic && !ValidateLogicFile()) return;
+            if (_settings.LogicMode != LogicMode.Vanilla && !ValidateLogicFile()) return;
 
             if (ttOutput.SelectedTab.TabIndex == 1)
             {
@@ -634,20 +669,35 @@ namespace MMRando
                 return;
             }
 
-            var logicMode = (LogicMode)cMode.SelectedIndex;
+            String LogicPath = "./logic/" + cMode.Text + ".txt";
 
-            if (logicMode == LogicMode.UserLogic)
+            if (cMode.SelectedIndex == (int)LogicMode.Casual)
             {
-                tbUserLogic.Enabled = true;
-                bLoadLogic.Enabled = true;
+                LogicPath = "./logic/casual.txt";
+                if (!File.Exists(LogicPath))
+                {
+                    MessageBox.Show("Casual logic file is missing! Be sure to extract all files from the Randomizer download!",
+                    "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+
             }
-            else
+            else if(cMode.SelectedIndex == (int)LogicMode.Glitched)
             {
-                tbUserLogic.Enabled = false;
-                bLoadLogic.Enabled = false;
+                LogicPath = "./logic/glitched.txt";
+                if (!File.Exists(LogicPath))
+                {
+                    MessageBox.Show("Glitched logic file is missing! Be sure to extract all files from the Randomizer download!",
+                    "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+            }
+            else if (cMode.SelectedIndex > (int)LogicMode.NoLogic && !File.Exists(LogicPath))
+            {
+                //error the fuck out. Should be impossible.
             }
 
-            UpdateSingleSetting(() => _settings.LogicMode = logicMode);
+            _settings.UserLogicFileName = LogicPath;
+
+            UpdateSingleSetting(() => _settings.LogicMode = (LogicMode)cMode.SelectedIndex);
         }
 
         private void cClockSpeed_SelectedIndexChanged(object sender, EventArgs e)
@@ -1001,9 +1051,6 @@ namespace MMRando
 
             tSeed.Text = _settings.Seed.ToString();
 
-            tbUserLogic.Enabled = false;
-            bLoadLogic.Enabled = false;
-
             var oldSettingsString = tSString.Text;
             UpdateSettingsString();
             _oldSettingsString = oldSettingsString;
@@ -1116,9 +1163,9 @@ namespace MMRando
 
         private bool ValidateLogicFile()
         {
-            if (_settings.LogicMode == LogicMode.UserLogic && !File.Exists(_settings.UserLogicFileName))
+            if (!File.Exists(_settings.UserLogicFileName))
             {
-                MessageBox.Show("User Logic not found, please load User Logic or change logic mode.",
+                MessageBox.Show("User Logic not found, please load User Logic or change logic mode. How did you get this message??",
                     "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return false;
             }

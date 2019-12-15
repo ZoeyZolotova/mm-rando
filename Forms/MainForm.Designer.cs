@@ -56,8 +56,6 @@ namespace MMRando
             this.lCustomStartingItemAmount = new System.Windows.Forms.Label();
             this.bStartingItemEditor = new System.Windows.Forms.Button();
             this.tStartingItemList = new System.Windows.Forms.TextBox();
-            this.tbUserLogic = new System.Windows.Forms.TextBox();
-            this.bLoadLogic = new System.Windows.Forms.Button();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.cNoStartingItems = new System.Windows.Forms.CheckBox();
             this.cDEnt = new System.Windows.Forms.CheckBox();
@@ -130,6 +128,7 @@ namespace MMRando
             this.saveWad = new System.Windows.Forms.SaveFileDialog();
             this.mMenu = new System.Windows.Forms.MenuStrip();
             this.mFile = new System.Windows.Forms.ToolStripMenuItem();
+            this.importCustomLogicToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.mExit = new System.Windows.Forms.ToolStripMenuItem();
             this.mCustomise = new System.Windows.Forms.ToolStripMenuItem();
             this.mDPadConfig = new System.Windows.Forms.ToolStripMenuItem();
@@ -221,7 +220,7 @@ namespace MMRando
             this.tSettings.Location = new System.Drawing.Point(0, 23);
             this.tSettings.Name = "tSettings";
             this.tSettings.SelectedIndex = 0;
-            this.tSettings.Size = new System.Drawing.Size(355, 538);
+            this.tSettings.Size = new System.Drawing.Size(355, 506);
             this.tSettings.TabIndex = 10;
             // 
             // tabROMSettings
@@ -352,8 +351,6 @@ namespace MMRando
             // 
             this.tabMain.Controls.Add(this.groupBox6);
             this.tabMain.Controls.Add(this.groupBox4);
-            this.tabMain.Controls.Add(this.tbUserLogic);
-            this.tabMain.Controls.Add(this.bLoadLogic);
             this.tabMain.Controls.Add(this.groupBox3);
             this.tabMain.Controls.Add(this.groupBox2);
             this.tabMain.Controls.Add(this.lMode);
@@ -361,7 +358,7 @@ namespace MMRando
             this.tabMain.Location = new System.Drawing.Point(4, 25);
             this.tabMain.Name = "tabMain";
             this.tabMain.Padding = new System.Windows.Forms.Padding(3);
-            this.tabMain.Size = new System.Drawing.Size(347, 509);
+            this.tabMain.Size = new System.Drawing.Size(347, 477);
             this.tabMain.TabIndex = 0;
             this.tabMain.Text = "Main Settings";
             this.tabMain.UseVisualStyleBackColor = true;
@@ -371,7 +368,7 @@ namespace MMRando
             this.groupBox6.Controls.Add(this.lJunkLocationsAmount);
             this.groupBox6.Controls.Add(this.bJunkLocationsEditor);
             this.groupBox6.Controls.Add(this.tJunkLocationsList);
-            this.groupBox6.Location = new System.Drawing.Point(10, 432);
+            this.groupBox6.Location = new System.Drawing.Point(10, 398);
             this.groupBox6.Name = "groupBox6";
             this.groupBox6.Size = new System.Drawing.Size(325, 72);
             this.groupBox6.TabIndex = 28;
@@ -414,7 +411,7 @@ namespace MMRando
             this.groupBox4.Controls.Add(this.lCustomStartingItemAmount);
             this.groupBox4.Controls.Add(this.bStartingItemEditor);
             this.groupBox4.Controls.Add(this.tStartingItemList);
-            this.groupBox4.Location = new System.Drawing.Point(10, 354);
+            this.groupBox4.Location = new System.Drawing.Point(10, 320);
             this.groupBox4.Name = "groupBox4";
             this.groupBox4.Size = new System.Drawing.Size(325, 72);
             this.groupBox4.TabIndex = 17;
@@ -452,31 +449,13 @@ namespace MMRando
             this.tStartingItemList.Text = "--";
             this.tStartingItemList.TextChanged += new System.EventHandler(this.tStartingItemList_TextChanged);
             // 
-            // tbUserLogic
-            // 
-            this.tbUserLogic.Location = new System.Drawing.Point(99, 43);
-            this.tbUserLogic.Name = "tbUserLogic";
-            this.tbUserLogic.ReadOnly = true;
-            this.tbUserLogic.Size = new System.Drawing.Size(219, 20);
-            this.tbUserLogic.TabIndex = 18;
-            // 
-            // bLoadLogic
-            // 
-            this.bLoadLogic.Location = new System.Drawing.Point(23, 41);
-            this.bLoadLogic.Name = "bLoadLogic";
-            this.bLoadLogic.Size = new System.Drawing.Size(73, 24);
-            this.bLoadLogic.TabIndex = 17;
-            this.bLoadLogic.Text = "Open Logic";
-            this.bLoadLogic.UseVisualStyleBackColor = true;
-            this.bLoadLogic.Click += new System.EventHandler(this.bLoadLogic_Click);
-            // 
             // groupBox3
             // 
             this.groupBox3.Controls.Add(this.cNoStartingItems);
             this.groupBox3.Controls.Add(this.cDEnt);
             this.groupBox3.Controls.Add(this.cEnemy);
             this.groupBox3.Controls.Add(this.cMixSongs);
-            this.groupBox3.Location = new System.Drawing.Point(10, 281);
+            this.groupBox3.Location = new System.Drawing.Point(10, 247);
             this.groupBox3.Name = "groupBox3";
             this.groupBox3.Size = new System.Drawing.Size(324, 71);
             this.groupBox3.TabIndex = 16;
@@ -562,7 +541,7 @@ namespace MMRando
             this.groupBox2.Controls.Add(this.cShop);
             this.groupBox2.Controls.Add(this.cAdditional);
             this.groupBox2.Controls.Add(this.cMoonItems);
-            this.groupBox2.Location = new System.Drawing.Point(10, 80);
+            this.groupBox2.Location = new System.Drawing.Point(10, 46);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(325, 200);
             this.groupBox2.TabIndex = 15;
@@ -817,8 +796,7 @@ namespace MMRando
             this.cMode.Items.AddRange(new object[] {
             "Casual",
             "Glitched",
-            "Vanilla Layout",
-            "User Logic",
+            "Vanilla Item Placement",
             "No Logic"});
             this.cMode.Location = new System.Drawing.Point(96, 13);
             this.cMode.Name = "cMode";
@@ -1451,16 +1429,24 @@ namespace MMRando
             // mFile
             // 
             this.mFile.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.importCustomLogicToolStripMenuItem,
             this.mExit});
             this.mFile.Name = "mFile";
             this.mFile.Size = new System.Drawing.Size(37, 20);
             this.mFile.Text = "File";
             // 
+            // importCustomLogicToolStripMenuItem
+            // 
+            this.importCustomLogicToolStripMenuItem.Name = "importCustomLogicToolStripMenuItem";
+            this.importCustomLogicToolStripMenuItem.Size = new System.Drawing.Size(187, 22);
+            this.importCustomLogicToolStripMenuItem.Text = "Import Custom Logic";
+            this.importCustomLogicToolStripMenuItem.Click += new System.EventHandler(this.ImportCustomLogicToolStripMenuItem_Click);
+            // 
             // mExit
             // 
             this.mExit.Name = "mExit";
             this.mExit.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.F4)));
-            this.mExit.Size = new System.Drawing.Size(134, 22);
+            this.mExit.Size = new System.Drawing.Size(187, 22);
             this.mExit.Text = "Exit";
             this.mExit.Click += new System.EventHandler(this.mExit_Click);
             // 
@@ -1523,7 +1509,7 @@ namespace MMRando
             // 
             // pProgress
             // 
-            this.pProgress.Location = new System.Drawing.Point(11, 681);
+            this.pProgress.Location = new System.Drawing.Point(11, 649);
             this.pProgress.Margin = new System.Windows.Forms.Padding(2);
             this.pProgress.Name = "pProgress";
             this.pProgress.Size = new System.Drawing.Size(339, 19);
@@ -1538,7 +1524,7 @@ namespace MMRando
             // 
             this.lStatus.AutoSize = true;
             this.lStatus.BackColor = System.Drawing.Color.Transparent;
-            this.lStatus.Location = new System.Drawing.Point(15, 662);
+            this.lStatus.Location = new System.Drawing.Point(15, 630);
             this.lStatus.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.lStatus.Name = "lStatus";
             this.lStatus.Size = new System.Drawing.Size(47, 13);
@@ -1595,7 +1581,7 @@ namespace MMRando
             this.cDummy.AutoSize = true;
             this.cDummy.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.cDummy.Enabled = false;
-            this.cDummy.Location = new System.Drawing.Point(265, 658);
+            this.cDummy.Location = new System.Drawing.Point(265, 626);
             this.cDummy.Name = "cDummy";
             this.cDummy.Size = new System.Drawing.Size(80, 17);
             this.cDummy.TabIndex = 9;
@@ -1617,7 +1603,7 @@ namespace MMRando
             // 
             this.label5.AutoSize = true;
             this.label5.ForeColor = System.Drawing.SystemColors.ActiveBorder;
-            this.label5.Location = new System.Drawing.Point(20, 643);
+            this.label5.Location = new System.Drawing.Point(20, 611);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(325, 13);
             this.label5.TabIndex = 14;
@@ -1631,7 +1617,7 @@ namespace MMRando
             // 
             this.ttOutput.Controls.Add(this.tpOutputSettings);
             this.ttOutput.Controls.Add(this.tpPatchSettings);
-            this.ttOutput.Location = new System.Drawing.Point(4, 563);
+            this.ttOutput.Location = new System.Drawing.Point(4, 531);
             this.ttOutput.Name = "ttOutput";
             this.ttOutput.SelectedIndex = 0;
             this.ttOutput.Size = new System.Drawing.Size(354, 89);
@@ -1689,7 +1675,7 @@ namespace MMRando
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.ClientSize = new System.Drawing.Size(355, 708);
+            this.ClientSize = new System.Drawing.Size(355, 677);
             this.Controls.Add(this.ttOutput);
             this.Controls.Add(this.lStatus);
             this.Controls.Add(this.cDummy);
@@ -1840,8 +1826,6 @@ namespace MMRando
         private System.Windows.Forms.TextBox tCustomItemList;
         private System.Windows.Forms.Label lCustomItemAmount;
         private System.Windows.Forms.CheckBox cFairyRewards;
-        private System.Windows.Forms.TextBox tbUserLogic;
-        private System.Windows.Forms.Button bLoadLogic;
         private System.Windows.Forms.CheckBox cCowMilk;
         private System.Windows.Forms.CheckBox cSpiders;
         private System.Windows.Forms.CheckBox cStrayFairies;
@@ -1865,6 +1849,7 @@ namespace MMRando
         private System.Windows.Forms.Button bJunkLocationsEditor;
         private System.Windows.Forms.TextBox tJunkLocationsList;
         private System.Windows.Forms.ToolStripMenuItem mDPadConfig;
+        private System.Windows.Forms.ToolStripMenuItem importCustomLogicToolStripMenuItem;
     }
 }
 

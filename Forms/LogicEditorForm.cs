@@ -386,10 +386,19 @@ namespace MMRando
         {
             if (openLogic.ShowDialog() == DialogResult.OK)
             {
-                using (var logicFile = new StreamReader(File.Open(openLogic.FileName, FileMode.Open)))
+
+                try
                 {
-                    var logicString = logicFile.ReadToEnd();
-                    LoadLogic(logicString);
+                    using (var logicFile = new StreamReader(File.Open(openLogic.FileName, FileMode.Open)))
+                    {
+                        var logicString = logicFile.ReadToEnd();
+                        LoadLogic(logicString);
+                    }
+                }
+                catch
+                {
+                    MessageBox.Show("Logic file seems invalid or corrupt!",
+                    "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
             }
         }

@@ -234,16 +234,15 @@ namespace MMRando
         {
             ItemList = new ItemList();
 
-            if (_settings.LogicMode == LogicMode.Casual
-                || _settings.LogicMode == LogicMode.Glitched
-                || _settings.LogicMode == LogicMode.UserLogic)
+
+            if (_settings.LogicMode == LogicMode.NoLogic)
+            {
+                PopulateItemListWithoutLogic();
+            }
+            else if (_settings.LogicMode != LogicMode.Vanilla)
             {
                 string[] data = ReadRulesetFromResources();
                 PopulateItemListFromLogicData(data);
-            }
-            else
-            {
-                PopulateItemListWithoutLogic();
             }
 
             if (_settings.UseCustomItemList)
@@ -417,22 +416,10 @@ namespace MMRando
         private string[] ReadRulesetFromResources()
         {
             string[] lines = null;
-            var mode = _settings.LogicMode;
 
-            if (mode == LogicMode.Casual)
+            using (StreamReader Req = new StreamReader(File.Open(_settings.UserLogicFileName, FileMode.Open)))
             {
-                lines = Properties.Resources.REQ_CASUAL.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
-            }
-            else if (mode == LogicMode.Glitched)
-            {
-                lines = Properties.Resources.REQ_GLITCH.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
-            }
-            else if (mode == LogicMode.UserLogic)
-            {
-                using (StreamReader Req = new StreamReader(File.Open(_settings.UserLogicFileName, FileMode.Open)))
-                {
                     lines = Req.ReadToEnd().Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
-                }
             }
 
             return lines;

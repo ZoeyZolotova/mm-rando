@@ -5,7 +5,6 @@
         Casual,
         Glitched,
         Vanilla,
-        UserLogic,
         NoLogic,
     }
 }
