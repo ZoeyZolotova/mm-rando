@@ -7,8 +7,8 @@ namespace MMRando.Models.Rom
     {
         public string Name { get; set; }
         public int Replaces { get; set; } = -1;
-        public int MM_seq { get; set; } = -1;
-        public List<int> Type { get; set; } = new List<int>();
+        public SequenceId MM_seq { get; set; } = SequenceId.invalid;
+        public SequenceType Type { get; set; }
         public int Instrument { get; set; }
     }
 }

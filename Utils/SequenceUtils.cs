@@ -1,16 +1,24 @@
 ﻿using MMRando.Constants;
-using MMRando.Models;
 using MMRando.Models.Rom;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 
 namespace MMRando.Utils
 {
-    public class SequenceUtils
+    public static class SequenceUtils
     {
+        private static SequenceType GetSequenceType(List<int> types)
+        {
+            SequenceType result = SequenceType.None;
+
+            foreach (int type in types)
+            {
+                result |= (SequenceType)(1 << type);
+            }
+            return result;
+        }
 
         public static void ReadSequenceInfo()
         {
@@ -34,21 +42,22 @@ namespace MMRando.Utils
                 SequenceInfo sourceSequence = new SequenceInfo
                 {
                     Name = sourceName,
-                    Type = sourceType,
+                    Type = GetSequenceType(sourceType),
                     Instrument = sourceInstrument
                 };
 
                 SequenceInfo targetSequence = new SequenceInfo
                 {
                     Name = targetName,
-                    Type = targetType,
+                    Type = GetSequenceType(targetType),
                     Instrument = targetInstrument
                 };
 
                 if (sourceSequence.Name.StartsWith("mm-"))
                 {
-                    targetSequence.Replaces = Convert.ToInt32(lines[i + 3], 16);
-                    sourceSequence.MM_seq = Convert.ToInt32(lines[i + 3], 16);
+                    int seqId = Convert.ToInt32(lines[i + 3], 16);
+                    targetSequence.Replaces = seqId;
+                    sourceSequence.MM_seq = (SequenceId)seqId;
                     RomData.TargetSequences.Add(targetSequence);
                     i += 4;
                 }
@@ -56,17 +65,17 @@ namespace MMRando.Utils
                 {
                     if (sourceSequence.Name == "mmr-f-sot")
                     {
-                        sourceSequence.Replaces = 0x33;
-                    };
+                        sourceSequence.Replaces = (int)SequenceId.mm_o_sot;
+                    }
 
                     i += 3;
-                };
+                }
 
-                if (sourceSequence.MM_seq != 0x18)
+                if (sourceSequence.MM_seq != SequenceId.mm_fileselect)
                 {
                     RomData.SequenceList.Add(sourceSequence);
-                };
-            };
+                }
+            }
         }
 
         public static void RebuildAudioSeq(List<SequenceInfo> SequenceList)
@@ -101,14 +110,15 @@ namespace MMRando.Utils
                     {
                         if ((entry.Addr > 0) && (entry.Addr < 128))
                         {
-                            if (SequenceList[j].Replaces != 0x28)
+                            if (SequenceList[j].Replaces != (int)SequenceId.mm_fairyfountain)
                             {
                                 SequenceList[j].Replaces = entry.Addr;
                             }
                             else
                             {
-                                entry.Data = OldSeq[0x18].Data;
-                                entry.Size = OldSeq[0x18].Size;
+                                var oldSeq = OldSeq[(int)SequenceId.mm_fileselect];
+                                entry.Data = oldSeq.Data;
+                                entry.Size = oldSeq.Size;
                             }
                         }
                     }
@@ -134,10 +144,11 @@ namespace MMRando.Utils
                 int j = SequenceList.FindIndex(u => u.Replaces == i);
                 if (j != -1)
                 {
-                    if (SequenceList[j].MM_seq != -1)
+                    SequenceId currentMM_seq = SequenceList[j].MM_seq;
+                    if (currentMM_seq != SequenceId.invalid)
                     {
-                        newentry.Size = OldSeq[SequenceList[j].MM_seq].Size;
-                        newentry.Data = OldSeq[SequenceList[j].MM_seq].Data;
+                        newentry.Size = OldSeq[(int)currentMM_seq].Size;
+                        newentry.Data = OldSeq[(int)currentMM_seq].Data;
                     }
                     else
                     {

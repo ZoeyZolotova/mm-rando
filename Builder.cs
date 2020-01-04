@@ -48,38 +48,35 @@ namespace MMRando
                 while (true)
                 {
                     int unassignedIndex = random.Next(Unassigned.Count);
+                    var unassignedSeq = Unassigned[unassignedIndex];
 
-                    if (Unassigned[unassignedIndex].Name.StartsWith("mm")
+                    if (unassignedSeq.Name.StartsWith("mm")
                         & (random.Next(100) < 50))
                     {
                         continue;
                     }
 
-                    for (int i = 0; i < Unassigned[unassignedIndex].Type.Count; i++)
+                    if ((unassignedSeq.Type & targetSequence.Type) > 0) //if target type contains unassigned type
                     {
-                        if (targetSequence.Type.Contains(Unassigned[unassignedIndex].Type[i]))
+                        unassignedSeq.Replaces = targetSequence.Replaces;
+                        Debug.WriteLine(unassignedSeq.Name + " -> " + targetSequence.Name);
+                        RomData.TargetSequences.RemoveAt(targetIndex);
+                    }
+
+                    else
+                    {
+                        if ((random.Next(30) == 0)
+                            && ((unassignedSeq.Type & SequenceType.IsFanfareMask) == (targetSequence.Type & SequenceType.IsFanfareMask)) //if both are bgm or both fanfare
+                            && ((unassignedSeq.Type & SequenceType.FanfareAreaClear) == (targetSequence.Type & SequenceType.FanfareAreaClear))
+                            && ((unassignedSeq.Type & SequenceType.CutsceneNoLoop) != SequenceType.CutsceneNoLoop))
                         {
-                            Unassigned[unassignedIndex].Replaces = targetSequence.Replaces;
-                            Debug.WriteLine(Unassigned[unassignedIndex].Name + " -> " + targetSequence.Name);
+                            unassignedSeq.Replaces = targetSequence.Replaces;
+                            Debug.WriteLine(unassignedSeq.Name + " -> " + targetSequence.Name);
                             RomData.TargetSequences.RemoveAt(targetIndex);
-                            break;
-                        }
-                        else if (i + 1 == Unassigned[unassignedIndex].Type.Count)
-                        {
-                            if ((random.Next(30) == 0)
-                                && ((Unassigned[unassignedIndex].Type[0] & 8) == (targetSequence.Type[0] & 8))
-                                && (Unassigned[unassignedIndex].Type.Contains(10) == targetSequence.Type.Contains(10))
-                                && (!Unassigned[unassignedIndex].Type.Contains(16)))
-                            {
-                                Unassigned[unassignedIndex].Replaces = targetSequence.Replaces;
-                                Debug.WriteLine(Unassigned[unassignedIndex].Name + " -> " + targetSequence.Name);
-                                RomData.TargetSequences.RemoveAt(targetIndex);
-                                break;
-                            }
                         }
                     }
 
-                    if (Unassigned[unassignedIndex].Replaces != -1)
+                    if (unassignedSeq.Replaces != -1)
                     {
                         break;
                     }

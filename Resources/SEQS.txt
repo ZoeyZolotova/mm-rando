@@ -303,11 +303,11 @@ mm-f-giantsleave
 21
 7c
 mm-c-giantscs
-16
+15
 21
 70
 mm-c-titlescreen
-16
+15
 23
 76
 oot-kokiriforest
@@ -395,7 +395,7 @@ oot-ganon
 7
 3
 oot-c-goddess
-16
+15
 21
 sf64-corneria
 0,1

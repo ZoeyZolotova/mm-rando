@@ -125,6 +125,9 @@
     <Compile Include="Models\RandomizedResult.cs" />
     <Compile Include="Models\Rom\MessageTable.cs" />
     <Compile Include="Models\Rom\Enemy.cs" />
+    <Compile Include="Models\Rom\SequenceId.cs" />
+    <Compile Include="Models\Rom\SequenceTableInfo.cs" />
+    <Compile Include="Models\Rom\SequenceType.cs" />
     <Compile Include="Models\Settings\BlastMaskCooldown.cs" />
     <Compile Include="Models\Settings\Music.cs" />
     <Compile Include="Models\SoundEffects\EffectAttribute.cs" />
