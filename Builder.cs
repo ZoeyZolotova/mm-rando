@@ -221,9 +221,21 @@ namespace MMRando
         {
             if (_settings.Music == Music.None)
             {
-                var codeFileAddress = 0xB3C000;
-                var offset = 0x102350; // address for branch when scene music is loaded
-                ReadWriteUtils.WriteToROM(codeFileAddress + offset, 0x1000); // change to always branch (do not load)
+                // Traverse the audioseq index table to get the locations of all sequences
+                byte[] audioseq_table = RomData.MMFileList[RomUtils.GetFileIndexForWriting(Addresses.SeqTable)].Data;
+                // turns out the randomizer doesn't consider the table to be its own file, we need the offset
+                int audioseq_table_baseaddr = RomData.MMFileList[RomUtils.GetFileIndexForWriting(Addresses.SeqTable)].Addr;
+                byte[] audioseq = RomData.MMFileList[RomUtils.GetFileIndexForWriting(0x00046AF0)].Data; // 46AF0 is audioseq starting location
+                // for each sequence, search for the master volume byte and change to zero
+                for (int seq = 2; seq < 128; seq += 1){
+                    int seq_location_offset = (int)ReadWriteUtils.Arr_ReadU32(audioseq_table, (Addresses.SeqTable + seq * 16) - audioseq_table_baseaddr);
+                    for (int byte_iter = 3; byte_iter < 128; byte_iter++){
+                        if (audioseq[seq_location_offset + byte_iter] == 0xDB){
+                            audioseq[seq_location_offset + byte_iter + 1] = 0x0;
+                            continue;
+                        }
+                    }
+                }
             }
         }
 
