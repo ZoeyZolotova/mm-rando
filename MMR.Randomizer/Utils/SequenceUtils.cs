@@ -171,19 +171,18 @@ namespace MMR.Randomizer.Utils
                 addr += newentry.Size;
             }
 
-            if (addr > (RomData.MMFileList[4].End - RomData.MMFileList[4].Addr))
-            {
-                int index = RomUtils.AppendFile(NewAudioSeq);
-                ResourceUtils.ApplyHack(Values.ModsDirectory + "reloc-audio");
-                RelocateSeq(index);
-                RomData.MMFileList[4].Data = new byte[0];
-                RomData.MMFileList[4].Cmp_Addr = -1;
-                RomData.MMFileList[4].Cmp_End = -1;
-            }
-            else
-            {
-                RomData.MMFileList[4].Data = NewAudioSeq;
-            }
+            // discovered when MM-only music was fixed, if the audioseq is left in it's old spot
+            // audio quality is garbage, sounds like static
+            //if (addr > (RomData.MMFileList[4].End - RomData.MMFileList[4].Addr))
+            //else
+                //RomData.MMFileList[4].Data = NewAudioSeq;
+
+            int index = RomUtils.AppendFile(NewAudioSeq);
+            ResourceUtils.ApplyHack(Values.ModsDirectory + "reloc-audio");
+            RelocateSeq(index);
+            RomData.MMFileList[4].Data = new byte[0];
+            RomData.MMFileList[4].Cmp_Addr = -1;
+            RomData.MMFileList[4].Cmp_End = -1;
 
             //update pointer table
             f = RomUtils.GetFileIndexForWriting(Addresses.SeqTable);
