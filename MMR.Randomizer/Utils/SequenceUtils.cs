@@ -79,11 +79,6 @@ namespace MMR.Randomizer.Utils
                 }
                 else
                 {
-                    if (sourceSequence.Name == "mmr-f-sot")
-                    {
-                        sourceSequence.Replaces = 0x33;
-                    }
-
                     i += 3;
 
                     // if sequence file doesn't exist, was removed by user, ignore it
