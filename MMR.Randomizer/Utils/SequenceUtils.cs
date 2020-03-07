@@ -271,7 +271,6 @@ namespace MMR.Randomizer.Utils
                                         Modified = 1,
                                         Hash = BitConverter.ToInt64(md5lib.ComputeHash(bank_data),0)
                                     };
-                                    Debug.WriteLine("Hash code for bank is " + new_sequence_data.InstrumentSet.Hash.ToString("X"));
                                 }//if requires bank
 
                                 // multiple seq possible, add depending on if first or not
