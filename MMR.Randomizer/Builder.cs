@@ -95,10 +95,10 @@ namespace MMR.Randomizer
             {
                 if (test_sequence.SequenceBinaryList != null && test_sequence.SequenceBinaryList[0] != null && test_sequence.SequenceBinaryList[0].InstrumentSet != null)
                 {
-                    test_sequence.Instrument = test_sequence.SequenceBinaryList[0].InstrumentSet.BankSlot;
-                    RomData.InstrumentSetList[test_sequence.Instrument] = test_sequence.SequenceBinaryList[0].InstrumentSet;
-                    test_sequence.SequenceBinaryList = new List<SequenceBinaryData> { test_sequence.SequenceBinaryList[0] }; // lock the one we want
-                    WriteOutput(" -- v -- Instrument set number " + test_sequence.Instrument.ToString("X") + " has been claimed -- v --");
+                        test_sequence.Instrument = test_sequence.SequenceBinaryList[0].InstrumentSet.BankSlot;
+                        RomData.InstrumentSetList[test_sequence.Instrument] = test_sequence.SequenceBinaryList[0].InstrumentSet;
+                        test_sequence.SequenceBinaryList = new List<SequenceBinaryData> { test_sequence.SequenceBinaryList[0] }; // lock the one we want
+                        WriteOutput(" -- v -- Instrument set number " + test_sequence.Instrument.ToString("X") + " has been claimed -- v --");
                 }
                 SequenceInfo slot = RomData.TargetSequences.Find(u => u.Name.Contains("fileselect"));
                 test_sequence.Replaces = slot.Replaces;
@@ -120,20 +120,32 @@ namespace MMR.Randomizer
                         continue;
 
                     // test if the testSeq can be used with available instrument set slots
-                    if (testSeq.SequenceBinaryList != null  && testSeq.SequenceBinaryList.Count > 0 && testSeq.SequenceBinaryList[0].InstrumentSet != null)
+                    if (testSeq.SequenceBinaryList != null && testSeq.SequenceBinaryList.Count > 0 && testSeq.SequenceBinaryList[0].InstrumentSet != null)
                     {
                         // randomize instrument sets last second, so the early banks don't get ravaged based on order
                         if (testSeq.SequenceBinaryList.Count > 1)
                             testSeq.SequenceBinaryList.OrderBy(x => random.Next()).ToList();
 
-                        // remove all instances of sequences that require custom audiobanks but are already taken
-                        testSeq.SequenceBinaryList = testSeq.SequenceBinaryList.FindAll(u => RomData.InstrumentSetList[u.InstrumentSet.BankSlot].Modified == false);
+
+                        testSeq.SequenceBinaryList = testSeq.SequenceBinaryList.FindAll(u => RomData.InstrumentSetList[u.InstrumentSet.BankSlot].Modified == 0
+                                                                                          || (u.InstrumentSet.Hash != 0 
+                                                                                           && u.InstrumentSet.Hash == RomData.InstrumentSetList[u.InstrumentSet.BankSlot].Hash));
                         if (testSeq.SequenceBinaryList.Count == 0) // all removed, song is dead.
                         {
+                            // TODO write detection for a song already chosen, that could swap to a bank we can use with this song, to swap both for compatibility
+                              // find a list of all currently chosen songs
+                              // find a sublist of songs that have multiple possible banks
+                                // check those songs for banks that are compatible with this song
+                                  // if one is found, swap that song sequence to point at the new one, 
+                                  //  unset modified of the old used bank, 
+                                    // set the new bank
+                                      // now what? should we just force the song to find a useful spot? that's not terribly random, that almost forces the same songs every seed
+
                             WriteOutput(GetSpacedString(testSeq.Name) + " cannot be used because it requires custom audiobank(s) already claimed ");
                             Unassigned.Remove(testSeq);
                             continue;
                         }
+                        
                     }
 
 
@@ -142,10 +154,18 @@ namespace MMR.Randomizer
                         if (testSeq.SequenceBinaryList != null && testSeq.SequenceBinaryList[0] != null && testSeq.SequenceBinaryList[0].InstrumentSet != null)
                         {
                             testSeq.Instrument = testSeq.SequenceBinaryList[0].InstrumentSet.BankSlot;
-                            RomData.InstrumentSetList[testSeq.Instrument] = testSeq.SequenceBinaryList[0].InstrumentSet;
-                            testSeq.SequenceBinaryList = new List<SequenceBinaryData> { testSeq.SequenceBinaryList[0]  }; // lock the one we want
-                            WriteOutput(" -- v -- Instrument set number " + testSeq.Instrument.ToString("X") + " has been claimed -- v --");
+                            if (RomData.InstrumentSetList[testSeq.Instrument].Modified > 0)
+                            {
+                                WriteOutput(" -- v -- Instrument set number " + testSeq.Instrument.ToString("X") + " is being reused -- v --");
+                            }
+                            else
+                            {
+                                RomData.InstrumentSetList[testSeq.Instrument] = testSeq.SequenceBinaryList[0].InstrumentSet;
+                                testSeq.SequenceBinaryList = new List<SequenceBinaryData> { testSeq.SequenceBinaryList[0]  }; // lock the one we want
+                                WriteOutput(" -- v -- Instrument set number " + testSeq.Instrument.ToString("X") + " has been claimed -- v --");
+                            }
                         }
+                    
 
                         testSeq.Replaces = targetSequence.Replaces;
                         WriteOutput(GetSpacedString(testSeq.Name) + " -> " + targetSequence.Name);
@@ -168,9 +188,17 @@ namespace MMR.Randomizer
                         if (testSeq.SequenceBinaryList != null && testSeq.SequenceBinaryList[0] != null && testSeq.SequenceBinaryList[0].InstrumentSet != null)
                         {
                             testSeq.Instrument = testSeq.SequenceBinaryList[0].InstrumentSet.BankSlot;
-                            RomData.InstrumentSetList[testSeq.Instrument] = testSeq.SequenceBinaryList[0].InstrumentSet;
-                            testSeq.SequenceBinaryList = new List<SequenceBinaryData> { testSeq.SequenceBinaryList[0] }; // lock the one we want
-                            WriteOutput(" -- v -- Instrument set number " + testSeq.Instrument.ToString("X") + " has been claimed -- v --");
+                            if (RomData.InstrumentSetList[testSeq.Instrument].Modified > 0)
+                            {
+                                WriteOutput(" -- v -- Instrument set number " + testSeq.Instrument.ToString("X") + " is being reused -- v --");
+                            }
+                            else
+                            {
+                                testSeq.Instrument = testSeq.SequenceBinaryList[0].InstrumentSet.BankSlot;
+                                RomData.InstrumentSetList[testSeq.Instrument] = testSeq.SequenceBinaryList[0].InstrumentSet;
+                                testSeq.SequenceBinaryList = new List<SequenceBinaryData> { testSeq.SequenceBinaryList[0] }; // lock the one we want
+                                WriteOutput(" -- v -- Instrument set number " + testSeq.Instrument.ToString("X") + " has been claimed -- v --");
+                            }
                         }
                         testSeq.Replaces = targetSequence.Replaces;
                         WriteOutput(GetSpacedString(testSeq.Name, len: 49) + " 🍀-> " + targetSequence.Name);

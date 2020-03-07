@@ -9,6 +9,7 @@ using System.Text;
 using System.Diagnostics;
 using System.IO.Compression;
 using MMR.Randomizer.Models.Settings;
+using System.Security.Cryptography;
 
 namespace MMR.Randomizer.Utils
 {
@@ -163,7 +164,7 @@ namespace MMR.Randomizer.Utils
                         BankBinary = input_bank_data,
                         BankMetaData = meta_data,
                         BankSlot = Convert.ToInt32(pieces[1], 16),
-                        Modified = true
+                        Modified = 1
                     };
                 }
 
@@ -203,6 +204,8 @@ namespace MMR.Randomizer.Utils
             //    if the song requires a custom audiobank, the bank and bank meta data are also here
             //  the user should be able to pack the archive with multiple sequences and multiple banks to match,
             //   where the redundancy increases likley hood of a song being able to be placed in a free audiobank slot
+
+            MD5 md5lib = MD5.Create();
 
             foreach (String filePath in Directory.GetFiles(directory, "*.mmrs"))
             {
@@ -265,8 +268,10 @@ namespace MMR.Randomizer.Utils
                                         BankBinary = bank_data,
                                         BankSlot = new_song.Instrument,
                                         BankMetaData = meta_data,
-                                        Modified = true
+                                        Modified = 1,
+                                        Hash = BitConverter.ToInt64(md5lib.ComputeHash(bank_data),0)
                                     };
+                                    Debug.WriteLine("Hash code for bank is " + new_sequence_data.InstrumentSet.Hash.ToString("X"));
                                 }//if requires bank
 
                                 // multiple seq possible, add depending on if first or not
