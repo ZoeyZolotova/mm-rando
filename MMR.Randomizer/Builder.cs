@@ -109,9 +109,10 @@ namespace MMR.Randomizer
                             testSeq.SequenceBinaryList.OrderBy(x => random.Next()).ToList();
 
                         // clear the sequence list of sequences we cannot use
-                        testSeq.SequenceBinaryList = testSeq.SequenceBinaryList.FindAll(u => RomData.InstrumentSetList[u.InstrumentSet.BankSlot].Modified == 0
-                                                                                          || (u.InstrumentSet.Hash != 0 
-                                                                                           && u.InstrumentSet.Hash == RomData.InstrumentSetList[u.InstrumentSet.BankSlot].Hash));
+                        testSeq.SequenceBinaryList = testSeq.SequenceBinaryList.FindAll(u => u.InstrumentSet != null 
+                                                                                          && (RomData.InstrumentSetList[u.InstrumentSet.BankSlot].Modified == 0
+                                                                                            || ( u.InstrumentSet.Hash != 0 
+                                                                                              && u.InstrumentSet.Hash == RomData.InstrumentSetList[u.InstrumentSet.BankSlot].Hash)));
                         if (testSeq.SequenceBinaryList.Count == 0) // all removed, song is dead.
                         {
                             // TODO write detection for a song already chosen, that could swap to a bank we can use with this song, to swap both for compatibility

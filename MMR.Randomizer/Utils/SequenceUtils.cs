@@ -392,8 +392,13 @@ namespace MMR.Randomizer.Utils
                             throw new Exception("Reached music write without a song to write");
                         if (SequenceList[j].SequenceBinaryList.Count > 1)
                             WriteOutput("Warning: writing song with multiple sequence/bank combos, selecting first available");
-                        newentry.Size = SequenceList[j].SequenceBinaryList[0].SequenceBinary.Length;
                         newentry.Data = SequenceList[j].SequenceBinaryList[0].SequenceBinary;
+                        // if the sequence is not padded to 16 bytes, the DMA fails
+                        //  music can stop from playing and on hardware it will just straight crash
+                        if (newentry.Data.Length % 0x10 != 0)
+                            newentry.Data = newentry.Data.Concat(new byte[0x10 - (newentry.Data.Length % 0x10)]).ToArray();
+                        newentry.Size = newentry.Data.Length;
+
                         WriteOutput("Slot " + i.ToString("X") + " := " + SequenceList[j].Name + " *");
 
                     }
