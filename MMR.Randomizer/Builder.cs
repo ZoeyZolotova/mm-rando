@@ -1419,19 +1419,19 @@ namespace MMR.Randomizer
             }
             WriteMiscellaneousChanges();
 
-            progressReporter.ReportProgress(72, "Writing cosmetics...");
-            WriteTatlColour(new Random(BitConverter.ToInt32(hash, 0)));
-            WriteTunicColor();
-
-            progressReporter.ReportProgress(73, "Writing music...");
-            WriteAudioSeq(new Random(BitConverter.ToInt32(hash, 0)), outputSettings);
-            WriteMuteMusic();
-
-            progressReporter.ReportProgress(74, "Writing sound effects...");
-            WriteSoundEffects(new Random(BitConverter.ToInt32(hash, 0)));
-
             if (outputSettings.GenerateROM || outputSettings.OutputVC)
             {
+                progressReporter.ReportProgress(72, "Writing cosmetics...");
+                WriteTatlColour(new Random(BitConverter.ToInt32(hash, 0)));
+                WriteTunicColor();
+
+                progressReporter.ReportProgress(73, "Writing music...");
+                WriteAudioSeq(new Random(BitConverter.ToInt32(hash, 0)), outputSettings);
+                WriteMuteMusic();
+
+                progressReporter.ReportProgress(74, "Writing sound effects...");
+                WriteSoundEffects(new Random(BitConverter.ToInt32(hash, 0)));
+
                 progressReporter.ReportProgress(75, "Building ROM...");
 
                 byte[] ROM = RomUtils.BuildROM();
