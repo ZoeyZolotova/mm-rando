@@ -9,6 +9,11 @@ namespace MMR.Randomizer
     {
         public static string Process(Configuration configuration, int seed, IProgressReporter progressReporter)
         {
+            if (configuration.OutputSettings.InputROMFilename == "")
+            {
+                return $"Please choose a valid input Majora's Mask (U) .z64 rom";
+            }
+
             var randomizer = new Randomizer(configuration.GameplaySettings, seed);
             RandomizedResult randomized = null;
             if (string.IsNullOrWhiteSpace(configuration.OutputSettings.InputPatchFilename))
