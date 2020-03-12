@@ -297,7 +297,7 @@ namespace MMR.Randomizer.Utils
         }
 
         // gets passed RomData.SequenceList in Builder.cs::WriteAudioSeq
-        public static void RebuildAudioSeq(List<SequenceInfo> SequenceList, OutputSettings _settings)
+        public static void RebuildAudioSeq(List<SequenceInfo> SequenceList, OutputSettings _settings, bool output_songlog)
         {
             // spoiler log output DEBUG
             StringBuilder log = new StringBuilder();
@@ -369,7 +369,7 @@ namespace MMR.Randomizer.Utils
 
                 if (SequenceList.FindAll(u => u.Replaces == i).Count > 1)
                 {
-                    WriteOutput("Error: Slot " + i.ToString("X") + " has multiple songs pointing at it!");
+                    WriteOutput("Error: Slot " + i.ToString("X2") + " has multiple songs pointing at it!");
                 }
 
                 int p = RomData.PointerizedSequences.FindIndex(u => u.PreviousSlot == i);
@@ -383,13 +383,11 @@ namespace MMR.Randomizer.Utils
                     {
                         newentry.Size = OldSeq[SequenceList[j].MM_seq].Size;
                         newentry.Data = OldSeq[SequenceList[j].MM_seq].Data;
-                        WriteOutput("Slot " + i.ToString("X") + " -> " + SequenceList[j].Name);
+                        WriteOutput("Slot " + i.ToString("X2") + " -> " + SequenceList[j].Name);
 
                     }
-                    else if (SequenceList[j].SequenceBinaryList != null && SequenceList[j].SequenceBinaryList[0] != null)
+                    else if (SequenceList[j].SequenceBinaryList != null && SequenceList[j].SequenceBinaryList.Count > 0)
                     {
-                        if (SequenceList[j].SequenceBinaryList.Count == 0)
-                            throw new Exception("Reached music write without a song to write");
                         if (SequenceList[j].SequenceBinaryList.Count > 1)
                             WriteOutput("Warning: writing song with multiple sequence/bank combos, selecting first available");
                         newentry.Data = SequenceList[j].SequenceBinaryList[0].SequenceBinary;
@@ -399,8 +397,7 @@ namespace MMR.Randomizer.Utils
                             newentry.Data = newentry.Data.Concat(new byte[0x10 - (newentry.Data.Length % 0x10)]).ToArray();
                         newentry.Size = newentry.Data.Length;
 
-                        WriteOutput("Slot " + i.ToString("X") + " := " + SequenceList[j].Name + " *");
-
+                        WriteOutput("Slot " + i.ToString("X2") + " := " + SequenceList[j].Name + " *");
                     }
                     else // non mm, load file and add
                     {
@@ -419,7 +416,7 @@ namespace MMR.Randomizer.Utils
                         }
                         else
                         {
-                            throw new Exception("Music not found as file or built-in resource.");
+                            throw new Exception("Music not found as file or built-in resource. " + SequenceList[j].Filename);
                         }
 
                         // if the sequence is not padded to 16 bytes, the DMA fails
@@ -436,7 +433,7 @@ namespace MMR.Randomizer.Utils
 
                         newentry.Size = data.Length;
                         newentry.Data = data;
-                        WriteOutput("Slot " + i.ToString("X") + " := " + SequenceList[j].Name);
+                        WriteOutput("Slot " + i.ToString("X2") + " := " + SequenceList[j].Name);
 
                     }
                 }
@@ -450,7 +447,6 @@ namespace MMR.Randomizer.Utils
                 // TODO is there not a better way to write this?
                 if (newentry.Data != null)
                 {
-
                     NewAudioSeq = NewAudioSeq.Concat(newentry.Data).ToArray();
                 }
 
@@ -505,22 +501,23 @@ namespace MMR.Randomizer.Utils
 
             }
 
-            // DEBUG spoiler log output
-            String dir = Path.GetDirectoryName(_settings.OutputROMFilename);
-            String path = $"{Path.GetFileNameWithoutExtension(_settings.OutputROMFilename)}";
-            // spoiler log should already be written by the time we reach this far
-            if (File.Exists(Path.Combine(dir, path + "_SpoilerLog.txt")))
-                path += "_SpoilerLog.txt";
-            else // TODO add HTML log compatibility
-                path += "_SongLog.txt";
-
-            using (StreamWriter sw = new StreamWriter(Path.Combine(dir, path), append: true))
+            if (output_songlog)
             {
-                sw.WriteLine(""); // spacer
-                sw.Write(log);
+                // DEBUG spoiler log output
+                String dir = Path.GetDirectoryName(_settings.OutputROMFilename);
+                String path = $"{Path.GetFileNameWithoutExtension(_settings.OutputROMFilename)}";
+                // spoiler log should already be written by the time we reach this far
+                if (File.Exists(Path.Combine(dir, path + "_SpoilerLog.txt")))
+                    path += "_SpoilerLog.txt";
+                else // TODO add HTML log compatibility
+                    path += "_SongLog.txt";
+
+                using (StreamWriter sw = new StreamWriter(Path.Combine(dir, path), append: true))
+                {
+                    sw.WriteLine(""); // spacer
+                    sw.Write(log);
+                }
             }
-
-
         }
 
         /// <summary>

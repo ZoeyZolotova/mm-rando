@@ -43,7 +43,7 @@ namespace MMR.Randomizer
         {
             // spoiler log output
             StringBuilder log = new StringBuilder();
-            
+
             // pointerize some slots
             // why? because fairy fountain and fileselect are the same song,
             //  with one being a pointer at the other, so we have 78 slots and 77 songs, not enough
@@ -101,37 +101,31 @@ namespace MMR.Randomizer
                     if (Unassigned.Count > 77 && testSeq.Name.StartsWith("mm") && (random.Next(100) < 33))
                         continue;
 
-                    // test if the testSeq can be used with available instrument set slots
-                    if (testSeq.SequenceBinaryList != null && testSeq.SequenceBinaryList.Count > 0 && testSeq.SequenceBinaryList[0].InstrumentSet != null)
+                    // if testSeq has an instrument set, test if the testSeq can be used with available instrument set slots
+                    if (testSeq.SequenceBinaryList != null && testSeq.SequenceBinaryList.Count > 0 && testSeq.SequenceBinaryList.Any(u => u.InstrumentSet != null))
                     {
-                        // randomize instrument sets last second, so the early banks don't get ravaged based on order
-                        if (testSeq.SequenceBinaryList.Count > 1)
-                            testSeq.SequenceBinaryList.OrderBy(x => random.Next()).ToList();
-
                         // clear the sequence list of sequences we cannot use
-                        testSeq.SequenceBinaryList = testSeq.SequenceBinaryList.FindAll(u => u.InstrumentSet != null 
-                                                                                          && (RomData.InstrumentSetList[u.InstrumentSet.BankSlot].Modified == 0
-                                                                                            || ( u.InstrumentSet.Hash != 0 
+                        //  only keep sequences that don't need a custom instrument set, or sets that have one and its open, or sets that share one already used
+                        testSeq.SequenceBinaryList = testSeq.SequenceBinaryList.FindAll(u => u.InstrumentSet == null
+                                                                                          || (RomData.InstrumentSetList[u.InstrumentSet.BankSlot].Modified == 0
+                                                                                            || (u.InstrumentSet.Hash != 0
                                                                                               && u.InstrumentSet.Hash == RomData.InstrumentSetList[u.InstrumentSet.BankSlot].Hash)));
                         if (testSeq.SequenceBinaryList.Count == 0) // all removed, song is dead.
                         {
-                            // TODO write detection for a song already chosen, that could swap to a bank we can use with this song, to swap both for compatibility
-                              // find a list of all currently chosen songs
-                              // find a sublist of songs that have multiple possible banks
-                                // check those songs for banks that are compatible with this song
-                                  // if one is found, swap that song sequence to point at the new one, 
-                                  //  unset modified of the old used bank, 
-                                    // set the new bank
-                                      // now what? should we just force the song to find a useful spot? that's not terribly random, that almost forces the same songs every seed
 
                             WriteOutput(GetSpacedString(testSeq.Name) + " cannot be used because it requires custom audiobank(s) already claimed ");
                             Unassigned.Remove(testSeq);
                             continue;
                         }
+
+                        // randomize instrument sets last second, so the early banks don't get ravaged based on order
+                        if (testSeq.SequenceBinaryList.Count > 1)
+                            testSeq.SequenceBinaryList = testSeq.SequenceBinaryList.OrderBy(x => random.Next()).ToList();
                     }
 
                     // do the target slot and the possible match seq share a category?
-                    if (testSeq.Type.Intersect(targetSequence.Type).Any()){
+                    if (testSeq.Type.Intersect(targetSequence.Type).Any())
+                    {
                         AssignSequenceSlot(targetSequence, testSeq, Unassigned, "");
                         foundValidReplacement = true;
                         break;
@@ -171,7 +165,7 @@ namespace MMR.Randomizer
                     {
                         WriteOutput(" * generalized replacement with " + replacementSong.Name + " song, with categories: " + String.Join(",", replacementSong.Type));
                         replacementSong.Replaces = targetSequence.Replaces;
-                        WriteOutput(GetSpacedString(replacementSong.Name, len: 49) + " ~-> " + targetSequence.Name);
+                        WriteOutput(GetSpacedString(targetSequence.Name, len: 49) + " ~-> " + replacementSong.Name);
                         Unassigned.Remove(replacementSong);
                     }
                     else
@@ -188,18 +182,21 @@ namespace MMR.Randomizer
 
             RomData.SequenceList.RemoveAll(u => u.Replaces == -1); // this still gets used in SequenceUtils.cs::RebuildAudioSeq
 
-            String dir = Path.GetDirectoryName(_settings.OutputROMFilename);
-            String path = $"{Path.GetFileNameWithoutExtension(_settings.OutputROMFilename)}";
-            // spoiler log should already be written by the time we reach this far
-            if (File.Exists(Path.Combine(dir, path + "_SpoilerLog.txt")))
-                path += "_SpoilerLog.txt";
-            else // TODO add HTML log compatibility
-                path += "_SongLog.txt";
-
-            using (StreamWriter sw = new StreamWriter(Path.Combine(dir, path), append: true))
+            if (_settings.GenerateSpoilerLog)
             {
-                sw.WriteLine(""); // spacer
-                sw.Write(log);
+                String dir = Path.GetDirectoryName(_settings.OutputROMFilename);
+                String path = $"{Path.GetFileNameWithoutExtension(_settings.OutputROMFilename)}";
+                // spoiler log should already be written by the time we reach this far
+                if (File.Exists(Path.Combine(dir, path + "_SpoilerLog.txt")))
+                    path += "_SpoilerLog.txt";
+                else // TODO add HTML log compatibility
+                    path += "_SongLog.txt";
+
+                using (StreamWriter sw = new StreamWriter(Path.Combine(dir, path), append: true))
+                {
+                    sw.WriteLine(""); // spacer
+                    sw.Write(log);
+                }
             }
 
             // internal functions just for BGMshuffle
@@ -233,7 +230,7 @@ namespace MMR.Randomizer
                     song_seq.SequenceBinaryList = new List<SequenceBinaryData> { song_seq.SequenceBinaryList[0] }; // lock the one we want
                 }
                 song_seq.Replaces = slot_seq.Replaces; // tells the rando later what song to put into slot_seq
-                WriteOutput(GetSpacedString(song_seq.Name, len: 49, debug_characters) + " -> " + slot_seq.Name);
+                WriteOutput(GetSpacedString(slot_seq.Name, len: 49, debug_characters) + " -> " + song_seq.Name);
                 remaining_songs.Remove(song_seq);
             }
         }
@@ -257,7 +254,7 @@ namespace MMR.Randomizer
             }
             else
             {
-                throw new IndexOutOfRangeException("Could not convert slot to pointer:" + seqSlotIndex.ToString("X"));
+                throw new IndexOutOfRangeException("Could not convert slot to pointer:" + seqSlotIndex.ToString("X2"));
             }
         }
 
@@ -278,7 +275,7 @@ namespace MMR.Randomizer
 
             ResourceUtils.ApplyHack(Values.ModsDirectory, "fix-music");
             ResourceUtils.ApplyHack(Values.ModsDirectory, "inst24-swap-guitar");
-            SequenceUtils.RebuildAudioSeq(RomData.SequenceList, _settings);
+            SequenceUtils.RebuildAudioSeq(RomData.SequenceList, _settings, _cosmeticSettings.Music == Music.Random && _settings.GenerateSpoilerLog);
             SequenceUtils.RebuildAudioBank(RomData.InstrumentSetList);
         }
 
