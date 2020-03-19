@@ -454,7 +454,7 @@ namespace MMR.Randomizer.Utils
         public static bool ValidateROM(string FileName)
         {
             bool res = false;
-            using (BinaryReader ROM = new BinaryReader(File.Open(FileName, FileMode.Open, FileAccess.Read)))
+            using (BinaryReader ROM = new BinaryReader(File.Open(FileName, FileMode.Open, FileAccess.Read, FileShare.Read)))
             {
                 if (ROM.BaseStream.Length == 0x2000000)
                 {

@@ -302,7 +302,7 @@ namespace MMR.CLI
             if (File.Exists(path))
             {
                 Configuration configuration;
-                using (StreamReader Req = new StreamReader(File.Open(path, FileMode.Open)))
+                using (StreamReader Req = new StreamReader(File.Open(path, FileMode.Open, FileAccess.Read, FileShare.Read)))
                 {
                     configuration = Configuration.FromJson(Req.ReadToEnd());
                 }
