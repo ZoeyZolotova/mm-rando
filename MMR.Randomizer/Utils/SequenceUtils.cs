@@ -132,7 +132,7 @@ namespace MMR.Randomizer.Utils
                 }
 
                 byte[] input_seq_data = null;
-                using (BinaryReader bank_reader = new BinaryReader(File.Open(Path.Combine(directory , filename), FileMode.Open)))
+                using (BinaryReader bank_reader = new BinaryReader(File.OpenRead(Path.Combine(directory , filename))))
                 {
                     input_seq_data = new byte[((int)bank_reader.BaseStream.Length)];
                     bank_reader.Read(input_seq_data, 0, (int)bank_reader.BaseStream.Length);
@@ -146,14 +146,14 @@ namespace MMR.Randomizer.Utils
                     // load the custom bank for this file
                     byte[] input_bank_data = null;
                     String bank_name = filename.Substring(0, filename.LastIndexOf(".zseq")) + ".zbank";
-                    using (BinaryReader bank_reader = new BinaryReader(File.Open(Path.Combine(directory , bank_name), FileMode.Open)))
+                    using (BinaryReader bank_reader = new BinaryReader(File.OpenRead(Path.Combine(directory , bank_name))))
                     {
                         input_bank_data = new byte[((int)bank_reader.BaseStream.Length)];
                         bank_reader.Read(input_bank_data, 0, (int)bank_reader.BaseStream.Length);
                     }
 
                     byte[] meta_data = new byte[8];
-                    using (BinaryReader meta_reader = new BinaryReader(File.Open(Path.Combine(directory , bank_name.Substring(0, bank_name.LastIndexOf(".zbank")) + ".bankmeta"), FileMode.Open)))
+                    using (BinaryReader meta_reader = new BinaryReader(File.OpenRead(Path.Combine(directory , bank_name.Substring(0, bank_name.LastIndexOf(".zbank")) + ".bankmeta"))))
                         meta_reader.Read(meta_data, 0, meta_data.Length);
 
                     pieces[1] = pieces[1].Replace("x", "");
@@ -398,7 +398,7 @@ namespace MMR.Randomizer.Utils
                         byte[] data;
                         if (File.Exists(SequenceList[j].Filename))
                         {
-                            using (var reader = new BinaryReader(File.Open(SequenceList[j].Filename, FileMode.Open)))
+                            using (var reader = new BinaryReader(File.OpenRead(SequenceList[j].Filename)))
                             {
                                 data = new byte[(int)reader.BaseStream.Length];
                                 reader.Read(data, 0, data.Length);

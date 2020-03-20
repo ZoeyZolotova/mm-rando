@@ -305,7 +305,7 @@ namespace MMR.Randomizer
 
             int characterIndex = (int)_randomized.Settings.Character;
 
-            using (var b = new BinaryReader(File.Open(Path.Combine(Values.ObjsDirectory, $"link-{characterIndex}"), FileMode.Open)))
+            using (var b = new BinaryReader(File.OpenRead(Path.Combine(Values.ObjsDirectory, $"link-{characterIndex}"))))
             {
                 var obj = new byte[b.BaseStream.Length];
                 b.Read(obj, 0, obj.Length);
@@ -315,7 +315,7 @@ namespace MMR.Randomizer
 
             if (_randomized.Settings.Character == Character.Kafei)
             {
-                using (var b = new BinaryReader(File.Open(Path.Combine(Values.ObjsDirectory, "kafei"), FileMode.Open)))
+                using (var b = new BinaryReader(File.OpenRead(Path.Combine(Values.ObjsDirectory, "kafei"))))
                 {
                     var obj = new byte[b.BaseStream.Length];
                     b.Read(obj, 0, obj.Length);
@@ -323,7 +323,7 @@ namespace MMR.Randomizer
                     ResourceUtils.ApplyHack(Values.ModsDirectory, "fix-kafei");
                 }
 
-                using (var b = new BinaryReader(File.Open(Path.Combine(Values.ObjsDirectory, "link-mask"), FileMode.Open)))
+                using (var b = new BinaryReader(File.OpenRead(Path.Combine(Values.ObjsDirectory, "link-mask"))))
                 {
                     var obj = new byte[b.BaseStream.Length];
                     b.Read(obj, 0, obj.Length);
@@ -331,7 +331,7 @@ namespace MMR.Randomizer
                     ResourceUtils.ApplyHack(Values.ModsDirectory, "update-kafei-mask-icon");
                 }
 
-                using (var b = new BinaryReader(File.Open(Path.Combine(Values.ObjsDirectory, "gi-link-mask"), FileMode.Open)))
+                using (var b = new BinaryReader(File.OpenRead(Path.Combine(Values.ObjsDirectory, "gi-link-mask"))))
                 {
                     var obj = new byte[b.BaseStream.Length];
                     b.Read(obj, 0, obj.Length);
@@ -1390,7 +1390,7 @@ namespace MMR.Randomizer
 
         public void MakeROM(OutputSettings outputSettings, IProgressReporter progressReporter)
         {
-            using (BinaryReader OldROM = new BinaryReader(File.Open(outputSettings.InputROMFilename, FileMode.Open, FileAccess.Read)))
+            using (BinaryReader OldROM = new BinaryReader(File.OpenRead(outputSettings.InputROMFilename)))
             {
                 RomUtils.ReadFileTable(OldROM);
                 _messageTable.InitializeTable();

@@ -42,7 +42,7 @@ namespace MMR.Randomizer.Utils
         public static int AddNewFile(string path, string filename)
         {
             byte[] buffer;
-            using (BinaryReader data = new BinaryReader(File.Open(Path.Combine(path, filename), FileMode.Open)))
+            using (BinaryReader data = new BinaryReader(File.OpenRead(Path.Combine(path, filename))))
             {
                 int len = (int)data.BaseStream.Length;
                 buffer = new byte[len];
@@ -107,7 +107,7 @@ namespace MMR.Randomizer.Utils
 
         public static int ByteswapROM(string filename)
         {
-            using (BinaryReader ROM = new BinaryReader(File.Open(filename, FileMode.Open)))
+            using (BinaryReader ROM = new BinaryReader(File.OpenRead(filename)))
             {
                 if (ROM.BaseStream.Length % 4 != 0)
                 {
@@ -454,7 +454,7 @@ namespace MMR.Randomizer.Utils
         public static bool ValidateROM(string FileName)
         {
             bool res = false;
-            using (BinaryReader ROM = new BinaryReader(File.Open(FileName, FileMode.Open, FileAccess.Read, FileShare.Read)))
+            using (BinaryReader ROM = new BinaryReader(File.OpenRead(FileName)))
             {
                 if (ROM.BaseStream.Length == 0x2000000)
                 {
