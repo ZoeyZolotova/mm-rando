@@ -26,64 +26,43 @@ namespace MMR.Randomizer.Templates
         /// </summary>
         public virtual string TransformText()
         {
-            this.Write(@"<html>
-<head>
-<style>
-    body.dark-mode {
-      background-color: #111;
-      color: #ccc;
-    }
-    body.dark-mode a {
-      color: #111;
-    }
-    body.dark-mode button {
-      background-color: #ddd;
-      color: #111;
-    }
-
-    body.light-mode {
-      background-color: #eee;
-      color: #111;
-    }
-    body.light-mode a {
-      color: #111;
-    }
-    body.light-mode button {
-      background-color: #111;
-      color: #ccc;
-    }
-
-    th{ text-align:left }
-    .region { text-align: center; font-weight: bold; }
-    [data-content]:before { content: attr(data-content); }
-
-	.dark-mode .spoiler{ background-color:#ccc }
-	.dark-mode .spoiler:hover { background-color: #111;  }
-	.dark-mode .show-highlight .unavailable .newlocation { background-color: #500705; }
-	.dark-mode .show-highlight .acquired .newlocation { background-color: #69591f; }
-	.dark-mode .show-highlight .available .newlocation { background-color: #313776; }
-
-	.light-mode .spoiler{ background-color:#111 }
-	.light-mode .spoiler:hover { background-color: #ccc;  }
-	.light-mode .show-highlight .unavailable .newlocation { background-color: #FF9999; }
-	.light-mode .show-highlight .acquired .newlocation { background-color: #99FF99; }
-	.light-mode .show-highlight .available .newlocation { background-color: #9999FF; }
-
-
-    #spoilerLogState { width: 560px; }
-</style>
-</head>
-<body class=""light-mode"">
-<label><b>Version: </b></label><span>");
+            this.Write("<html>\r\n<head>\r\n<style>\r\n    body.dark-mode {\r\n      background-color: #111;\r\n   " +
+                    "   color: #ccc;\r\n    }\r\n    body.dark-mode a {\r\n      color: #111;\r\n    }\r\n    b" +
+                    "ody.dark-mode button {\r\n      background-color: #ddd;\r\n      color: #111;\r\n    }" +
+                    "\r\n\r\n    body.light-mode {\r\n      background-color: #eee;\r\n      color: #111;\r\n  " +
+                    "  }\r\n    body.light-mode a {\r\n      color: #111;\r\n    }\r\n    body.light-mode but" +
+                    "ton {\r\n      background-color: #111;\r\n      color: #ccc;\r\n    }\r\n\r\n    th{ text-" +
+                    "align:left }\r\n    .region { text-align: center; font-weight: bold; }\r\n    [data-" +
+                    "content]:before { content: attr(data-content); }\r\n\r\n\t.dark-mode .spoiler{ backgr" +
+                    "ound-color:#ccc }\r\n\t.dark-mode .spoiler:hover { background-color: #111;  }\r\n\t.da" +
+                    "rk-mode .show-highlight .unavailable .newlocation { background-color: #500705; }" +
+                    "\r\n\t.dark-mode .show-highlight .acquired .newlocation { background-color: #69591f" +
+                    "; }\r\n\t.dark-mode .show-highlight .available .newlocation { background-color: #31" +
+                    "3776; }\r\n\r\n\t.light-mode .spoiler{ background-color:#111 }\r\n\t.light-mode .spoiler" +
+                    ":hover { background-color: #ccc;  }\r\n\t.light-mode .show-highlight .unavailable ." +
+                    "newlocation { background-color: #FF9999; }\r\n\t.light-mode .show-highlight .acquir" +
+                    "ed .newlocation { background-color: #99FF99; }\r\n\t.light-mode .show-highlight .av" +
+                    "ailable .newlocation { background-color: #9999FF; }\r\n\r\n    .light-mode .never-sp" +
+                    "oil { background-color: #111; color: #111; }\r\n    .light-mode .never-spoil:hover" +
+                    " { background-color: #111; color: #111; }\r\n\r\n    .dark-mode .never-spoil { backg" +
+                    "round-color: #ccc; color: #ccc; }\r\n    .dark-mode .never-spoil:hover { backgroun" +
+                    "d-color: #ccc; color: #ccc; }\r\n\r\n    #spoilerLogState { width: 560px; }\r\n</style" +
+                    ">\r\n</head>\r\n<body class=\"light-mode\">\r\n<label><b>Version: </b></label><span>");
             this.Write(this.ToStringHelper.ToStringWithCulture(spoiler.Version));
             this.Write("</span><br/>\r\n<label><b>Settings: </b></label><code style=\"word-break: break-all;" +
                     "\">");
             this.Write(this.ToStringHelper.ToStringWithCulture(spoiler.SettingsString));
             this.Write("</code><br/>\r\n<label><b>Seed: </b></label><span>");
             this.Write(this.ToStringHelper.ToStringWithCulture(spoiler.Seed));
-            this.Write("</span><br/>\r\n<br/>\r\n<button type=\"button\" onclick=\"toggleDarkLight()\" title=\"Tog" +
-                    "gle dark/light mode\">Toggle Dark Theme</button>\r\n<br/>\r\n<br/>\r\n<label><b>Spoiler" +
-                    " Log State: </b></label><input id=\"spoilerLogState\" type=\"text\"/><br/>\r\n");
+            this.Write(@"</span><br/>
+<br/>
+<button type=""button"" onclick=""toggleDarkLight()"" title=""Toggle dark/light mode"">Toggle Dark Theme</button>
+<br/>
+<input type=""checkbox"" id=""never-spoil"" name=""neverSpoil"" value=""neverSpoil"">
+<label for=""never-spoil""> Never Spoil</label></br>
+<br/>
+<label><b>Spoiler Log State: </b></label><input id=""spoilerLogState"" type=""text""/><br/>
+");
  if (spoiler.RandomizeDungeonEntrances) { 
 
             this.Write("<h2>Dungeon Entrance Replacements</h2>\r\n<table border=\"1\" class=\"item-replacement" +
@@ -229,11 +208,16 @@ namespace MMR.Randomizer.Templates
                     "ctorAll(\"table.item-replacements\");\r\n        for (var i = 0; i < tables.length; " +
                     "i++) {\r\n            if (e.target.checked) {\r\n                tables[i].classList" +
                     ".add(\"show-highlight\");\r\n            } else {\r\n                tables[i].classLi" +
-                    "st.remove(\"show-highlight\");\r\n            }\r\n        }\r\n\t});\r\n\r\n    function tog" +
-                    "gleDarkLight() {\r\n\t    var body = document.getElementsByTagName(\'body\')[0];\r\n\t  " +
-                    "  var currentClassBody = body.className;\r\n\t    body.className = currentClassBody" +
-                    " === \"dark-mode\" ? \"light-mode\" : \"dark-mode\";\r\n    }\r\n</script>\r\n</body>\r\n</htm" +
-                    "l>");
+                    "st.remove(\"show-highlight\");\r\n            }\r\n        }\r\n\t});\r\n\r\n\tdocument.queryS" +
+                    "elector(\"#never-spoil\").addEventListener(\"click\", function(e) {\r\n        var spo" +
+                    "ilers = document.querySelectorAll(\".itemname:nth-child(3), .newlocation:nth-chil" +
+                    "d(3)\");\r\n        for (var i = 0; i < spoilers.length; i++) {\r\n            if (e." +
+                    "target.checked) {\r\n                spoilers[i].classList.add(\"never-spoil\");\r\n  " +
+                    "          } else {\r\n                spoilers[i].classList.remove(\"never-spoil\");" +
+                    "\r\n            }\r\n        }\r\n\t});\r\n\r\n    function toggleDarkLight() {\r\n\t    var b" +
+                    "ody = document.getElementsByTagName(\'body\')[0];\r\n\t    var currentClassBody = bod" +
+                    "y.className;\r\n\t    body.className = currentClassBody === \"dark-mode\" ? \"light-mo" +
+                    "de\" : \"dark-mode\";\r\n    }\r\n</script>\r\n</body>\r\n</html>");
             return this.GenerationEnvironment.ToString();
         }
     }
