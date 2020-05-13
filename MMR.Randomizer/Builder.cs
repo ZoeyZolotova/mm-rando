@@ -1526,7 +1526,8 @@ namespace MMR.Randomizer
         {
             var addFairies = _randomized.Settings.AddStrayFairies;
             var addSkulltulas = _randomized.Settings.AddSkulltulaTokens;
-            var extended = _extendedObjects = ExtendedObjects.Create(addFairies, addSkulltulas);
+            var randomStrayFairyColors = _cosmeticSettings.RandomStrayFairyColors;
+            var extended = _extendedObjects = ExtendedObjects.Create(addFairies, addSkulltulas, randomStrayFairyColors);
 
             foreach (var e in RomData.GetItemList.Values)
             {

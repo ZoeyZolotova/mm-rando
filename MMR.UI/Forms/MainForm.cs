@@ -146,6 +146,7 @@ namespace MMR.UI.Forms
             TooltipBuilder.SetTooltip(cEnableNightMusic, "Enables playing daytime Background music during nighttime in the field.\n(Clocktown night music can be weird)");
             TooltipBuilder.SetTooltip(cArrowCycling, "Cycle through arrow types when pressing R while an arrow is out when using the bow.");
             TooltipBuilder.SetTooltip(cCloseCows, "When playing Epona's Song for a group of cows, the closest cow will respond, instead of the default behavior.");
+            TooltipBuilder.SetTooltip(cRandomStrayFairyColors, "Randomizes all Stray Fairy colors.");
         }
 
         /// <summary>
@@ -716,6 +717,11 @@ namespace MMR.UI.Forms
         private void cCloseCows_CheckedChanged(object sender, EventArgs e)
         {
             UpdateSingleSetting(() => _configuration.GameplaySettings.CloseCows = cCloseCows.Checked);
+        }
+
+        private void cRandomStrayFairyColors_CheckedChanged(object sender, EventArgs e)
+        {
+            UpdateSingleSetting(() => _configuration.CosmeticSettings.RandomStrayFairyColors = cRandomStrayFairyColors.Checked);
         }
 
         private void cMode_SelectedIndexChanged(object sender, EventArgs e)

@@ -47,11 +47,12 @@ namespace MMR.Randomizer.Asm
         /// </summary>
         /// <param name="fairies">Whether or not to include Stray Fairy objects</param>
         /// <param name="skulltulas">Whether or not to include Skulltula Token objects</param>
+        /// <param name="randomStrayFairyColors">Whether or not to randomize the Stray Fairy object colors. Does nothing if fairies is false.</param>
         /// <returns>ExtendedObjects</returns>
-        public static ExtendedObjects Create(bool fairies = false, bool skulltulas = false)
+        public static ExtendedObjects Create(bool fairies = false, bool skulltulas = false, bool randomStrayFairyColors = false)
         {
             var result = new ExtendedObjects();
-            result.AddExtendedObjects(fairies, skulltulas);
+            result.AddExtendedObjects(fairies, skulltulas, randomStrayFairyColors);
             return result;
         }
 
@@ -84,7 +85,8 @@ namespace MMR.Randomizer.Asm
         /// </summary>
         /// <param name="fairies">Whether or not to include Stray Fairy objects</param>
         /// <param name="skulltulas">Whether or not to include Skulltula Token objects</param>
-        void AddExtendedObjects(bool fairies = false, bool skulltulas = false)
+        /// <param name="randomStrayFairyColors">Whether or not to randomize the Stray Fairy object colors. Does nothing if fairies is false.</param>
+        void AddExtendedObjects(bool fairies = false, bool skulltulas = false, bool randomStrayFairyColors = false)
         {
             // Add Double Defense
             this.Offsets.Add(AddDoubleDefense());
@@ -104,7 +106,14 @@ namespace MMR.Randomizer.Asm
             // Add Stray Fairies
             if (fairies)
             {
-                AddAllStrayFairies();
+                if (randomStrayFairyColors)
+                {
+                    AddAllRandomStrayFairies();
+                }
+                else
+                {
+                    AddAllStrayFairies();
+                }
                 this.Indexes.Fairies = AdvanceIndex(5);
             }
         }
@@ -136,7 +145,7 @@ namespace MMR.Randomizer.Asm
         /// <summary>
         /// Colors used for Stray Fairy object data.
         /// </summary>
-        struct StrayFairyColors
+        public struct StrayFairyColors
         {
             public Color OuterPrimColor;
             public Color InnerPrimColor;
@@ -153,6 +162,24 @@ namespace MMR.Randomizer.Asm
             this.Offsets.Add(AddSnowheadStrayFairy());
             this.Offsets.Add(AddGreatBayStrayFairy());
             this.Offsets.Add(AddStoneTowerStrayFairy());
+        }
+
+        /// <summary>
+        /// Add all Stray Fairy objects with random colors.
+        /// </summary>
+        void AddAllRandomStrayFairies()
+        {
+            var clockTown = AddRandomStrayFairy();
+            var woodfall = AddRandomStrayFairy();
+            var snowhead = AddRandomStrayFairy();
+            var greatBay = AddRandomStrayFairy();
+            var stoneTower = AddRandomStrayFairy();
+
+            this.Offsets.Add(clockTown);
+            this.Offsets.Add(woodfall);
+            this.Offsets.Add(snowhead);
+            this.Offsets.Add(greatBay);
+            this.Offsets.Add(stoneTower);
         }
 
         /// <summary>
@@ -184,13 +211,7 @@ namespace MMR.Randomizer.Asm
         /// <returns>Offsets</returns>
         (uint, uint) AddClockTownStrayFairy()
         {
-            var colors = new StrayFairyColors
-            {
-                OuterPrimColor = Color.FromArgb(0xFF, 0xA5, 0x00),
-                InnerPrimColor = Color.FromArgb(0xFF, 0xFF, 0xDC),
-                InnerEnvColor = Color.FromArgb(0xFF, 0x80, 0x00),
-            };
-            return AddStrayFairy(colors);
+            return AddStrayFairy(DefaultStrayFairyColors.ClockTown);
         }
 
         /// <summary>
@@ -199,13 +220,7 @@ namespace MMR.Randomizer.Asm
         /// <returns>Offsets</returns>
         (uint, uint) AddWoodfallStrayFairy()
         {
-            var colors = new StrayFairyColors
-            {
-                OuterPrimColor = Color.FromArgb(0xFF, 0x69, 0xB4),
-                InnerPrimColor = Color.FromArgb(0xFF, 0xDC, 0xFF),
-                InnerEnvColor = Color.FromArgb(0xFF, 0x00, 0x64),
-            };
-            return AddStrayFairy(colors);
+            return AddStrayFairy(DefaultStrayFairyColors.Woodfall);
         }
 
         /// <summary>
@@ -214,13 +229,7 @@ namespace MMR.Randomizer.Asm
         /// <returns>Offsets</returns>
         (uint, uint) AddSnowheadStrayFairy()
         {
-            var colors = new StrayFairyColors
-            {
-                OuterPrimColor = Color.FromArgb(0x00, 0xC0, 0x00),
-                InnerPrimColor = Color.FromArgb(0xDC, 0xFF, 0xFF),
-                InnerEnvColor = Color.FromArgb(0x00, 0xFF, 0x32),
-            };
-            return AddStrayFairy(colors);
+            return AddStrayFairy(DefaultStrayFairyColors.Snowhead);
         }
 
         /// <summary>
@@ -229,13 +238,7 @@ namespace MMR.Randomizer.Asm
         /// <returns>Offsets</returns>
         (uint, uint) AddGreatBayStrayFairy()
         {
-            var colors = new StrayFairyColors
-            {
-                OuterPrimColor = Color.FromArgb(0x18, 0x74, 0xCD),
-                InnerPrimColor = Color.FromArgb(0xDC, 0xFF, 0xFF),
-                InnerEnvColor = Color.FromArgb(0x00, 0x64, 0xFF),
-            };
-            return AddStrayFairy(colors);
+            return AddStrayFairy(DefaultStrayFairyColors.GreatBay);
         }
 
         /// <summary>
@@ -244,15 +247,17 @@ namespace MMR.Randomizer.Asm
         /// <returns>Offsets</returns>
         (uint, uint) AddStoneTowerStrayFairy()
         {
-            var colors = new StrayFairyColors
-            {
-                OuterPrimColor = Color.FromArgb(0xFF, 0xFF, 0x00),
-                InnerPrimColor = Color.FromArgb(0xFF, 0xFF, 0xDC),
-                InnerEnvColor = Color.FromArgb(0xFF, 0xFF, 0x00),
-            };
-            return AddStrayFairy(colors);
+            return AddStrayFairy(DefaultStrayFairyColors.StoneTower);
         }
 
+        /// <summary>
+        /// Add an object for Stone Tower Stray Fairies.
+        /// </summary>
+        /// <returns>Offsets</returns>
+        (uint, uint) AddRandomStrayFairy()
+        {
+            return AddStrayFairy(RandomStrayFairColors.Generate());
+        }
         #endregion
 
         #region Skulltula Tokens

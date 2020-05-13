@@ -122,6 +122,7 @@ namespace MMR.UI.Forms
             this.cQuestItemStorage = new System.Windows.Forms.CheckBox();
             this.cCutsc = new System.Windows.Forms.CheckBox();
             this.cNoDowngrades = new System.Windows.Forms.CheckBox();
+            this.cRandomStrayFairyColors = new System.Windows.Forms.CheckBox();
             this.tabGimmicks = new System.Windows.Forms.TabPage();
             this.cByoAmmo = new System.Windows.Forms.CheckBox();
             this.cFDAnywhere = new System.Windows.Forms.CheckBox();
@@ -1119,6 +1120,7 @@ namespace MMR.UI.Forms
             this.groupBox7.Controls.Add(this.cQuestItemStorage);
             this.groupBox7.Controls.Add(this.cCutsc);
             this.groupBox7.Controls.Add(this.cNoDowngrades);
+            this.groupBox7.Controls.Add(this.cRandomStrayFairyColors);
             this.groupBox7.Location = new System.Drawing.Point(373, 6);
             this.groupBox7.Name = "groupBox7";
             this.groupBox7.Size = new System.Drawing.Size(286, 211);
@@ -1315,6 +1317,16 @@ namespace MMR.UI.Forms
             this.cNoDowngrades.UseVisualStyleBackColor = false;
             this.cNoDowngrades.CheckedChanged += new System.EventHandler(this.cNoDowngrades_CheckedChanged);
             // 
+            // cRandomStrayFairyColors
+            //
+            this.cRandomStrayFairyColors.AutoSize = true;
+            this.cRandomStrayFairyColors.Location = new System.Drawing.Point(147, 183);
+            this.cRandomStrayFairyColors.Name = "cRandomStrayFairyColors";
+            this.cRandomStrayFairyColors.Size = new System.Drawing.Size(133, 17);
+            this.cRandomStrayFairyColors.TabIndex = 37;
+            this.cRandomStrayFairyColors.Text = "Random Fairy Colors";
+            this.cRandomStrayFairyColors.CheckedChanged += new System.EventHandler(this.cRandomStrayFairyColors_CheckedChanged);
+            //
             // tabGimmicks
             // 
             this.tabGimmicks.Controls.Add(this.cDeathMoonCrash);
@@ -2181,6 +2193,7 @@ namespace MMR.UI.Forms
         private System.Windows.Forms.Button bToggleTricks;
         private System.Windows.Forms.CheckBox cByoAmmo;
         private System.Windows.Forms.CheckBox cDeathMoonCrash;
+        private System.Windows.Forms.CheckBox cRandomStrayFairyColors;
     }
 }
 

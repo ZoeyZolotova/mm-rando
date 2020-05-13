@@ -54,6 +54,11 @@ namespace MMR.Randomizer.Models.Settings
         /// </summary>
         public bool EnableNightBGM { get; set; }
 
+        /// <summary>
+        /// Enables stray fairy colors to be randomized.
+        /// </summary>
+        public bool RandomStrayFairyColors { get; set; }
+
         #region Asm Getters / Setters
 
         /// <summary>
