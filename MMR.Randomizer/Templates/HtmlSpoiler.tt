@@ -47,6 +47,11 @@
 	.light-mode .show-highlight .acquired .newlocation { background-color: #99FF99; }
 	.light-mode .show-highlight .available .newlocation { background-color: #9999FF; }
 
+    .light-mode .never-spoil { background-color: #111; color: #111; }
+    .light-mode .never-spoil:hover { background-color: #111; color: #111; }
+
+    .dark-mode .never-spoil { background-color: #ccc; color: #ccc; }
+    .dark-mode .never-spoil:hover { background-color: #ccc; color: #ccc; }
 
     #spoilerLogState { width: 560px; }
 </style>
@@ -58,6 +63,8 @@
 <br/>
 <button type="button" onclick="toggleDarkLight()" title="Toggle dark/light mode">Toggle Dark Theme</button>
 <br/>
+<input type="checkbox" id="never-spoil" name="neverSpoil" value="neverSpoil">
+<label for="never-spoil"> Never Spoil</label></br>
 <br/>
 <label><b>Spoiler Log State: </b></label><input id="spoilerLogState" type="text"/><br/>
 <# if (spoiler.RandomizeDungeonEntrances) { 
@@ -297,6 +304,17 @@
                 tables[i].classList.add("show-highlight");
             } else {
                 tables[i].classList.remove("show-highlight");
+            }
+        }
+	});
+
+	document.querySelector("#never-spoil").addEventListener("click", function(e) {
+        var spoilers = document.querySelectorAll(".itemname:nth-child(3), .newlocation:nth-child(3)");
+        for (var i = 0; i < spoilers.length; i++) {
+            if (e.target.checked) {
+                spoilers[i].classList.add("never-spoil");
+            } else {
+                spoilers[i].classList.remove("never-spoil");
             }
         }
 	});
