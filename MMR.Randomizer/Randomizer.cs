@@ -1105,6 +1105,85 @@ namespace MMR.Randomizer
         }
 
         /// <summary>
+        /// Places plando items in the randomization pool
+        ///   re-implements PlaceItem for plando
+        ///   reasons: we need pass a different list of checks, but itemPool still needs to be decremented
+        ///            we want a different error, stating plando failed not just any randomization
+        ///            for plando, we want the ability to bypass logic
+        ///            for skipped logic, we still need to make sure certain items are not placed in starting slots
+        /// </summary>
+        /// <param name="itemPool"></param>
+        private void PlacePlandoItems(List<Item> itemPool = null)
+        {
+            // remember, this is a check pool, not an item pool
+            if (itemPool == null)
+            {
+                itemPool = new List<Item>();
+                AddAllItems(itemPool);
+            }
+
+            List<PlandoItemCombo> plandoItemCombos = PlandoUtils.ReadAllItemPlandoFiles(itemPool);
+            if (plandoItemCombos != null)
+            {
+                foreach (PlandoItemCombo pic in plandoItemCombos)
+                {
+                    var itemCombo = PlandoUtils.CleanItemCombo(pic, Random, itemPool, ItemList);
+                    if (itemCombo == null) // not possible to fullfill
+                    {
+                        // let's backtrack and find the items that are already assigned
+                        //   and the checks that are already taken and print them
+                        var allItems = ItemList.FindAll(u => pic.ItemList.Contains(u.Item));
+                        var previouslyPlacedItems = allItems.FindAll(u => u.IsRandomized);
+                        string picDebug = "Items that were already assigned:\n";
+                        foreach(var item in previouslyPlacedItems)
+                        {
+                            picDebug += "- [" + item.Item.Name() + "] was placed in check: [" + item.NewLocation.Value.Location() + "]\n";
+                        }
+                        var previouslyPlacedChecks = ItemList.FindAll(u => u.IsRandomized && pic.CheckList.Contains(u.NewLocation.Value));
+                        picDebug += "\nChecks that were already assigned:\n";
+                        foreach (var item in previouslyPlacedChecks)
+                        {
+                            picDebug += "- [" + item.NewLocation.Value.Location() + "] was filled with item: [" + item.Item.Name() + "]\n";
+                        }
+                        throw new Exception("Error: Plando failed to build with this seed\n combo name: [" + pic.Name + "]\n\n" + picDebug);
+                    }
+
+                    int drawCount = 0;
+                    for(int itemCount = 0; drawCount < itemCombo.ItemDrawCount && itemCount < itemCombo.ItemList.Count; itemCount++)
+                    {
+                        /// for all items, attempt to add; count successes
+                        Item item = itemCombo.ItemList[itemCount];
+                        foreach (Item check in itemCombo.CheckList)
+                        {
+                            if (itemCombo.SkipLogic && ItemUtils.IsStartingLocation(check) && ForbiddenStartingItems.Contains(item))
+                            {
+                                Debug.WriteLine("Cannot place forbidden item in starting location: " + item.Name());
+                                continue;
+                            }
+
+                            if (itemCombo.SkipLogic || CheckMatch(item, check))
+                            {
+                                ItemList[item].NewLocation = check;
+                                ItemList[item].IsRandomized = true;
+
+                                Debug.WriteLine($"----Plando Placed {item.Name()} at {check.Location()}----");
+
+                                itemPool.Remove(check);
+                                itemCombo.CheckList.Remove(check);
+                                drawCount++;
+                                break;
+                            }
+                        }
+                    }
+                    if (drawCount < itemCombo.ItemDrawCount)
+                    {
+                        throw new Exception("Error: Plando could not find enough checks to match this plandos items with this seed: " + itemCombo.Name);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
         /// Places starting items in the randomization pool.
         /// </summary>
         private void PlaceStartingItems(List<Item> itemPool)
@@ -1369,6 +1448,8 @@ namespace MMR.Randomizer
                 ItemList[Item.SongSoaring].NewLocation = Item.SongSoaring;
             }
 
+            PlacePlandoItems();
+
             if (!_settings.AddSongs)
             {
                 ShuffleSongs();
@@ -1620,15 +1701,27 @@ namespace MMR.Randomizer
         private void ShuffleSongs()
         {
             var itemPool = new List<Item>();
+            // build check list
             for (var i = Item.SongHealing; i <= Item.SongOath; i++)
             {
-                if (ItemList[i].NewLocation.HasValue)
+                /*if (ItemList[i].NewLocation.HasValue) // this seems to do the oposite of what we want
                 {
                     continue;
-                }
+                }*/
                 itemPool.Add(i);
             }
 
+            // plando: if a song location was already selected
+            foreach (var item in itemPool.ToList())
+            {
+                // if check already has an item, remove from list
+                if (ItemList[item].NewLocation.HasValue)
+                {
+                    itemPool.Remove(ItemList[item].NewLocation.Value);
+                }
+            }
+
+            // add songs to list
             for (var i = Item.SongHealing; i <= Item.SongOath; i++)
             {
                 PlaceItem(i, itemPool);
@@ -1645,6 +1738,9 @@ namespace MMR.Randomizer
 
             // Should these be vanilla by default? Why not check settings.
             ApplyCustomItemList();
+
+            // the above functions would cancel plando, must be at least here
+            PlacePlandoItems();
 
             // Should these be randomized by default? Why not check settings.
             AddBottleCatchContents();

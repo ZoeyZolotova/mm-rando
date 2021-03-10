@@ -144,6 +144,14 @@ namespace MMR.Randomizer
                 }
             }
 
+            // music plando, user has selected they want an easier time specifying where and what songs are placed in specific spots
+            var plandoPlacements = PlandoUtils.GetRandomizedSongPlacements(random, log);
+            foreach ((var song, var slot) in plandoPlacements)
+            {
+                AssignSequenceSlot(slot, song, Unassigned, "PLANDO");
+                RomData.TargetSequences.Remove(slot);
+            }
+
             foreach (SequenceInfo targetSequence in RomData.TargetSequences)
             {
                 bool foundValidReplacement = false; // would really have liked for/else but C# doesn't have it seems
