@@ -27,7 +27,7 @@ namespace MMR.Randomizer.Models.Settings
         [JsonIgnore]
         public string InputPatchFilename { get; set; }
 
-        [JsonIgnore]
+        //[JsonIgnore] // I want this for my right click, so that I can change directories
         public string OutputROMFilename { get; set; }
 
         /// <summary>

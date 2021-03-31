@@ -179,6 +179,7 @@ namespace MMR.UI.Forms
             this.cEnergy = new System.Windows.Forms.ColorDialog();
             this.cTunic = new System.Windows.Forms.ColorDialog();
             this.bRandomise = new System.Windows.Forms.Button();
+            this.bReroll = new System.Windows.Forms.Button();
             this.saveWad = new System.Windows.Forms.SaveFileDialog();
             this.mMenu = new System.Windows.Forms.MenuStrip();
             this.mFile = new System.Windows.Forms.ToolStripMenuItem();
@@ -2011,7 +2012,17 @@ namespace MMR.UI.Forms
             this.bRandomise.TabIndex = 5;
             this.bRandomise.Text = "Randomize";
             this.bRandomise.UseVisualStyleBackColor = true;
-            this.bRandomise.Click += new System.EventHandler(this.bRandomise_Click);
+            this.bRandomise.MouseDown += new System.Windows.Forms.MouseEventHandler(this.bRandomise_MouseDown);
+            // 
+            // bReroll
+            // 
+            this.bReroll.Location = new System.Drawing.Point(212, 9);
+            this.bReroll.Name = "bReroll";
+            this.bReroll.Size = new System.Drawing.Size(88, 23);
+            this.bReroll.TabIndex = 8;
+            this.bReroll.Text = "Re-Roll Seed";
+            this.bReroll.UseVisualStyleBackColor = true;
+            this.bReroll.MouseDown += new System.Windows.Forms.MouseEventHandler(this.bReroll_MouseDown);
             // 
             // saveWad
             // 
@@ -2158,7 +2169,7 @@ namespace MMR.UI.Forms
             this.tSeed.Location = new System.Drawing.Point(77, 10);
             this.tSeed.MaxLength = 10;
             this.tSeed.Name = "tSeed";
-            this.tSeed.Size = new System.Drawing.Size(223, 20);
+            this.tSeed.Size = new System.Drawing.Size(129, 20);
             this.tSeed.TabIndex = 2;
             this.tSeed.Enter += new System.EventHandler(this.tSeed_Enter);
             this.tSeed.KeyDown += new System.Windows.Forms.KeyEventHandler(this.tSeed_KeyDown);
@@ -2205,6 +2216,7 @@ namespace MMR.UI.Forms
             // 
             // tpOutputSettings
             // 
+            this.tpOutputSettings.Controls.Add(this.bReroll);
             this.tpOutputSettings.Controls.Add(this.bRandomise);
             this.tpOutputSettings.Controls.Add(this.tSeed);
             this.tpOutputSettings.Controls.Add(this.lSeed);
@@ -2353,6 +2365,7 @@ namespace MMR.UI.Forms
         private System.Windows.Forms.ColorDialog cEnergy;
         private System.Windows.Forms.ColorDialog cTunic;
         private System.Windows.Forms.Button bRandomise;
+        private System.Windows.Forms.Button bReroll;
         private System.Windows.Forms.CheckBox cSoS;
         private System.Windows.Forms.TabControl tSettings;
         private System.Windows.Forms.TabPage tabMain;

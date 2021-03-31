@@ -557,7 +557,7 @@ namespace MMR.UI.Forms
             }
         }
 
-        private void Randomize()
+        private void Randomize(bool filePromptBypass = false)
         {
             var validationResult = _configuration.GameplaySettings.Validate() ?? _configuration.OutputSettings.Validate();
             if (validationResult != null)
@@ -569,11 +569,30 @@ namespace MMR.UI.Forms
             var defaultOutputROMFilename = FileUtils.MakeFilenameValid(DateTime.UtcNow.ToString("o"));
 
             saveROM.FileName = !string.IsNullOrWhiteSpace(_configuration.OutputSettings.InputPatchFilename)
-                ? Path.ChangeExtension(Path.GetFileName(_configuration.OutputSettings.InputPatchFilename), "z64")
-                : defaultOutputROMFilename;
-            if (saveROM.ShowDialog() != DialogResult.OK)
+                             ? Path.ChangeExtension(Path.GetFileName(_configuration.OutputSettings.InputPatchFilename), "z64")
+                             : defaultOutputROMFilename;
+
+            if (!filePromptBypass)
             {
-                return;
+                if (saveROM.ShowDialog() != DialogResult.OK)
+                {
+                    return;
+                }
+            }
+            else
+            {
+                var directory = "output";
+                if (_configuration.OutputSettings.OutputROMFilename != null && _configuration.OutputSettings.OutputROMFilename.Length > 0)
+                {
+                    directory = Path.GetDirectoryName(_configuration.OutputSettings.OutputROMFilename);
+                }
+                else if (! Directory.Exists(directory))
+                {
+                    Directory.CreateDirectory(directory);
+                }
+
+                saveROM.FileName = saveROM.FileName + "." + saveROM.DefaultExt;
+                saveROM.FileName = Path.Combine(directory, saveROM.FileName);
             }
 
             _configuration.OutputSettings.OutputROMFilename = saveROM.FileName;
@@ -582,9 +601,20 @@ namespace MMR.UI.Forms
             bgWorker.RunWorkerAsync();
         }
 
-        private void bRandomise_Click(object sender, EventArgs e)
+        private void bRandomise_MouseDown(object sender, MouseEventArgs e)
         {
-            Randomize();
+            // if right click, generate quickly without file select
+            Randomize(e.Button == MouseButtons.Right);
+        }
+
+        private void bReroll_MouseDown(object sender, MouseEventArgs e)
+        {
+            tSeed.Text = (new Random()).Next(2147483647).ToString();
+
+            if (e.Button == MouseButtons.Right)  // reroll seed and instant re-generate
+            {
+                Randomize(true);
+            }
         }
 
         private void bApplyPatch_Click(object sender, EventArgs e)
@@ -1483,6 +1513,7 @@ namespace MMR.UI.Forms
             cDrawHash.Enabled = v;
 
             bRandomise.Enabled = v;
+            bReroll.Enabled = v;
             tSeed.Enabled = v;
             tSettings.Enabled = v;
             bLoadPatch.Enabled = v;
