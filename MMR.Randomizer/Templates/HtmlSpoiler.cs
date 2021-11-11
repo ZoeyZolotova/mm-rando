@@ -94,7 +94,7 @@ namespace MMR.Randomizer.Templates
       flex: 1;
       right: 10px;
       margin: 5px;
-      max-height: 700px;         
+      max-height: 700px;
       width: 180px;
       justify-content: center;
       overflow-y: auto;
@@ -103,10 +103,14 @@ namespace MMR.Randomizer.Templates
     position: fixed;
     top: 0;
     }
-    .index{
-
+    #index.light-mode {
+		background-color: #eee;
+		color: #111;
+	}
+    #index.dark-mode {
+      background-color: #111;
+      color: #ccc;
     }
-
 </style>
 </head>
 <body class=""light-mode"">
@@ -122,7 +126,7 @@ namespace MMR.Randomizer.Templates
                     " Log State: </b></label><input id=\"spoilerLogState\" type=\"text\"/><br/>\r\n");
 
 
-            this.Write("<table class=\"index\" id=\"index\">\n");
+            this.Write("<table class=\"light-mode\" id=\"index\">\n");
             this.Write("  <th><h2>Termina Index</h2></th>\n");
             foreach (var region in spoiler.ItemList.GroupBy(item => item.Region).OrderBy(g => g.Key))
             {
@@ -351,8 +355,8 @@ namespace MMR.Randomizer.Templates
                     "dd(\"show-highlight\");\r\n            } else {\r\n                tables[i].classList" +
                     ".remove(\"show-highlight\");\r\n            }\r\n        }\r\n    });\r\n\r\n    function to" +
                     "ggleDarkLight() {\r\n        var body = document.getElementsByTagName(\'body\')[0];\r" +
-                    "\n        var currentClassBody = body.className;\r\n        body.className = curren" +
-                    "tClassBody === \"dark-mode\" ? \"light-mode\" : \"dark-mode\";\r\n    }\r\n");
+                    "\n        var currentClassBody = body.className;\r\n        var ind = document.getElementById('index');\r\n        body.className = curren" +
+                    "tClassBody === \"dark-mode\" ? \"light-mode\" : \"dark-mode\";\r\n index.className = currentClassBody === \"dark-mode\" ? \"light-mode\" : \"dark-mode\";    }\r\n");
             this.Write(@"
 window.onscroll = function() { indFloat()};
 
