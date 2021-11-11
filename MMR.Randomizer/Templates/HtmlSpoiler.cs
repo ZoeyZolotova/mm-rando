@@ -29,12 +29,20 @@ namespace MMR.Randomizer.Templates
             this.Write(@"<html>
 <head>
 <style>
+        body.dark-mode div {
+		background-color: #111;
+		color: #ccc;
+	}
+	body.light-mode div {
+		background-color: #eee;
+		color: #111;
+	}
     body.dark-mode {
       background-color: #111;
       color: #ccc;
     }
     body.dark-mode a {
-      color: #111;
+      color: #ccc;
     }
     body.dark-mode button {
       background-color: #ddd;
@@ -52,6 +60,12 @@ namespace MMR.Randomizer.Templates
       background-color: #111;
       color: #ccc;
     }
+#items{
+  display: flex;
+  flex: 0;
+  flex-direction: column;
+  max-width: 785px;
+}
 
     th{ text-align:left }
     .region { text-align: center; font-weight: bold; }
@@ -71,6 +85,28 @@ namespace MMR.Randomizer.Templates
 
 
     #spoilerLogState { width: 560px; }
+
+    #index {
+      border: 1px solid black;
+      display: flex;
+      flex-direction: inline-flex;
+      float: right;
+      flex: 1;
+      right: 10px;
+      margin: 5px;
+      max-height: 700px;         
+      width: 180px;
+      justify-content: center;
+      overflow-y: auto;
+	  }
+    .fixed {
+    position: fixed;
+    top: 0;
+    }
+    .index{
+
+    }
+
 </style>
 </head>
 <body class=""light-mode"">
@@ -84,7 +120,22 @@ namespace MMR.Randomizer.Templates
             this.Write("</span><br/>\r\n<br/>\r\n<button type=\"button\" onclick=\"toggleDarkLight()\" title=\"Tog" +
                     "gle dark/light mode\">Toggle Dark Theme</button>\r\n<br/>\r\n<br/>\r\n<label><b>Spoiler" +
                     " Log State: </b></label><input id=\"spoilerLogState\" type=\"text\"/><br/>\r\n");
- if (spoiler.DungeonEntrances.Any()) { 
+
+
+            this.Write("<table class=\"index\" id=\"index\">\n");
+            this.Write("  <th><h2>Termina Index</h2></th>\n");
+            foreach (var region in spoiler.ItemList.GroupBy(item => item.Region).OrderBy(g => g.Key))
+            {
+                this.Write("  <tr><td><a href=\"#");
+                this.Write(this.ToStringHelper.ToStringWithCulture(region.Key.Name()));
+                this.Write("\">");
+                this.Write(this.ToStringHelper.ToStringWithCulture(region.Key.Name()));
+                this.Write("</a></td></tr>\n");
+            };
+            this.Write("</table>\n");
+
+
+            if (spoiler.DungeonEntrances.Any()) { 
 
             this.Write("<h2>Dungeon Entrance Replacements</h2>\r\n<table border=\"1\" class=\"item-replacement" +
                     "s\">\r\n    <tr>\r\n        <th>Entrance</th>\r\n        <th></th>\r\n        <th>New Des" +
@@ -110,7 +161,9 @@ namespace MMR.Randomizer.Templates
                     "<th>Location</th>\r\n     <th></th>\r\n     <th></th>\r\n </tr>\r\n");
  foreach (var region in spoiler.ItemList.GroupBy(item => item.Region).OrderBy(g => g.Key)) {
 
-            this.Write(" <tr class=\"region\"><td colspan=\"3\">");
+            this.Write(" <tr class=\"region\" id=\"");
+            this.Write(this.ToStringHelper.ToStringWithCulture(region.Key.Name()));
+            this.Write("\"><td colspan=\"3\">");
             this.Write(this.ToStringHelper.ToStringWithCulture(region.Key.Name()));
             this.Write("</td></tr>\r\n ");
  foreach (var item in region.OrderBy(item => item.NewLocationName)) { 
@@ -299,8 +352,24 @@ namespace MMR.Randomizer.Templates
                     ".remove(\"show-highlight\");\r\n            }\r\n        }\r\n    });\r\n\r\n    function to" +
                     "ggleDarkLight() {\r\n        var body = document.getElementsByTagName(\'body\')[0];\r" +
                     "\n        var currentClassBody = body.className;\r\n        body.className = curren" +
-                    "tClassBody === \"dark-mode\" ? \"light-mode\" : \"dark-mode\";\r\n    }\r\n</script>\r\n</bo" +
-                    "dy>\r\n</html>\r\n");
+                    "tClassBody === \"dark-mode\" ? \"light-mode\" : \"dark-mode\";\r\n    }\r\n");
+            this.Write(@"
+window.onscroll = function() { indFloat()};
+
+            var index = document.getElementById('index');
+
+            function indFloat()
+            {
+                if (window.pageYOffset > document.getElementById('index').offsetTop)
+                {
+                    index.classList.add('fixed');
+                }
+                else
+                {
+                    index.classList.remove('fixed');
+                }
+            }
+" + "\r\n</script> \r\n </body>\r\n</html>\r\n");
             return this.GenerationEnvironment.ToString();
         }
     }
