@@ -15,23 +15,57 @@ namespace MMR.UI.Forms
     public partial class ToggleTricksForm : Form
     {
         public List<string> Result { get; private set; }
+        public LogicFile lines { get; private set; }
 
         public ToggleTricksForm(LogicMode logicMode, string userLogicFilename, IEnumerable<string> tricksEnabled)
         {
             InitializeComponent();
             Result = tricksEnabled.ToList();
+            lines = LogicUtils.ReadRulesetFromResources(logicMode, userLogicFilename);
+            Write_Tricks();
+        }
 
-            var lines = LogicUtils.ReadRulesetFromResources(logicMode, userLogicFilename);
+        private void Write_Tricks()
+        {
+            pTricks.Controls.Clear();
             var itemList = LogicUtils.PopulateItemListFromLogicData(lines);
 
             var y = 9;
             var deltaY = 23;
             var tricks = itemList.Where(io => io.IsTrick);
-            foreach (var itemObject in tricks.OrderBy(io => io.Name))
+            var OrderedTricks = tricks;
+
+            if (tricks.Any(io => !string.IsNullOrWhiteSpace(io.TrickCategory)))
             {
+                foreach (var i in OrderedTricks)
+                {
+                    i.TrickCategory = string.IsNullOrWhiteSpace(i.TrickCategory) ? "MISC" : i.TrickCategory.ToUpper();
+                }
+                OrderedTricks = OrderedTricks.OrderBy(io => io.TrickCategory == "MISC").ThenBy(io => io.TrickCategory).ThenBy(io => io.Name);
+
+            }
+            else
+            {
+                OrderedTricks = OrderedTricks.OrderBy(io => io.Name);
+            }
+
+            string CurrentCategory = "";
+            foreach (var itemObject in OrderedTricks)
+            {
+                if (!itemObject.Name.ToLower().Contains(txtSearch.Text.ToLower())) { continue; }
+                if (itemObject.TrickCategory != null && CurrentCategory != itemObject.TrickCategory)
+                {
+                    CurrentCategory = itemObject.TrickCategory;
+                    Label CategoryLabel = new Label();
+                    CategoryLabel.Text = CurrentCategory + ":";
+                    CategoryLabel.Location = new Point(5, y + 3);
+                    CategoryLabel.Size = new Size(pTricks.Width - 50, deltaY);
+                    pTricks.Controls.Add(CategoryLabel);
+                    y += deltaY;
+                }
                 var cTrick = new CheckBox();
                 cTrick.Tag = itemObject;
-                cTrick.Checked = tricksEnabled.Contains(itemObject.Name);
+                cTrick.Checked = Result.Contains(itemObject.Name);
                 cTrick.Text = itemObject.Name;
                 TooltipBuilder.SetTooltip(cTrick, itemObject.TrickTooltip);
                 cTrick.Location = new Point(9, y);
@@ -66,6 +100,11 @@ namespace MMR.UI.Forms
         {
             DialogResult = DialogResult.Cancel;
             this.Close();
+        }
+
+        private void txtSearch_TextChanged(object sender, EventArgs e)
+        {
+            Write_Tricks();
         }
     }
 }

@@ -191,6 +191,8 @@ namespace MMR.UI.Forms
             cTrick.Checked = _logic.Logic[n].IsTrick;
             tTrickDescription.Text = _logic.Logic[n].TrickTooltip ?? "(optional tooltip)";
             tTrickDescription.ForeColor = _logic.Logic[n].TrickTooltip != null ? SystemColors.WindowText : SystemColors.WindowFrame;
+            tTrickCategory.Text = _logic.Logic[n].TrickCategory ?? "(optional category)";
+            tTrickCategory.ForeColor = _logic.Logic[n].TrickCategory != null ? SystemColors.WindowText : SystemColors.WindowFrame;
         }
 
         private void Reset()
@@ -254,6 +256,7 @@ namespace MMR.UI.Forms
             bDeleteItem.Visible = isCustomItem;
             cTrick.Visible = isCustomItem;
             tTrickDescription.Visible = isCustomItem;
+            tTrickCategory.Visible = isCustomItem;
 
             var isMultiLocation = _logic.Logic[n].IsMultiLocation;
             tMain.Enabled = !isMultiLocation;
@@ -537,6 +540,7 @@ namespace MMR.UI.Forms
         }
 
         private const string DEFAULT_TRICK_TOOLTIP = "(optional tooltip)";
+        private const string DEFAULT_CATEGORY_TOOLTIP = "(optional category)";
 
         private void tTrickDescription_TextChanged(object sender, EventArgs e)
         {
@@ -587,6 +591,30 @@ namespace MMR.UI.Forms
 
                 SetIndex(n);
                 //nItem.Value = itemIndex;
+            }
+        }
+
+        private void tCategoryDescription_TextChanged(object sender, EventArgs e)
+        {
+            _logic.Logic[n].TrickCategory = string.IsNullOrWhiteSpace(tTrickCategory.Text) || tTrickCategory.Text == DEFAULT_CATEGORY_TOOLTIP
+                ? null
+                : tTrickCategory.Text;
+        }
+
+        private void tCategoryDescription_Enter(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(_logic.Logic[n].TrickCategory))
+            {
+                tTrickCategory.Text = string.Empty;
+                tTrickCategory.ForeColor = SystemColors.WindowText;
+            }
+        }
+        private void tCategoryDescription_Leave(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(_logic.Logic[n].TrickCategory))
+            {
+                tTrickCategory.Text = DEFAULT_CATEGORY_TOOLTIP;
+                tTrickCategory.ForeColor = SystemColors.WindowFrame;
             }
         }
     }

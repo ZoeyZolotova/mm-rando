@@ -37,6 +37,14 @@
             this.lCond = new System.Windows.Forms.Label();
             this.lReq = new System.Windows.Forms.Label();
             this.tTimes = new System.Windows.Forms.TableLayoutPanel();
+            this.lNote = new System.Windows.Forms.Label();
+            this.cSNight3 = new System.Windows.Forms.CheckBox();
+            this.cSDay3 = new System.Windows.Forms.CheckBox();
+            this.cSNight2 = new System.Windows.Forms.CheckBox();
+            this.cSDay2 = new System.Windows.Forms.CheckBox();
+            this.cSNight1 = new System.Windows.Forms.CheckBox();
+            this.cSDay1 = new System.Windows.Forms.CheckBox();
+            this.lTSetup = new System.Windows.Forms.Label();
             this.cANight3 = new System.Windows.Forms.CheckBox();
             this.cADay3 = new System.Windows.Forms.CheckBox();
             this.cANight2 = new System.Windows.Forms.CheckBox();
@@ -79,14 +87,7 @@
             this.cTrick = new System.Windows.Forms.CheckBox();
             this.tTrickDescription = new System.Windows.Forms.TextBox();
             this.bCopy = new System.Windows.Forms.Button();
-            this.lTSetup = new System.Windows.Forms.Label();
-            this.cSDay1 = new System.Windows.Forms.CheckBox();
-            this.cSNight1 = new System.Windows.Forms.CheckBox();
-            this.cSDay2 = new System.Windows.Forms.CheckBox();
-            this.cSNight2 = new System.Windows.Forms.CheckBox();
-            this.cSDay3 = new System.Windows.Forms.CheckBox();
-            this.cSNight3 = new System.Windows.Forms.CheckBox();
-            this.lNote = new System.Windows.Forms.Label();
+            this.tTrickCategory = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.nItem)).BeginInit();
             this.tMain.SuspendLayout();
             this.tTimes.SuspendLayout();
@@ -238,6 +239,122 @@
             this.tTimes.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 23F));
             this.tTimes.Size = new System.Drawing.Size(258, 444);
             this.tTimes.TabIndex = 3;
+            // 
+            // lNote
+            // 
+            this.lNote.AutoSize = true;
+            this.tTimes.SetColumnSpan(this.lNote, 2);
+            this.lNote.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lNote.Location = new System.Drawing.Point(4, 420);
+            this.lNote.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lNote.Name = "lNote";
+            this.lNote.Size = new System.Drawing.Size(250, 24);
+            this.lNote.TabIndex = 22;
+            this.lNote.Text = "If there is no time restriction, leave blank.";
+            this.lNote.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // cSNight3
+            // 
+            this.cSNight3.AutoSize = true;
+            this.cSNight3.CheckAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.cSNight3.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.cSNight3.Location = new System.Drawing.Point(133, 381);
+            this.cSNight3.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.cSNight3.Name = "cSNight3";
+            this.cSNight3.Size = new System.Drawing.Size(121, 36);
+            this.cSNight3.TabIndex = 21;
+            this.cSNight3.Text = "Night 3";
+            this.cSNight3.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.cSNight3.UseVisualStyleBackColor = true;
+            this.cSNight3.CheckedChanged += new System.EventHandler(this.cNDay1_CheckedChanged);
+            // 
+            // cSDay3
+            // 
+            this.cSDay3.AutoSize = true;
+            this.cSDay3.CheckAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.cSDay3.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.cSDay3.Location = new System.Drawing.Point(4, 381);
+            this.cSDay3.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.cSDay3.Name = "cSDay3";
+            this.cSDay3.Size = new System.Drawing.Size(121, 36);
+            this.cSDay3.TabIndex = 20;
+            this.cSDay3.Text = "Day 3";
+            this.cSDay3.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.cSDay3.UseVisualStyleBackColor = true;
+            this.cSDay3.CheckedChanged += new System.EventHandler(this.cNDay1_CheckedChanged);
+            // 
+            // cSNight2
+            // 
+            this.cSNight2.AutoSize = true;
+            this.cSNight2.CheckAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.cSNight2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.cSNight2.Location = new System.Drawing.Point(133, 339);
+            this.cSNight2.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.cSNight2.Name = "cSNight2";
+            this.cSNight2.Size = new System.Drawing.Size(121, 36);
+            this.cSNight2.TabIndex = 19;
+            this.cSNight2.Text = "Night 2";
+            this.cSNight2.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.cSNight2.UseVisualStyleBackColor = true;
+            this.cSNight2.CheckedChanged += new System.EventHandler(this.cNDay1_CheckedChanged);
+            // 
+            // cSDay2
+            // 
+            this.cSDay2.AutoSize = true;
+            this.cSDay2.CheckAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.cSDay2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.cSDay2.Location = new System.Drawing.Point(4, 339);
+            this.cSDay2.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.cSDay2.Name = "cSDay2";
+            this.cSDay2.Size = new System.Drawing.Size(121, 36);
+            this.cSDay2.TabIndex = 18;
+            this.cSDay2.Text = "Day 2";
+            this.cSDay2.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.cSDay2.UseVisualStyleBackColor = true;
+            this.cSDay2.CheckedChanged += new System.EventHandler(this.cNDay1_CheckedChanged);
+            // 
+            // cSNight1
+            // 
+            this.cSNight1.AutoSize = true;
+            this.cSNight1.CheckAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.cSNight1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.cSNight1.Location = new System.Drawing.Point(133, 297);
+            this.cSNight1.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.cSNight1.Name = "cSNight1";
+            this.cSNight1.Size = new System.Drawing.Size(121, 36);
+            this.cSNight1.TabIndex = 17;
+            this.cSNight1.Text = "Night 1";
+            this.cSNight1.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.cSNight1.UseVisualStyleBackColor = true;
+            this.cSNight1.CheckedChanged += new System.EventHandler(this.cNDay1_CheckedChanged);
+            // 
+            // cSDay1
+            // 
+            this.cSDay1.AutoSize = true;
+            this.cSDay1.CheckAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.cSDay1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.cSDay1.Location = new System.Drawing.Point(4, 297);
+            this.cSDay1.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.cSDay1.Name = "cSDay1";
+            this.cSDay1.Size = new System.Drawing.Size(121, 36);
+            this.cSDay1.TabIndex = 16;
+            this.cSDay1.Text = "Day 1";
+            this.cSDay1.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.cSDay1.UseVisualStyleBackColor = true;
+            this.cSDay1.CheckedChanged += new System.EventHandler(this.cNDay1_CheckedChanged);
+            // 
+            // lTSetup
+            // 
+            this.lTSetup.AutoSize = true;
+            this.tTimes.SetColumnSpan(this.lTSetup, 2);
+            this.lTSetup.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lTSetup.Location = new System.Drawing.Point(4, 280);
+            this.lTSetup.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lTSetup.Name = "lTSetup";
+            this.lTSetup.Size = new System.Drawing.Size(250, 14);
+            this.lTSetup.TabIndex = 15;
+            this.lTSetup.Text = "Setup on";
+            this.lTSetup.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // cANight3
             // 
@@ -741,127 +858,25 @@
             this.bCopy.UseVisualStyleBackColor = true;
             this.bCopy.Click += new System.EventHandler(this.bCopy_Click);
             // 
-            // lTSetup
+            // tTrickCategory
             // 
-            this.lTSetup.AutoSize = true;
-            this.tTimes.SetColumnSpan(this.lTSetup, 2);
-            this.lTSetup.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.lTSetup.Location = new System.Drawing.Point(4, 280);
-            this.lTSetup.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.lTSetup.Name = "lTSetup";
-            this.lTSetup.Size = new System.Drawing.Size(250, 14);
-            this.lTSetup.TabIndex = 15;
-            this.lTSetup.Text = "Setup on";
-            this.lTSetup.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // cSDay1
-            // 
-            this.cSDay1.AutoSize = true;
-            this.cSDay1.CheckAlign = System.Drawing.ContentAlignment.TopCenter;
-            this.cSDay1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.cSDay1.Location = new System.Drawing.Point(4, 297);
-            this.cSDay1.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.cSDay1.Name = "cSDay1";
-            this.cSDay1.Size = new System.Drawing.Size(121, 36);
-            this.cSDay1.TabIndex = 16;
-            this.cSDay1.Text = "Day 1";
-            this.cSDay1.TextAlign = System.Drawing.ContentAlignment.TopCenter;
-            this.cSDay1.UseVisualStyleBackColor = true;
-            this.cSDay1.CheckedChanged += new System.EventHandler(this.cNDay1_CheckedChanged);
-            // 
-            // cSNight1
-            // 
-            this.cSNight1.AutoSize = true;
-            this.cSNight1.CheckAlign = System.Drawing.ContentAlignment.TopCenter;
-            this.cSNight1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.cSNight1.Location = new System.Drawing.Point(133, 297);
-            this.cSNight1.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.cSNight1.Name = "cSNight1";
-            this.cSNight1.Size = new System.Drawing.Size(121, 36);
-            this.cSNight1.TabIndex = 17;
-            this.cSNight1.Text = "Night 1";
-            this.cSNight1.TextAlign = System.Drawing.ContentAlignment.TopCenter;
-            this.cSNight1.UseVisualStyleBackColor = true;
-            this.cSNight1.CheckedChanged += new System.EventHandler(this.cNDay1_CheckedChanged);
-            // 
-            // cSDay2
-            // 
-            this.cSDay2.AutoSize = true;
-            this.cSDay2.CheckAlign = System.Drawing.ContentAlignment.TopCenter;
-            this.cSDay2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.cSDay2.Location = new System.Drawing.Point(4, 339);
-            this.cSDay2.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.cSDay2.Name = "cSDay2";
-            this.cSDay2.Size = new System.Drawing.Size(121, 36);
-            this.cSDay2.TabIndex = 18;
-            this.cSDay2.Text = "Day 2";
-            this.cSDay2.TextAlign = System.Drawing.ContentAlignment.TopCenter;
-            this.cSDay2.UseVisualStyleBackColor = true;
-            this.cSDay2.CheckedChanged += new System.EventHandler(this.cNDay1_CheckedChanged);
-            // 
-            // cSNight2
-            // 
-            this.cSNight2.AutoSize = true;
-            this.cSNight2.CheckAlign = System.Drawing.ContentAlignment.TopCenter;
-            this.cSNight2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.cSNight2.Location = new System.Drawing.Point(133, 339);
-            this.cSNight2.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.cSNight2.Name = "cSNight2";
-            this.cSNight2.Size = new System.Drawing.Size(121, 36);
-            this.cSNight2.TabIndex = 19;
-            this.cSNight2.Text = "Night 2";
-            this.cSNight2.TextAlign = System.Drawing.ContentAlignment.TopCenter;
-            this.cSNight2.UseVisualStyleBackColor = true;
-            this.cSNight2.CheckedChanged += new System.EventHandler(this.cNDay1_CheckedChanged);
-            // 
-            // cSDay3
-            // 
-            this.cSDay3.AutoSize = true;
-            this.cSDay3.CheckAlign = System.Drawing.ContentAlignment.TopCenter;
-            this.cSDay3.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.cSDay3.Location = new System.Drawing.Point(4, 381);
-            this.cSDay3.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.cSDay3.Name = "cSDay3";
-            this.cSDay3.Size = new System.Drawing.Size(121, 36);
-            this.cSDay3.TabIndex = 20;
-            this.cSDay3.Text = "Day 3";
-            this.cSDay3.TextAlign = System.Drawing.ContentAlignment.TopCenter;
-            this.cSDay3.UseVisualStyleBackColor = true;
-            this.cSDay3.CheckedChanged += new System.EventHandler(this.cNDay1_CheckedChanged);
-            // 
-            // cSNight3
-            // 
-            this.cSNight3.AutoSize = true;
-            this.cSNight3.CheckAlign = System.Drawing.ContentAlignment.TopCenter;
-            this.cSNight3.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.cSNight3.Location = new System.Drawing.Point(133, 381);
-            this.cSNight3.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.cSNight3.Name = "cSNight3";
-            this.cSNight3.Size = new System.Drawing.Size(121, 36);
-            this.cSNight3.TabIndex = 21;
-            this.cSNight3.Text = "Night 3";
-            this.cSNight3.TextAlign = System.Drawing.ContentAlignment.TopCenter;
-            this.cSNight3.UseVisualStyleBackColor = true;
-            this.cSNight3.CheckedChanged += new System.EventHandler(this.cNDay1_CheckedChanged);
-            // 
-            // lNote
-            // 
-            this.lNote.AutoSize = true;
-            this.tTimes.SetColumnSpan(this.lNote, 2);
-            this.lNote.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.lNote.Location = new System.Drawing.Point(4, 420);
-            this.lNote.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.lNote.Name = "lNote";
-            this.lNote.Size = new System.Drawing.Size(250, 24);
-            this.lNote.TabIndex = 22;
-            this.lNote.Text = "If there is no time restriction, leave blank.";
-            this.lNote.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.tTrickCategory.ForeColor = System.Drawing.SystemColors.WindowFrame;
+            this.tTrickCategory.Location = new System.Drawing.Point(536, 67);
+            this.tTrickCategory.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.tTrickCategory.Name = "tTrickCategory";
+            this.tTrickCategory.Size = new System.Drawing.Size(274, 23);
+            this.tTrickCategory.TabIndex = 12;
+            this.tTrickCategory.Text = "(optional category)";
+            this.tTrickCategory.TextChanged += new System.EventHandler(this.tCategoryDescription_TextChanged);
+            this.tTrickCategory.Enter += new System.EventHandler(this.tCategoryDescription_Enter);
+            this.tTrickCategory.Leave += new System.EventHandler(this.tCategoryDescription_Leave);
             // 
             // LogicEditorForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(824, 622);
+            this.Controls.Add(this.tTrickCategory);
             this.Controls.Add(this.bCopy);
             this.Controls.Add(this.tTrickDescription);
             this.Controls.Add(this.cTrick);
@@ -955,5 +970,6 @@
         private System.Windows.Forms.CheckBox cSNight1;
         private System.Windows.Forms.CheckBox cSDay1;
         private System.Windows.Forms.Label lTSetup;
+        private System.Windows.Forms.TextBox tTrickCategory;
     }
 }

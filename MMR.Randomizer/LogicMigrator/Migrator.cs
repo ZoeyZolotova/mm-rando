@@ -3889,6 +3889,7 @@ namespace MMR.Randomizer.LogicMigrator
             public TimeOfDay TimeSetup { get; set; }
             public bool IsTrick { get; set; }
             public string TrickTooltip { get; set; }
+            public string TrickCategory { get; set; }
         }
 
         [Flags]
