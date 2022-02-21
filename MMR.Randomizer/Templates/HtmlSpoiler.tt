@@ -7,48 +7,90 @@
 <html>
 <head>
 <style>
-    body.dark-mode {
-      background-color: #111;
-      color: #ccc;
-    }
-    body.dark-mode a {
-      color: #111;
-    }
-    body.dark-mode button {
-      background-color: #ddd;
-      color: #111;
-    }
+	body.dark-mode {
+	  background-color: #111;
+	  color: #ccc;
+	}
+	body.dark-mode a {
+	  color: #111;
+	}
+	body.dark-mode div {
+		background-color: #111;
+		color: #ccc;
+	}
+	body.light-mode div {
+		background-color: #eee;
+		color: #111;
+	}
+	body.dark-mode button {
+	  background-color: #ddd;
+	  color: #111;
+	}
 
-    body.light-mode {
-      background-color: #eee;
-      color: #111;
-    }
-    body.light-mode a {
-      color: #111;
-    }
-    body.light-mode button {
-      background-color: #111;
-      color: #ccc;
-    }
+	body.light-mode {
+	  background-color: #eee;
+	  color: #111;
+	}
+	body.light-mode a {
+	  color: #111;
+	}
+	body.light-mode button {
+	  background-color: #111;
+	  color: #ccc;
+	}
+	#items{
+	  display: flex;
+	  flex: 0;
+	  flex-direction: column;
+	  max-width: 785px;
+	}
 
-    th{ text-align:left }
-    .region { text-align: center; font-weight: bold; }
-    [data-content]:before { content: attr(data-content); }
+	th{ text-align:left }
+	.region { text-align: center; font-weight: bold; }
+	[data-content]:before { content: attr(data-content); }
 
-    .dark-mode .spoiler{ background-color:#ccc }
-    .dark-mode .spoiler:active { background-color: #111;  }
-    .dark-mode .show-highlight .unavailable .newlocation { background-color: #500705; }
-    .dark-mode .show-highlight .acquired .newlocation { background-color: #69591f; }
-    .dark-mode .show-highlight .available .newlocation { background-color: #313776; }
+	.dark-mode .spoiler{ background-color:#ccc }
+	.dark-mode .spoiler:active { background-color: #111;  }
+	.dark-mode .show-highlight .unavailable .newlocation { background-color: #500705; }
+	.dark-mode .show-highlight .acquired .newlocation { background-color: #69591f; }
+	.dark-mode .show-highlight .available .newlocation { background-color: #313776; }
 
-    .light-mode .spoiler{ background-color:#111 }
-    .light-mode .spoiler:active { background-color: #ccc;  }
-    .light-mode .show-highlight .unavailable .newlocation { background-color: #FF9999; }
-    .light-mode .show-highlight .acquired .newlocation { background-color: #99FF99; }
-    .light-mode .show-highlight .available .newlocation { background-color: #9999FF; }
+	.light-mode .spoiler{ background-color:#111 }
+	.light-mode .spoiler:active { background-color: #ccc;  }
+	.light-mode .show-highlight .unavailable .newlocation { background-color: #FF9999; }
+	.light-mode .show-highlight .acquired .newlocation { background-color: #99FF99; }
+	.light-mode .show-highlight .available .newlocation { background-color: #9999FF; }
 
 
-    #spoilerLogState { width: 560px; }
+	#spoilerLogState { width: 560px; }
+	#index {
+	  border: 1px solid black;
+	  display: flex;
+	  flex-direction: inline-flex;
+	  float: right;
+	  flex: 1;
+	  right: 10px;
+	  margin: 5px;
+	  max-height: 700px;
+	  width: 180px;
+	  justify-content: center;
+	  overflow-y: auto;
+	  }
+	.fixed {
+	position: fixed;
+	top: 0;
+	}
+	#index.light-mode {
+		background-color: #eee;
+		color: #111;
+	}
+    #index.dark-mode a {
+	  color: #ccc;
+	}
+	#index.dark-mode {
+	  background-color: #111;
+	  color: #ccc;
+	}
 </style>
 </head>
 <body class="light-mode">
@@ -56,27 +98,35 @@
 <label><b>Settings: </b></label><code style="word-break: break-all;"><#= spoiler.SettingsString #></code><br/>
 <label><b>Seed: </b></label><span><#= spoiler.Seed #></span><br/>
 <br/>
+<table class="index" id="index">
+    <th><h2>Termina Index</h2></th>
+    <# foreach (var region in spoiler.ItemList.GroupBy(item => item.Region).OrderBy(g => g.Key))
+        { #>
+            <tr><td><a href="#<#= region.Key.Name() #>"><#= region.Key.Name() #></a></td></tr><#
+        } #>
+</table>
 <button type="button" onclick="toggleDarkLight()" title="Toggle dark/light mode">Toggle Dark Theme</button>
 <br/>
 <br/>
 <label><b>Spoiler Log State: </b></label><input id="spoilerLogState" type="text"/><br/>
+
 <# if (spoiler.DungeonEntrances.Any()) { 
 #>
 <h2>Dungeon Entrance Replacements</h2>
 <table border="1" class="item-replacements">
-    <tr>
-        <th>Entrance</th>
-        <th></th>
-        <th>New Destination</th>
-    </tr>
+	<tr>
+		<th>Entrance</th>
+		<th></th>
+		<th>New Destination</th>
+	</tr>
 <#         foreach (var kvp in spoiler.DungeonEntrances) {
-            var entrance = kvp.Key;
-            var destination = kvp.Value;#>
-    <tr data-id="<#= (int)destination #>" data-newlocationid="<#= (int)entrance #>" class="unavailable">
-        <td class="newlocation"><#= entrance.Entrance() #></td>
-        <td><input type="checkbox"/></td>
-        <td class="spoiler itemname"><span data-content="<#= destination.Entrance() #>"></span></td>
-    </tr>
+			var entrance = kvp.Key;
+			var destination = kvp.Value;#>
+	<tr data-id="<#= (int)destination #>" data-newlocationid="<#= (int)entrance #>" class="unavailable">
+		<td class="newlocation"><#= entrance.Entrance() #></td>
+		<td><input type="checkbox"/></td>
+		<td class="spoiler itemname"><span data-content="<#= destination.Entrance() #>"></span></td>
+	</tr>
 <# } #>
 </table>
 <# } #>
@@ -84,18 +134,18 @@
 <input type="checkbox" id="highlight-checks"/> Highlight available checks
 <table border="1" class="item-replacements">
  <tr>
-     <th>Location</th>
-     <th></th>
-     <th></th>
+	 <th>Location</th>
+	 <th></th>
+	 <th></th>
  </tr>
 <# foreach (var region in spoiler.ItemList.GroupBy(item => item.Region).OrderBy(g => g.Key)) {
 #>
- <tr class="region"><td colspan="3"><#= region.Key.Name() #></td></tr>
+ <tr class="region" id="<#= region.Key.Name() #>"><td colspan="3"><#= region.Key.Name() #></td></tr>
  <# foreach (var item in region.OrderBy(item => item.NewLocationName)) { #>
  <tr data-id="<#= item.Id #>" data-newlocationid="<#= item.NewLocationId #>" class="unavailable">
-    <td class="newlocation"><#= item.NewLocationName #></td>
-    <td><input type="checkbox"/></td>
-    <td class="spoiler itemname"> <span data-content="<#= item.Name #>"></span></td>
+	<td class="newlocation"><#= item.NewLocationName #></td>
+	<td><input type="checkbox"/></td>
+	<td class="spoiler itemname"> <span data-content="<#= item.Name #>"></span></td>
  </tr>
  <# } #>
 <# } #>
@@ -103,18 +153,18 @@
 <h2>Item Locations</h2>
 <table border="1" id="item-locations">
  <tr>
-     <th>Item</th>
-     <th></th>
-     <th>Location</th>
+	 <th>Item</th>
+	 <th></th>
+	 <th>Location</th>
  </tr>
 <# foreach (var itemCategory in spoiler.ItemList.Where(item => !item.IsJunk).GroupBy(item => item.ItemCategory).OrderBy(g => g.Key)) {
 #>
  <tr class="region"><td colspan="3"><#= itemCategory.Key.ToString() #></td></tr>
  <# foreach (var item in itemCategory.OrderBy(item => item.Id)) { #>
  <tr data-id="<#= item.Id #>" data-newlocationid="<#= item.NewLocationId #>">
-    <td><#= item.Name #></td>
-    <td><input type="checkbox"/></td>
-    <td class="spoiler newlocation"> <span data-content="<#= item.NewLocationName #>"></span></td>
+	<td><#= item.Name #></td>
+	<td><input type="checkbox"/></td>
+	<td class="spoiler newlocation"> <span data-content="<#= item.NewLocationName #>"></span></td>
  </tr>
  <# } #>
 <# } #>
@@ -123,16 +173,16 @@
 #>
 <h2>Randomized Prices</h2>
 <table border="1">
-    <tr>
-        <th>Name</th>
-        <th>Cost</th>
-    </tr>
+	<tr>
+		<th>Name</th>
+		<th>Cost</th>
+	</tr>
 <#    foreach (var (name, cost) in spoiler.MessageCosts) { 
 #>
-    <tr>
-        <td><#= name #></td>
-        <td class="spoiler"><span data-content="<#= cost #>"></span></td>
-    </tr>
+	<tr>
+		<td><#= name #></td>
+		<td class="spoiler"><span data-content="<#= cost #>"></span></td>
+	</tr>
 <# } #>
 </table>
 <# } #>
@@ -140,271 +190,287 @@
 #>
 <h2>Gossip Stone Hints</h2>
 <table border="1">
-    <tr>
-        <th>Gossip Stone</th>
-        <th>Message</th>
-    </tr>
+	<tr>
+		<th>Gossip Stone</th>
+		<th>Message</th>
+	</tr>
 <#    foreach (var hint in spoiler.GossipHints.OrderBy(h => h.Key.ToString())) { 
 #>
-    <tr>
-        <td><#= hint.Key #></td>
-        <td class="spoiler"><span data-content="<#= hint.Value #>"></span></td>
-    </tr>
+	<tr>
+		<td><#= hint.Key #></td>
+		<td class="spoiler"><span data-content="<#= hint.Value #>"></span></td>
+	</tr>
 <# } #>
 </table>
 <# } #>
 <script>
-    function all(list, predicate) {
-        for (var i = 0; i < list.length; i++) {
-            if (!predicate(list[i])) {
-                return false;
-            }
-        }
-        return true;
-    }
+	function all(list, predicate) {
+		for (var i = 0; i < list.length; i++) {
+			if (!predicate(list[i])) {
+				return false;
+			}
+		}
+		return true;
+	}
 
-    function any(list, predicate) {
-        for (var i = 0; i < list.length; i++) {
-            if (predicate(list[i])) {
-                return true;
-            }
-        }
-        return false;
-    }
+	function any(list, predicate) {
+		for (var i = 0; i < list.length; i++) {
+			if (predicate(list[i])) {
+				return true;
+			}
+		}
+		return false;
+	}
 
-    function includes(list, item) {
-        for (var i = 0; i < list.length; i++) {
-            if (list[i] === item) {
-                return true;
-            }
-        }
-        return false;
-    }
+	function includes(list, item) {
+		for (var i = 0; i < list.length; i++) {
+			if (list[i] === item) {
+				return true;
+			}
+		}
+		return false;
+	}
 
-    function find(list, predicate) {
-        for (var i = 0; i < list.length; i++) {
-            if (predicate(list[i])) {
-                return list[i];
-            }
-        }
-        return null;
-    }
-    
-    var segmentSize = 16;
-    function saveItems() {
-        var segments = [];
-        for (var i = 0; i < logic.length; i++) {
-            var segmentIndex = parseInt(i / segmentSize);
-            segments[segmentIndex] = segments[segmentIndex] || 0;
-            if (logic[i].Checked) {
-                segments[parseInt(i / segmentSize)] += (1 << (i%segmentSize));
-            }
-        }
-        var saveString = segments.map(function(s) {
-            return s.toString(16);
-        }).join("-");
-        var saveInput = document.querySelector("#spoilerLogState");
-        saveInput.value = saveString;
-    }
+	function find(list, predicate) {
+		for (var i = 0; i < list.length; i++) {
+			if (predicate(list[i])) {
+				return list[i];
+			}
+		}
+		return null;
+	}
+	
+	var segmentSize = 16;
+	function saveItems() {
+		var segments = [];
+		for (var i = 0; i < logic.length; i++) {
+			var segmentIndex = parseInt(i / segmentSize);
+			segments[segmentIndex] = segments[segmentIndex] || 0;
+			if (logic[i].Checked) {
+				segments[parseInt(i / segmentSize)] += (1 << (i%segmentSize));
+			}
+		}
+		var saveString = segments.map(function(s) {
+			return s.toString(16);
+		}).join("-");
+		var saveInput = document.querySelector("#spoilerLogState");
+		saveInput.value = saveString;
+	}
 
-    function loadItems() {
-        var saveInput = document.querySelector("#spoilerLogState");
-        var segments = saveInput.value.split("-");
-        if (Math.ceil((logic.length - 1) / segmentSize) !== segments.length) {
-            alert("Invalid Spoiler Log state");
-            return;
-        }
-        segments = segments.map(function(segment) {
-            return parseInt(segment, 16);
-        });
-        var locationsToCheck = [];
-        for (var i = 0; i < segments.length; i++) {
-            var segment = segments[i];
-            for (var j = 0; j < segmentSize; j++) {
-                var itemIndex = segmentSize * i + j;
-                if (itemIndex < logic.length) {
-                    var mark = ((segment >> j) % 2 == 1);
-                    logic[itemIndex].Checked = mark;
-                    var itemRow = document.querySelector("tr[data-newlocationid='" + itemIndex + "']");
-                    if (itemRow) {
-                        logic[itemRow.dataset.id].Acquired = mark;
-                    } else {
-                        logic[itemIndex].Acquired = mark;
-                    }
-                    if (!includes(locationsToCheck, itemIndex)) {
-                        locationsToCheck.push(itemIndex);
-                    }
-                }
-            }
-        }
-        checkLocations(locationsToCheck);
-    }
+	function loadItems() {
+		var saveInput = document.querySelector("#spoilerLogState");
+		var segments = saveInput.value.split("-");
+		if (Math.ceil((logic.length - 1) / segmentSize) !== segments.length) {
+			alert("Invalid Spoiler Log state");
+			return;
+		}
+		segments = segments.map(function(segment) {
+			return parseInt(segment, 16);
+		});
+		var locationsToCheck = [];
+		for (var i = 0; i < segments.length; i++) {
+			var segment = segments[i];
+			for (var j = 0; j < segmentSize; j++) {
+				var itemIndex = segmentSize * i + j;
+				if (itemIndex < logic.length) {
+					var mark = ((segment >> j) % 2 == 1);
+					logic[itemIndex].Checked = mark;
+					var itemRow = document.querySelector("tr[data-newlocationid='" + itemIndex + "']");
+					if (itemRow) {
+						logic[itemRow.dataset.id].Acquired = mark;
+					} else {
+						logic[itemIndex].Acquired = mark;
+					}
+					if (!includes(locationsToCheck, itemIndex)) {
+						locationsToCheck.push(itemIndex);
+					}
+				}
+			}
+		}
+		checkLocations(locationsToCheck);
+	}
 
-    document.querySelector("#spoilerLogState").addEventListener("keypress", function(event) {
-        if (event.keyCode === 13) {
-            loadItems();
-        }
-    });
+	document.querySelector("#spoilerLogState").addEventListener("keypress", function(event) {
+		if (event.keyCode === 13) {
+			loadItems();
+		}
+	});
 
-    function checkLocations(locations) {
-        var itemsToCheck = [];
-        for (var i = 0; i < locations.length; i++) {
-            var location = logic[locations[i]];
-            location.IsAvailable = 
-                (location.RequiredItemIds === null || location.RequiredItemIds.length === 0 || all(location.RequiredItemIds, function(id) { return logic[id].Acquired; }))
-                && 
-                (location.ConditionalItemIds === null || location.ConditionalItemIds.length === 0 || any(location.ConditionalItemIds, function(conditionals) { return all(conditionals, function(id) { return logic[id].Acquired; }); }));
-            
-            var newLocation = find(logic, function(io) { return io.NewLocationId === locations[i]; });
-            if (!newLocation) {
-                newLocation = location;
-            }
-            if (!newLocation.Acquired && location.IsFakeItem && location.IsAvailable) {
-                newLocation.Acquired = true;
-                itemsToCheck.push(newLocation.ItemId);
-            }
-            if (newLocation.Acquired && location.IsFakeItem && !location.IsAvailable) {
-                newLocation.Acquired = false;
-                itemsToCheck.push(newLocation.ItemId);
-            }
-        
-            var locationRows = document.querySelectorAll(".item-replacements tr[data-newlocationid='" + locations[i] + "']");
-            for (const locationRow of locationRows) {
-                locationRow.className = "";
-                locationRow.classList.add(location.IsAvailable ? "available" : "unavailable");
-                var itemName = locationRow.querySelector(".itemname");
-                var checkbox = locationRow.querySelector("input");
-                checkbox.checked = location.Checked;
-                if (location.Checked) {
-                    itemName.classList.remove("spoiler");
-                } else {
-                    itemName.classList.add("spoiler");
-                }
-            }
-        
-            var itemRows = document.querySelectorAll("#item-locations tr[data-newlocationid='" + locations[i] + "']");
-            for (const itemRow of itemRows) {
-                var itemName = itemRow.querySelector(".newlocation");
-                var checkbox = itemRow.querySelector("input");
-                var item = logic[itemRow.dataset.id];
-                checkbox.checked = item.Acquired;
-                if (item.Acquired) {
-                    itemName.classList.remove("spoiler");
-                } else {
-                    itemName.classList.add("spoiler");
-                }
-            }
-        }
-        if (itemsToCheck.length > 0) {
-            checkItems(itemsToCheck);
-        } else {
-            saveItems();
-        }
-    }
+	function checkLocations(locations) {
+		var itemsToCheck = [];
+		for (var i = 0; i < locations.length; i++) {
+			var location = logic[locations[i]];
+			location.IsAvailable = 
+				(location.RequiredItemIds === null || location.RequiredItemIds.length === 0 || all(location.RequiredItemIds, function(id) { return logic[id].Acquired; }))
+				&& 
+				(location.ConditionalItemIds === null || location.ConditionalItemIds.length === 0 || any(location.ConditionalItemIds, function(conditionals) { return all(conditionals, function(id) { return logic[id].Acquired; }); }));
+			
+			var newLocation = find(logic, function(io) { return io.NewLocationId === locations[i]; });
+			if (!newLocation) {
+				newLocation = location;
+			}
+			if (!newLocation.Acquired && location.IsFakeItem && location.IsAvailable) {
+				newLocation.Acquired = true;
+				itemsToCheck.push(newLocation.ItemId);
+			}
+			if (newLocation.Acquired && location.IsFakeItem && !location.IsAvailable) {
+				newLocation.Acquired = false;
+				itemsToCheck.push(newLocation.ItemId);
+			}
+		
+			var locationRows = document.querySelectorAll(".item-replacements tr[data-newlocationid='" + locations[i] + "']");
+			for (const locationRow of locationRows) {
+				locationRow.className = "";
+				locationRow.classList.add(location.IsAvailable ? "available" : "unavailable");
+				var itemName = locationRow.querySelector(".itemname");
+				var checkbox = locationRow.querySelector("input");
+				checkbox.checked = location.Checked;
+				if (location.Checked) {
+					itemName.classList.remove("spoiler");
+				} else {
+					itemName.classList.add("spoiler");
+				}
+			}
+		
+			var itemRows = document.querySelectorAll("#item-locations tr[data-newlocationid='" + locations[i] + "']");
+			for (const itemRow of itemRows) {
+				var itemName = itemRow.querySelector(".newlocation");
+				var checkbox = itemRow.querySelector("input");
+				var item = logic[itemRow.dataset.id];
+				checkbox.checked = item.Acquired;
+				if (item.Acquired) {
+					itemName.classList.remove("spoiler");
+				} else {
+					itemName.classList.add("spoiler");
+				}
+			}
+		}
+		if (itemsToCheck.length > 0) {
+			checkItems(itemsToCheck);
+		} else {
+			saveItems();
+		}
+	}
 
-    var logic = <#= spoiler.LogicJson #>;
+	var logic = <#= spoiler.LogicJson #>;
 
-    for (var i = 0; i < logic.length; i++) {
-        var item = logic[i];
-        if (item.Acquired) {
-            item.Checked = true;
-            var inputs = document.querySelectorAll("tr[data-newlocationid='" + i + "'] input");
-            for (const input of inputs) {
-                input.checked = true;
-            }
-        }
-        if (item.RequiredItemIds !== null) {
-            for (var j = 0; j < item.RequiredItemIds.length; j++) {
-                var id = item.RequiredItemIds[j];
-                if (!logic[id].LocksLocations) {
-                    logic[id].LocksLocations = [];
-                }
-                if (!includes(logic[id].LocksLocations, i)) {
-                    logic[id].LocksLocations.push(i);
-                }
-            }
-        }
-        if (item.ConditionalItemIds !== null) {
-            for (var k = 0; k < item.ConditionalItemIds.length; k++) {
-                for (var j = 0; j < item.ConditionalItemIds[k].length; j++) {
-                    var id = item.ConditionalItemIds[k][j];
-                    if (!logic[id].LocksLocations) {
-                        logic[id].LocksLocations = [];
-                    }
-                    if (!includes(logic[id].LocksLocations, i)) {
-                        logic[id].LocksLocations.push(i);
-                    }
-                }
-            }
-        }
-    }
+	for (var i = 0; i < logic.length; i++) {
+		var item = logic[i];
+		if (item.Acquired) {
+			item.Checked = true;
+			var inputs = document.querySelectorAll("tr[data-newlocationid='" + i + "'] input");
+			for (const input of inputs) {
+				input.checked = true;
+			}
+		}
+		if (item.RequiredItemIds !== null) {
+			for (var j = 0; j < item.RequiredItemIds.length; j++) {
+				var id = item.RequiredItemIds[j];
+				if (!logic[id].LocksLocations) {
+					logic[id].LocksLocations = [];
+				}
+				if (!includes(logic[id].LocksLocations, i)) {
+					logic[id].LocksLocations.push(i);
+				}
+			}
+		}
+		if (item.ConditionalItemIds !== null) {
+			for (var k = 0; k < item.ConditionalItemIds.length; k++) {
+				for (var j = 0; j < item.ConditionalItemIds[k].length; j++) {
+					var id = item.ConditionalItemIds[k][j];
+					if (!logic[id].LocksLocations) {
+						logic[id].LocksLocations = [];
+					}
+					if (!includes(logic[id].LocksLocations, i)) {
+						logic[id].LocksLocations.push(i);
+					}
+				}
+			}
+		}
+	}
 
-    function checkItems(itemIds) {
-        var locationsToCheck = [];
-        for (var i = 0; i < itemIds.length; i++) {
-            var itemId = itemIds[i];
-            if (logic[itemId].LocksLocations) {
-                for (var j = 0; j < logic[itemId].LocksLocations.length; j++) {
-                    var locationId = logic[itemId].LocksLocations[j];
-                    if (!includes(locationsToCheck, locationId)) {
-                        locationsToCheck.push(locationId);
-                    }
-                }
-            }
+	function checkItems(itemIds) {
+		var locationsToCheck = [];
+		for (var i = 0; i < itemIds.length; i++) {
+			var itemId = itemIds[i];
+			if (logic[itemId].LocksLocations) {
+				for (var j = 0; j < logic[itemId].LocksLocations.length; j++) {
+					var locationId = logic[itemId].LocksLocations[j];
+					if (!includes(locationsToCheck, locationId)) {
+						locationsToCheck.push(locationId);
+					}
+				}
+			}
+		}
+		checkLocations(locationsToCheck);
+	}
+
+	var startingLocations = [0, 96, 278, 279, 280, 281];
+	for (var id of startingLocations) {
+		logic[id].Checked = true;
+		var row = document.querySelector("tr[data-newlocationid='" + id + "']");
+		var itemId = id;
+		if (row) {
+			itemId = row.dataset.id;
+			document.querySelector("tr[data-newlocationid='" + id + "'] input").checked = true;
+		}
+		logic[itemId].Acquired = true;
+	}
+
+	var allLocationIds = [];
+	for (var i = 0; i < logic.length; i++) {
+		allLocationIds.push(i);
+	}
+	checkLocations(allLocationIds);
+
+	var rows = document.querySelectorAll("tr");
+	for (var i = 1; i < rows.length; i++) {
+		var row = rows[i];
+		var checkbox = row.querySelector("input");
+		if (checkbox) {
+			checkbox.addEventListener("click", function(e) {
+				var row = e.target.closest("tr");
+				var rowId = parseInt(row.dataset.id);
+				var newLocationId = parseInt(row.dataset.newlocationid);
+				logic[newLocationId].Checked = e.target.checked;
+				logic[rowId].Acquired = e.target.checked;
+				checkLocations([newLocationId]);
+				checkItems([rowId]);
+			});
+		}
+	}
+
+	document.querySelector("#highlight-checks").addEventListener("click", function(e) {
+		var tables = document.querySelectorAll("table.item-replacements");
+		for (var i = 0; i < tables.length; i++) {
+			if (e.target.checked) {
+				tables[i].classList.add("show-highlight");
+			} else {
+				tables[i].classList.remove("show-highlight");
+			}
+		}
+	});
+
+	function toggleDarkLight() {
+		var body = document.getElementsByTagName('body')[0];
+		var currentClassBody = body.className;
+        var ind = document.getElementById('index');
+		body.className = currentClassBody === "dark-mode" ? "light-mode" : "dark-mode";
+        index.className = currentClassBody === "dark-mode" ? "light-mode" : "dark-mode";
+	}
+
+    window.onscroll = function() { indFloat()};
+    var index = document.getElementById('index');
+    function indFloat()
+    {
+        if (window.pageYOffset > document.getElementById('index').offsetTop)
+        {
+            index.classList.add('fixed');
         }
-        checkLocations(locationsToCheck);
-    }
-
-    var startingLocations = [0, 96, 278, 279, 280, 281];
-    for (var id of startingLocations) {
-        logic[id].Checked = true;
-        var row = document.querySelector("tr[data-newlocationid='" + id + "']");
-        var itemId = id;
-        if (row) {
-            itemId = row.dataset.id;
-            document.querySelector("tr[data-newlocationid='" + id + "'] input").checked = true;
+        else
+        {
+            index.classList.remove('fixed');
         }
-        logic[itemId].Acquired = true;
-    }
-
-    var allLocationIds = [];
-    for (var i = 0; i < logic.length; i++) {
-        allLocationIds.push(i);
-    }
-    checkLocations(allLocationIds);
-
-    var rows = document.querySelectorAll("tr");
-    for (var i = 1; i < rows.length; i++) {
-        var row = rows[i];
-        var checkbox = row.querySelector("input");
-        if (checkbox) {
-            checkbox.addEventListener("click", function(e) {
-                var row = e.target.closest("tr");
-                var rowId = parseInt(row.dataset.id);
-                var newLocationId = parseInt(row.dataset.newlocationid);
-                logic[newLocationId].Checked = e.target.checked;
-                logic[rowId].Acquired = e.target.checked;
-                checkLocations([newLocationId]);
-                checkItems([rowId]);
-            });
-        }
-    }
-
-    document.querySelector("#highlight-checks").addEventListener("click", function(e) {
-        var tables = document.querySelectorAll("table.item-replacements");
-        for (var i = 0; i < tables.length; i++) {
-            if (e.target.checked) {
-                tables[i].classList.add("show-highlight");
-            } else {
-                tables[i].classList.remove("show-highlight");
-            }
-        }
-    });
-
-    function toggleDarkLight() {
-        var body = document.getElementsByTagName('body')[0];
-        var currentClassBody = body.className;
-        body.className = currentClassBody === "dark-mode" ? "light-mode" : "dark-mode";
     }
 </script>
 </body>
