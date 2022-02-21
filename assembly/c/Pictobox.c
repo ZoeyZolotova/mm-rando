@@ -58,5 +58,5 @@ void Pictobox_PreparePromptMessage(GlobalContext* ctxt, u16 messageId, u8 zero) 
     if (photoTakenFlag == 1) {
         z2_UpdatePictoFlags(ctxt);
     }
-    z2_ShowMessage(ctxt, messageId, zero);
+    z2_ShowMessage(ctxt, messageId, (Actor*)((u32)zero));
 }

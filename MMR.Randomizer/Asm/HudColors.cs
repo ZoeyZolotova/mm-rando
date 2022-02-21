@@ -68,6 +68,7 @@ namespace MMR.Randomizer.Asm
         public Color MenuSubtitleText { get; set; } = Color.FromArgb(0xFF, 0xC8, 0x00);
         public Color ShopCursor1 { get; set; } = Color.FromArgb(0x00, 0x00, 0xFF);
         public Color ShopCursor2 { get; set; } = Color.FromArgb(0x00, 0x50, 0xFF);
+        public Color RupeeIcon4 { get; set; } = Color.FromArgb(0xA0, 0x60, 0xFF);
 
         /// <summary>
         /// Get all colors in the order of serialization.
@@ -127,6 +128,7 @@ namespace MMR.Randomizer.Asm
                 MenuSubtitleText,
                 ShopCursor1,
                 ShopCursor2,
+                RupeeIcon4,
             };
         }
 
@@ -164,7 +166,7 @@ namespace MMR.Randomizer.Asm
             }
             else
             {
-                return this.All().Take(52).ToArray();
+                return this.All().Take(53).ToArray();
             }
         }
 

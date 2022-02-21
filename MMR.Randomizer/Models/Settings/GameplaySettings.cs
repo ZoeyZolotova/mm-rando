@@ -159,6 +159,24 @@ namespace MMR.Randomizer.Models.Settings
             set { this.AsmOptions.MiscConfig.Flags.FreeScarecrow = value; }
         }
 
+        public bool FillWallet
+        {
+            get { return this.AsmOptions.MiscConfig.Flags.FillWallet; }
+            set { this.AsmOptions.MiscConfig.Flags.FillWallet = value; }
+        }
+
+        public AutoInvertState AutoInvert
+        {
+            get { return this.AsmOptions.MiscConfig.Flags.AutoInvert; }
+            set { this.AsmOptions.MiscConfig.Flags.AutoInvert = value; }
+        }
+
+        public bool DoubleArcheryRewards
+        {
+            get { return this.AsmOptions.MiscConfig.Speedups.DoubleArcheryRewards; }
+            set { this.AsmOptions.MiscConfig.Speedups.DoubleArcheryRewards = value; }
+        }
+
         #endregion
 
         #region Random Elements
@@ -168,7 +186,19 @@ namespace MMR.Randomizer.Models.Settings
         /// </summary>
         public LogicMode LogicMode { get; set; }
 
-        public List<int> EnabledTricks { get; set; } = new List<int> { 1205,1209,1171,1207,1194,1161,1167,1160,1223,1159 };
+        public List<string> EnabledTricks { get; set; } = new List<string>
+        {
+            "Exit Ocean Spider House without Goron",
+            "Lensless Chests",
+            "Lensless Walking",
+            "Lensless Walls/Ceilings",
+            "Pinnacle Rock without Seahorse",
+            "Poisoned Water as Zora",
+            "Quest Item Extra Storage",
+            "Scarecrow's Song",
+            "Take Damage",
+            "WFT 2nd Floor Skip",
+        };
 
         /// <summary>
         /// Add songs to the randomization pool
@@ -196,6 +226,8 @@ namespace MMR.Randomizer.Models.Settings
 
         public StrayFairyMode StrayFairyMode { get; set; }
 
+        public BossRemainsMode BossRemainsMode { get; set; }
+
         public PriceMode PriceMode { get; set; }
 
 
@@ -212,7 +244,7 @@ namespace MMR.Randomizer.Models.Settings
         /// <summary>
         ///  Custom item list string
         /// </summary>
-        public string CustomItemListString { get; set; } = "--------------------206-40000000----10ffff-ffffffff-ffffffff-f8000000-3ddf77fd-3fffffff-f378ffff-ffffffff";
+        public string CustomItemListString { get; set; } = "--------------------40c-80000000----21ffff-ffffffff-ffffffff-f0000000-7bbeeffa-7fffffff-e6f1fffe-ffffffff";
 
         /// <summary>
         ///  Custom starting item list selections
@@ -223,7 +255,7 @@ namespace MMR.Randomizer.Models.Settings
         /// <summary>
         ///  Custom starting item list string
         /// </summary>
-        public string CustomStartingItemListString { get; set; } = "fdfe-2c00000-";
+        public string CustomStartingItemListString { get; set; } = "1fbfc-5800000-";
 
         /// <summary>
         /// List of locations that must be randomized to junk
@@ -234,7 +266,7 @@ namespace MMR.Randomizer.Models.Settings
         /// <summary>
         ///  Custom junk location string
         /// </summary>
-        public string CustomJunkLocationsString { get; set; } = "-------------------------100000-----200000--f000";
+        public string CustomJunkLocationsString { get; set; } = "-------------------------200000-----400000--f000";
 
         /// <summary>
         /// Defines number of ice traps.

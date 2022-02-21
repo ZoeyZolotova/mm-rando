@@ -17,5 +17,8 @@ namespace MMR.Randomizer.Models
 
         [Description("Prices for other miscellaneous spending will be randomized.")]
         Misc = 4,
+
+        [Description("Price randomization will range from 1-999 instead of 1-500.")]
+        AccountForRoyalWallet = 8,
     }
 }

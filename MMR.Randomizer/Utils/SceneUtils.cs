@@ -380,11 +380,21 @@ namespace MMR.Randomizer.Utils
             // Kamaro the dancing ghost in Termina Field breaks night music
             //   he calls a function that sets an unknown actor flag unk39 & 20, he calls this function per frame from multiple places
             // if we nop it his music never plays, and might music is never interupted by him
-            var kamaroFID = 593; //GameObjects.Actor.En_Yb.FileListIndex();
+            var kamaroFID = 593;
             RomUtils.CheckCompressed(kamaroFID);
             var kamaroData = RomData.MMFileList[kamaroFID].Data;
             // null function call to func_800B9084 -> NOP
             ReadWriteUtils.Arr_WriteU32(kamaroData, 0x618, 0x00000000);
+
+            // Sakon the Bomb Bag theif breaks night music
+            //   on first night, after he's supposed to have stolen the bag
+            //   his actor will spawn, check the time, and self-destroy, and take out BGM with it
+            // if we nop that kill music command it will stop him from stopping BGM
+            var sakonFID = 526;
+            RomUtils.CheckCompressed(sakonFID);
+            var sakonData = RomData.MMFileList[sakonFID].Data;
+            // null function call to Audio_QueueSeqCmd -> NOP
+            ReadWriteUtils.Arr_WriteU32(sakonData, 0x3A0C, 0x00000000);
         }
     }
 }

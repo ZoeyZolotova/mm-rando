@@ -1,4 +1,5 @@
 using MMR.Common.Extensions;
+using MMR.Randomizer.Asm;
 using MMR.Randomizer.Attributes;
 using MMR.Randomizer.Constants;
 using MMR.Randomizer.Extensions;
@@ -59,19 +60,18 @@ namespace MMR.Randomizer.Utils
         {
             RomData.GetItemList = new Dictionary<int, GetItemEntry>();
             int f = RomUtils.GetFileIndexForWriting(GET_ITEM_TABLE);
-            int baseaddr = GET_ITEM_TABLE - RomData.MMFileList[f].Addr;
             var fileData = RomData.MMFileList[f].Data;
-            foreach (var getItemIndex in ItemUtils.AllGetItemIndices())
+            for (var i = 0; i < fileData.Length; i += 8)
             {
-                int offset = (getItemIndex - 1) * 8 + baseaddr;
+                var getItemIndex = (i / 8) + 1;
                 RomData.GetItemList[getItemIndex] = new GetItemEntry
                 {
-                    ItemGained = fileData[offset],
-                    Flag = fileData[offset + 1],
-                    Index = fileData[offset + 2],
-                    Type = fileData[offset + 3],
-                    Message = (short)((fileData[offset + 4] << 8) | fileData[offset + 5]),
-                    Object = (short)((fileData[offset + 6] << 8) | fileData[offset + 7])
+                    ItemGained = fileData[i],
+                    Flag = fileData[i + 1],
+                    Index = fileData[i + 2],
+                    Type = fileData[i + 3],
+                    Message = (short)((fileData[i + 4] << 8) | fileData[i + 5]),
+                    Object = (short)((fileData[i + 6] << 8) | fileData[i + 7])
                 };
             }
         }
@@ -104,7 +104,7 @@ namespace MMR.Randomizer.Utils
             }
         }
 
-        public static void WriteNewItem(ItemObject itemObject, List<MessageEntry> newMessages, GameplaySettings settings, ChestTypeAttribute.ChestType? overrideChestType, MessageTable messageTable)
+        public static void WriteNewItem(ItemObject itemObject, List<MessageEntry> newMessages, GameplaySettings settings, ChestTypeAttribute.ChestType? overrideChestType, MessageTable messageTable, ExtendedObjects extendedObjects)
         {
             var item = itemObject.Item;
             var location = itemObject.NewLocation.Value;
@@ -143,6 +143,14 @@ namespace MMR.Randomizer.Utils
                 newItem = RomData.GetItemList[item.GetItemIndex().Value];
             }
 
+            // Attempt to resolve extended object Id, which should affect "Exclusive Items" as well.
+            var graphics = extendedObjects.ResolveGraphics(newItem);
+            if (graphics.HasValue)
+            {
+                newItem.Object = graphics.Value.objectId;
+                newItem.Index = graphics.Value.graphicId;
+            }
+
             var data = new byte[]
             {
                 newItem.ItemGained,
@@ -155,6 +163,37 @@ namespace MMR.Randomizer.Utils
                 (byte)(newItem.Object & 0xFF),
             };
             ReadWriteUtils.Arr_Insert(data, 0, data.Length, fileData, offset);
+
+            int? refillGetItemIndex = item switch
+            {
+                Item.ItemBottleMadameAroma => 0x91,
+                Item.ItemBottleAliens => 0x92,
+                _ => null,
+            };
+
+            if (refillGetItemIndex.HasValue)
+            {
+                var refillItem = RomData.GetItemList[refillGetItemIndex.Value];
+                var refillGraphics = extendedObjects.ResolveGraphics(refillItem);
+                if (refillGraphics.HasValue)
+                {
+                    refillItem.Object = refillGraphics.Value.objectId;
+                    refillItem.Index = refillGraphics.Value.graphicId;
+                }
+                var refillData = new byte[]
+                {
+                    refillItem.ItemGained,
+                    refillItem.Flag,
+                    refillItem.Index,
+                    refillItem.Type,
+                    (byte)(refillItem.Message >> 8),
+                    (byte)(refillItem.Message & 0xFF),
+                    (byte)(refillItem.Object >> 8),
+                    (byte)(refillItem.Object & 0xFF),
+                };
+                var refillOffset = (refillGetItemIndex.Value - 1) * 8 + baseaddr;
+                ReadWriteUtils.Arr_Insert(refillData, 0, refillData.Length, fileData, refillOffset);
+            }
 
             if (location.IsRupeeRepeatable())
             {
@@ -208,7 +247,7 @@ namespace MMR.Randomizer.Utils
             foreach (var shopInventory in shopInventories)
             {
                 var messageId = ReadWriteUtils.ReadU16(shopInventory.ShopItemAddress + 0x0A);
-                var oldMessage = messageTable.GetMessage(messageId);
+                var oldMessage = messageTable.GetMessage((ushort)(messageId + 1));
                 var cost = ReadWriteUtils.Arr_ReadU16(oldMessage.Header, 5);
                 newMessages.Add(new MessageEntryBuilder()
                     .Id(messageId)

@@ -100,6 +100,7 @@ namespace MMR.UI.Forms
             btn_wallet99.BackColor = colors.RupeeIcon1;
             btn_wallet200.BackColor = colors.RupeeIcon2;
             btn_wallet500.BackColor = colors.RupeeIcon3;
+            btn_wallet999.BackColor = colors.RupeeIcon4;
             btn_dpad.BackColor = colors.DPad;
         }
 
@@ -130,6 +131,7 @@ namespace MMR.UI.Forms
             colors.RupeeIcon1 = btn_wallet99.BackColor;
             colors.RupeeIcon2 = btn_wallet200.BackColor;
             colors.RupeeIcon3 = btn_wallet500.BackColor;
+            colors.RupeeIcon4 = btn_wallet999.BackColor;
             colors.DPad = btn_dpad.BackColor;
             return colors;
         }
@@ -246,6 +248,11 @@ namespace MMR.UI.Forms
         }
 
         private void btn_wallet500_Click(object sender, EventArgs e)
+        {
+            SelectColor((Button)sender);
+        }
+
+        private void btn_wallet999_Click(object sender, EventArgs e)
         {
             SelectColor((Button)sender);
         }
@@ -439,7 +446,7 @@ namespace MMR.UI.Forms
 
         void ctxtMenu_RandomizeRupees(object sender, EventArgs e)
         {
-            RandomizeControlColor(btn_wallet99, btn_wallet200, btn_wallet500);
+            RandomizeControlColor(btn_wallet99, btn_wallet200, btn_wallet500, btn_wallet999);
         }
 
         void ctxtMenu_ResetAllColors(object sender, EventArgs e)
@@ -485,7 +492,7 @@ namespace MMR.UI.Forms
 
         void ctxtMenu_ResetRupees(object sender, EventArgs e)
         {
-            ResetControlColor(btn_wallet99, btn_wallet200, btn_wallet500);
+            ResetControlColor(btn_wallet99, btn_wallet200, btn_wallet500, btn_wallet999);
         }
 
         #endregion
@@ -522,6 +529,7 @@ namespace MMR.UI.Forms
                 new ColorControl(btn_wallet99, ColorMode.Back, defaultColors.RupeeIcon1),
                 new ColorControl(btn_wallet200, ColorMode.Back, defaultColors.RupeeIcon2),
                 new ColorControl(btn_wallet500, ColorMode.Back, defaultColors.RupeeIcon3),
+                new ColorControl(btn_wallet999, ColorMode.Back, defaultColors.RupeeIcon4),
                 new ColorControl(btn_dpad, ColorMode.Back, defaultColors.DPad),
             };
         }

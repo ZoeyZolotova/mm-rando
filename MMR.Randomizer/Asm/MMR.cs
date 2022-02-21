@@ -32,6 +32,7 @@ namespace MMR.Randomizer.Asm
 
         public ushort LocationWalletAdult;
         public ushort LocationWalletGiant;
+        public ushort LocationWalletRoyal;
 
         public ushort LocationBombBagSmall;
         public ushort LocationBombBagBig;
@@ -80,6 +81,7 @@ namespace MMR.Randomizer.Asm
 
                 writer.WriteUInt16(this.LocationWalletAdult);
                 writer.WriteUInt16(this.LocationWalletGiant);
+                writer.WriteUInt16(this.LocationWalletRoyal);
 
                 writer.WriteUInt16(this.LocationBombBagSmall);
                 writer.WriteUInt16(this.LocationBombBagBig);
@@ -125,6 +127,7 @@ namespace MMR.Randomizer.Asm
 
         public ushort LocationWalletAdult { get; set; }
         public ushort LocationWalletGiant { get; set; }
+        public ushort LocationWalletRoyal { get; set; }
 
         public ushort LocationBombBagSmall { get; set; }
         public ushort LocationBombBagBig { get; set; }
@@ -191,6 +194,7 @@ namespace MMR.Randomizer.Asm
 
                 LocationWalletAdult = this.LocationWalletAdult,
                 LocationWalletGiant = this.LocationWalletGiant,
+                LocationWalletRoyal = this.LocationWalletRoyal,
 
                 LocationBombBagSmall = this.LocationBombBagSmall,
                 LocationBombBagBig = this.LocationBombBagBig,

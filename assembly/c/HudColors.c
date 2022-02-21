@@ -69,6 +69,8 @@ struct HudColorConfig HUD_COLOR_CONFIG = {
     .menuSubtitleText     = { 0xFF, 0xC8, 0x00 },
     .shopCursor1          = { 0x00, 0x00, 0xFF },
     .shopCursor2          = { 0x00, 0x50, 0xFF },
+
+    .royalRupee           = { 0xA0, 0x60, 0xFF },
 };
 
 struct PauseCursorColors {
@@ -385,12 +387,18 @@ static void UpdateTextButtonIconColors(void) {
 }
 
 static void UpdateRupeeColors(u16* rupeeColors) {
+    // Write standard rupee colors.
     for (int i = 0; i < 3; i++) {
         int idx = i * 3;
         rupeeColors[idx] = HUD_COLOR_CONFIG.rupee[i].r;
         rupeeColors[idx + 1] = HUD_COLOR_CONFIG.rupee[i].g;
         rupeeColors[idx + 2] = HUD_COLOR_CONFIG.rupee[i].b;
     }
+    // Write royal wallet rupee color.
+    u16* const royalColor = rupeeColors + 9;
+    royalColor[0] = HUD_COLOR_CONFIG.royalRupee.r;
+    royalColor[1] = HUD_COLOR_CONFIG.royalRupee.g;
+    royalColor[2] = HUD_COLOR_CONFIG.royalRupee.b;
 }
 
 void HudColors_Init(void) {

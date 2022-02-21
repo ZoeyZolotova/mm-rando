@@ -30,3 +30,17 @@
     lw      ra, 0x001C (sp)
     jr      ra
     addiu   sp, sp, 0x20
+
+; Directly after above code
+; Replaces
+; week_eve
+; nt_reg[86]..week
+; _eve
+.org 0x801DC7D8
+    addiu   sp, sp, -0x14
+    sw      ra, 0x0010 (sp)
+    jal     MMR_QueueItem
+    nop
+    lw      ra, 0x0010 (sp)
+    jr      ra
+    addiu   sp, sp, 0x14

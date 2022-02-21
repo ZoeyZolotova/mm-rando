@@ -24,6 +24,13 @@ namespace MMR.Randomizer.Asm
         Never,
     }
 
+    public enum AutoInvertState : byte
+    {
+        Never,
+        FirstCycle,
+        Always,
+    }
+
     /// <summary>
     /// Speedups.
     /// </summary>
@@ -60,6 +67,16 @@ namespace MMR.Randomizer.Asm
         public bool FastBankRupees { get; set; }
 
         /// <summary>
+        /// Whether or not to grant both archery rewards with a sufficient score when relevant.
+        /// </summary>
+        public bool DoubleArcheryRewards { get; set; }
+
+        /// <summary>
+        /// Whether or not to grant multiple bank deposit rewards for each threshold passed.
+        /// </summary>
+        public bool BankMultiRewards { get; set; } = true;
+
+        /// <summary>
         /// Convert to a <see cref="uint"/> integer.
         /// </summary>
         /// <returns>Integer</returns>
@@ -72,6 +89,8 @@ namespace MMR.Randomizer.Asm
             flags |= (this.BoatArchery ? (uint)1 : 0) << 28;
             flags |= (this.DonGero ? (uint)1 : 0) << 27;
             flags |= (this.FastBankRupees ? (uint)1 : 0) << 26;
+            flags |= (this.DoubleArcheryRewards ? (uint)1 : 0) << 25;
+            flags |= (this.BankMultiRewards ? (uint)1 : 0) << 24;
             return flags;
         }
     }
@@ -189,6 +208,16 @@ namespace MMR.Randomizer.Asm
         /// </summary>
         public bool FreeScarecrow { get; set; }
 
+        /// <summary>
+        /// Whether or not to max out rupees when finding a wallet upgrade.
+        /// </summary>
+        public bool FillWallet { get; set; }
+
+        /// <summary>
+        /// Whether or not time should be auto-inverted at the start of a cycle.
+        /// </summary>
+        public AutoInvertState AutoInvert { get; set; }
+
         public MiscFlags()
         {
         }
@@ -221,6 +250,8 @@ namespace MMR.Randomizer.Asm
             this.TargetHealth = ((flags >> 12) & 1) == 1;
             this.ClimbAnything = ((flags >> 11) & 1) == 1;
             this.FreeScarecrow = ((flags >> 10) & 1) == 1;
+            this.FillWallet = ((flags >> 9) & 1) == 1;
+            this.AutoInvert = (AutoInvertState)((flags >> 7) & 3);
         }
 
         /// <summary>
@@ -250,6 +281,8 @@ namespace MMR.Randomizer.Asm
             flags |= (this.TargetHealth ? (uint)1 : 0) << 12;
             flags |= (this.ClimbAnything ? (uint)1 : 0) << 11;
             flags |= (this.FreeScarecrow ? (uint)1 : 0) << 10;
+            flags |= (this.FillWallet ? (uint)1 : 0) << 9;
+            flags |= (((uint)this.AutoInvert) & 3) << 7;
             return flags;
         }
     }

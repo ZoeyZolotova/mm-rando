@@ -830,12 +830,21 @@ void Models_DrawOcarina(GlobalContext* ctxt, u32* skeleton, Vec3s* limbDrawTable
 }
 
 void Models_DrawOcarinaLimb(GlobalContext* ctxt, Actor* actor) {
+    if (!MISC_CONFIG.flags.freestanding) {
+        gSPDisplayList(ctxt->state.gfxCtx->polyOpa.p++, 0x0601CAD0);
+        return;
+    }
+
     // Store backup of previous 0xDA (Mtx) instruction (for Skull Kid's hand) and overwrite it.
     // Is this safe? Probably not. :)
     Gfx backup = *(ctxt->state.gfxCtx->polyOpa.p-- - 1);
 
     // Perform underlying draw.
     DrawFromGiTable(actor, ctxt, 25.0, 0x4C);
+
+    // Restore setup DList to that which Skull Kid's actor expects.
+    ctxt->state.gfxCtx->polyOpa.p = z2_Gfx_CallSetupDL(ctxt->state.gfxCtx->polyOpa.p, 0x19);
+    ctxt->state.gfxCtx->polyXlu.p = z2_Gfx_CallSetupDL(ctxt->state.gfxCtx->polyXlu.p, 0x19);
 
     // Find Skull Kid object data and restore segmented addresses.
     SceneObject* obj = FindObject(ctxt, OBJECT_STK);

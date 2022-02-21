@@ -1,4 +1,5 @@
 ﻿using MMR.Randomizer.Extensions;
+using MMR.Randomizer.Models.Rom;
 using MMR.Randomizer.Utils;
 using System.Collections.Generic;
 using System.Drawing;
@@ -11,12 +12,14 @@ namespace MMR.Randomizer.Asm
     /// </summary>
     public class ObjectIndexes
     {
+        public short? RoyalWallet;
         public short? DoubleDefense;
         public short? MagicPower;
         public short? Fairies;
         public short? Skulltula;
         public short? MusicNotes;
         public short? Rupees;
+        public short? Milk;
     }
 
     /// <summary>
@@ -43,6 +46,36 @@ namespace MMR.Randomizer.Asm
         /// Object indexes.
         /// </summary>
         public ObjectIndexes Indexes { get; } = new ObjectIndexes();
+
+        /// <summary>
+        /// Attempt to resolve the extended object Id for a <see cref="GetItemEntry"/>.
+        /// </summary>
+        /// <param name="entry"></param>
+        /// <returns>Object Id if resolved.</returns>
+        public (short objectId, byte graphicId)? ResolveGraphics(GetItemEntry entry)
+        {
+            // Royal Wallet.
+            if (entry.ItemGained == 0xA4 && entry.Object == 0xA8 && Indexes.RoyalWallet.HasValue)
+            {
+                return (Indexes.RoyalWallet.Value, 0x22);
+            }
+
+            // Milk Refill
+            if (entry.ItemGained == 0xA0 && entry.Object == 0xB6 && Indexes.Milk.HasValue)
+            {
+                return (Indexes.Milk.Value, 0x31);
+            }
+
+            // Chateau Refill
+            if (entry.ItemGained == 0x9F && entry.Object == 0x227 && Indexes.Milk.HasValue)
+            {
+                return (Indexes.Milk.Value, 0x32);
+            }
+
+            return null;
+
+            // TODO: Move behavior for resolving others into here.
+        }
 
         /// <summary>
         /// Create an <see cref="ExtendedObjects"/> with all relevant extended objects added.
@@ -88,6 +121,10 @@ namespace MMR.Randomizer.Asm
         /// <param name="skulltulas">Whether or not to include Skulltula Token objects</param>
         void AddExtendedObjects(bool fairies = false, bool skulltulas = false)
         {
+            // Add Royal Wallet.
+            this.Offsets.Add(AddRoyalWallet());
+            Indexes.RoyalWallet = AdvanceIndex();
+
             // Add Double Defense
             this.Offsets.Add(AddDoubleDefense());
             Indexes.DoubleDefense = AdvanceIndex();
@@ -103,6 +140,10 @@ namespace MMR.Randomizer.Asm
             // Add Rupees
             this.Offsets.Add(AddRupees());
             this.Indexes.Rupees = AdvanceIndex();
+
+            // Add Milk
+            this.Offsets.Add(AddMilk());
+            this.Indexes.Milk = AdvanceIndex();
 
             // Add Skulltula Tokens
             if (skulltulas)
@@ -390,6 +431,64 @@ namespace MMR.Randomizer.Asm
             //WriteByte(data, 0x4B4 + 0x20 * 5, 0xFF, 0xFF, 0xFF); // Gold Env
             //WriteByte(data, 0x4AC + 0xC0 + 0x20 * 5, 0xFF, 0xFF, 0xFF); // Gold Primary
             //WriteByte(data, 0x4B4 + 0xC0 + 0x20 * 5, 0xFF, 0xFF, 0xFF); // Gold Env
+
+            return this.Bundle.Append(data);
+        }
+
+        #endregion
+
+        #region Milk
+
+        (uint, uint) AddMilk()
+        {
+            var data = CloneExistingData(752);
+
+            // Jar
+            WriteByte(data, 0x1270 + 0xC, 0xFF, 0xFF, 0xFF); // Green Primary
+            WriteByte(data, 0x1270 + 0x14, 0x64, 0x64, 0x64); // Green Env
+
+            // Liquid
+            WriteByte(data, 0x12D0 + 0xC, 0xFF, 0xFF, 0xFF); // Green Primary 2
+            WriteByte(data, 0x12D0 + 0x14, 0xFF, 0xFF, 0xFF); // Green Env 2
+
+            // Pattern
+            WriteByte(data, 0x1330 + 0xC, 0, 0x20, 0xFF); // Green Primary 3
+            WriteByte(data, 0x1330 + 0x14, 0, 0x20, 0xFF); // Green Env 3
+
+            // Jar
+            WriteByte(data, 0x1270 + 0x20 * 1 + 0xC, 0xFF, 0xFF, 0xFF); // Red Primary
+            WriteByte(data, 0x1270 + 0x20 * 1 + 0x14, 0x64, 0x64, 0x64); // Red Env
+
+            // Liquid
+            WriteByte(data, 0x12D0 + 0x20 * 1 + 0xC, 0xFF, 0xFF, 0xFF); // Red Primary 2
+            WriteByte(data, 0x12D0 + 0x20 * 1 + 0x14, 0xFF, 0xFF, 0xFF); // Red Env 2
+
+            // Pattern
+            WriteByte(data, 0x1330 + 0x58 * 1 + 0xC, 0x6E, 0x46, 0x00); // Red Primary 3
+            WriteByte(data, 0x1330 + 0x58 * 1 + 0x14, 0x69, 0x0, 0x50); // Red Env 3
+
+            // ENDDL before drawing spoon. Affects green, red and blue variants.
+            WriteByte(data, 0x1698, 0xDF);
+
+            return this.Bundle.Append(data);
+        }
+
+        #endregion
+
+        #region Royal Wallet
+
+        (uint, uint) AddRoyalWallet()
+        {
+            var data = CloneExistingData(739);
+
+            WriteByte(data, 0x177C, 0xFF, 0xFF, 0xFF); // Wallet exterior prim.
+            WriteByte(data, 0x1784, 0xD0, 0xB0, 0xFF); // Wallet exterior env.
+            WriteByte(data, 0x17FC, 0xA0, 0x40, 0xFF); // Rupee exterior prim.
+            WriteByte(data, 0x1804, 0x50, 0x00, 0xC0); // Rupee exterior env.
+            WriteByte(data, 0x181C, 0x80, 0x00, 0xA0); // Rope color prim.
+            WriteByte(data, 0x1824, 0x20, 0x20, 0x20); // Rope color env.
+            WriteByte(data, 0x183C, 0xA0, 0x40, 0xFF); // Rupee interior prim.
+            WriteByte(data, 0x1844, 0xFF, 0xC0, 0xFF); // Rupee interior env.
 
             return this.Bundle.Append(data);
         }

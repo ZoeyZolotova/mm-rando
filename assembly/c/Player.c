@@ -53,7 +53,9 @@ bool Player_CanReceiveItem(GlobalContext* ctxt) {
 
 void Player_Pause(GlobalContext* ctxt) {
     ActorPlayer* player = GET_PLAYER(ctxt);
-    player->stateFlags.state1 |= PLAYER_STATE1_TIME_STOP_2;
+    if (!(player->stateFlags.state1 & PLAYER_STATE1_GROTTO_IN)) {
+        player->stateFlags.state1 |= PLAYER_STATE1_TIME_STOP_2;
+    }
 }
 
 void Player_Unpause(GlobalContext* ctxt) {

@@ -39,6 +39,8 @@ struct DpadConfig {
     /* 0x1A */ u8 reserved[2];
 }; // size = 0x1C
 
+extern struct DpadConfig DPAD_CONFIG;
+
 void Dpad_BeforePlayerActorUpdate(ActorPlayer* player, GlobalContext* ctxt);
 void Dpad_ClearItemTextures(void);
 void Dpad_Init(void);

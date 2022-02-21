@@ -3,7 +3,7 @@
 
 enum CustomItem {
     // Non-progressive upgrades
-    CUSTOM_ITEM_TYCOONS_WALLET     = 0xA4,
+    CUSTOM_ITEM_ROYAL_WALLET       = 0xA4,
     CUSTOM_ITEM_MAGIC_POWER        = 0xA5,
     CUSTOM_ITEM_SPIN_ATTACK        = 0xA6,
     CUSTOM_ITEM_DOUBLE_DEFENSE     = 0xA7,

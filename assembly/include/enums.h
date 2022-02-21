@@ -463,6 +463,7 @@ enum PlayerForm {
 };
 
 enum PlayerState1 {
+    PLAYER_STATE1_GROTTO_IN   = 0x80000000, // Link is entering a grotto.
     PLAYER_STATE1_TIME_STOP   = 0x20000000, // Time is stopped but Link & NPC animations continue.
     PLAYER_STATE1_SPECIAL_2   = 0x10000000, // Form transition, using ocarina.
     PLAYER_STATE1_SWIM        = 0x08000000, // Swimming.

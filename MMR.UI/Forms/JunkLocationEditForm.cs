@@ -25,10 +25,7 @@ namespace MMR.UI.Forms
 
             _junkLocations = ItemUtils.AllLocations().ToList();
 
-            foreach (var item in _junkLocations)
-            {
-                lJunkLocations.Items.Add(item.Location());
-            }
+            PrintToListView();
 
             if (CustomJunkLocations != null)
             {
@@ -38,6 +35,15 @@ namespace MMR.UI.Forms
             else
             {
                 tJunkLocationsString.Text = "--";
+            }
+        }
+
+        private void PrintToListView()
+        {
+            foreach (var item in _junkLocations)
+            {
+                if (!item.Location().ToLower().Contains(tSearchString.Text.ToLower())) { continue; }
+                lJunkLocations.Items.Add(new ListViewItem { Text = item.Location(), Tag = item, Checked = CustomJunkLocations.Contains(item) });
             }
         }
 
@@ -104,7 +110,7 @@ namespace MMR.UI.Forms
                 }
                 foreach (ListViewItem l in lJunkLocations.Items)
                 {
-                    if (CustomJunkLocations.Contains(_junkLocations[l.Index]))
+                    if (CustomJunkLocations.Contains((Item)l.Tag))
                     {
                         l.Checked = true;
                     }
@@ -143,14 +149,25 @@ namespace MMR.UI.Forms
             updating = true;
             if (e.Item.Checked)
             {
-                CustomJunkLocations.Add(_junkLocations[e.Item.Index]);
+                CustomJunkLocations.Add((Item)e.Item.Tag);
             }
             else
             {
-                CustomJunkLocations.Remove(_junkLocations[e.Item.Index]);
+                CustomJunkLocations.Remove((Item)e.Item.Tag);
             }
             UpdateString(CustomJunkLocations);
             updating = false;
+        }
+
+        private void tSearchString_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyData == Keys.Enter)
+            {
+                updating = true;
+                lJunkLocations.Items.Clear();
+                PrintToListView();
+                updating = false;
+            }
         }
     }
 }

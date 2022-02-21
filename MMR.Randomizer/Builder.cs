@@ -366,6 +366,67 @@ namespace MMR.Randomizer
         }
 
         /// <summary>
+        /// Write text for swamp archery double reward message.
+        /// </summary>
+        /// <param name="table"><see cref="MessageTable"/> to update.</param>
+        private void WriteArcheryDoubleRewardText(MessageTable table)
+        {
+            table.UpdateMessages(new MessageEntryBuilder()
+                .Id(0x23E)
+                .Header(it =>
+                {
+                    it.Standard().Y(0).Icon(0xFE);
+                })
+                .Message(it =>
+                {
+                    it.Text("Y'played so well, y've'rned").NewLine()
+                    .Text("yuhself the ").Red("grand prize").Text("!")
+                    .DisableTextSkip2()
+                    .EndFinalTextBox();
+                })
+                .Build()
+            );
+        }
+
+        /// <summary>
+        /// Write text for bank post-reward when giving another reward afterwards.
+        /// </summary>
+        /// <param name="table"><see cref="MessageTable"/> to update.</param>
+        private void WriteBankPostRewardText(MessageTable table)
+        {
+            // Copy of message 0x47A without EndFinalTextBox (0xBF).
+            table.UpdateMessages(new MessageEntryBuilder()
+                .Id(0x1B67)
+                .Header(it =>
+                {
+                    it.Standard2().Y(0).Icon(0xFE);
+                })
+                .Message(it =>
+                {
+                    it
+                    .Text("See! Doesn't it hold more than").NewLine()
+                    .Text("your old one? Fill it up and bring").NewLine()
+                    .Text("it all in to deposit!").DisableTextSkip2();
+                })
+                .Build()
+            );
+
+            // Copy of message 0x47B without EndFinalTextBox (0xBF).
+            table.UpdateMessages(new MessageEntryBuilder()
+                .Id(0x1B77)
+                .Header(it =>
+                {
+                    it.Standard2().Y(0).Icon(0xFE);
+                })
+                .Message(it =>
+                {
+                    it.Text("That's what they call interest!").DisableTextSkip2();
+                })
+                .Build()
+            );
+        }
+
+        /// <summary>
         /// Write text for pictograph prompt.
         /// </summary>
         /// <param name="table"><see cref="MessageTable"/> to update.</param>
@@ -392,6 +453,30 @@ namespace MMR.Randomizer
                     .Text("\xCC").NewLine()
                     .Text("Set the amount with \xBB \xB4 \xB5").NewLine()
                     .Text("and press \xB0 to decide.")
+                    .EndFinalTextBox();
+                })
+                .Build()
+            );
+        }
+
+        /// <summary>
+        /// Write text for Royal Wallet get-item message.
+        /// </summary>
+        /// <param name="table">Table to update.</param>
+        private void WriteRoyalWalletText(MessageTable table)
+        {
+            table.UpdateMessages(new MessageEntryBuilder()
+                .Id(0xB)
+                .Header(it =>
+                {
+                    // Using icon from Giant Wallet message.
+                    it.FaintBlue().Y(1).Icon(0x9);
+                })
+                .Message(it =>
+                {
+                    // Note: Messages for Adult Wallet and Giant Wallet use 0xC2 (TwoChoices) before ending text box?
+                    it.Text("You got a ").Red("Royal Wallet").Text("!").NewLine()
+                    .Text("It can hold up to ").Red("999 Rupees").Text(".")
                     .EndFinalTextBox();
                 })
                 .Build()
@@ -1394,11 +1479,14 @@ namespace MMR.Randomizer
                 hacks.Add(Resources.mods.enemy_max_health);
             }
 
-            if (!_randomized.Settings.CustomStartingItemList.Contains(Item.ItemOcarina) || !_randomized.Settings.CustomStartingItemList.Contains(Item.SongTime)
-                || _randomized.Settings.CustomItemList.Contains(Item.ItemOcarina) || _randomized.Settings.CustomItemList.Contains(Item.SongTime))
+            if (_randomized.Settings.LogicMode != LogicMode.Vanilla)
             {
-                hacks.Add(Resources.mods.fix_ocarina_checks);
-                hacks.Add(Resources.mods.fix_song_of_time);
+                if (!_randomized.Settings.CustomStartingItemList.Contains(Item.ItemOcarina) || !_randomized.Settings.CustomStartingItemList.Contains(Item.SongTime)
+                    || _randomized.Settings.CustomItemList.Contains(Item.ItemOcarina) || _randomized.Settings.CustomItemList.Contains(Item.SongTime))
+                {
+                    hacks.Add(Resources.mods.fix_ocarina_checks);
+                    hacks.Add(Resources.mods.fix_song_of_time);
+                }
             }
 
             foreach (var hack in hacks)
@@ -1491,7 +1579,7 @@ namespace MMR.Randomizer
                     {
                         overrideChestType = ChestTypeAttribute.ChestType.LargeGold;
                     }
-                    ItemSwapUtils.WriteNewItem(item, newMessages, _randomized.Settings, item.Mimic?.ChestType ?? overrideChestType, _messageTable);
+                    ItemSwapUtils.WriteNewItem(item, newMessages, _randomized.Settings, item.Mimic?.ChestType ?? overrideChestType, _messageTable, _extendedObjects);
                 }
             }
 
@@ -1509,6 +1597,7 @@ namespace MMR.Randomizer
 
             _randomized.Settings.AsmOptions.MMRConfig.LocationWalletAdult = GetLocationIdOfItem(Item.UpgradeAdultWallet);
             _randomized.Settings.AsmOptions.MMRConfig.LocationWalletGiant = GetLocationIdOfItem(Item.UpgradeGiantWallet);
+            _randomized.Settings.AsmOptions.MMRConfig.LocationWalletRoyal = GetLocationIdOfItem(Item.UpgradeRoyalWallet);
 
             _randomized.Settings.AsmOptions.MMRConfig.LocationBombBagSmall = GetLocationIdOfItem(Item.ItemBombBag);
             _randomized.Settings.AsmOptions.MMRConfig.LocationBombBagBig = GetLocationIdOfItem(Item.UpgradeBigBombBag);
@@ -2929,6 +3018,32 @@ namespace MMR.Randomizer
             //   the conditional branches detecting if you haven't hit the right buttons, leaving function
             var bootFile = RomData.MMFileList[1].Data;
             ReadWriteUtils.Arr_WriteU32(bootFile, 0x2BBC, 0x1000000C);
+
+            void SwapBytes(int start, int end, byte searchByte, byte replaceByte)
+            {
+                for (int i = start; i < end; ++i)
+                {
+                    if (bootFile[i] == searchByte)
+                    {
+                        bootFile[i]  = replaceByte;
+                    }
+                }
+            }
+
+            // the H after each hex value for registers (H for base 16 'hex' ?) is hard for me to read
+            // starts RAM 80098648, on rom it starts on 0x19640, within boot file its 0x185E0
+            SwapBytes(0x185E0, 0x18720, (byte) 'H', (byte) ' '); // general registers
+            SwapBytes(0x18760, 0x188D0, (byte) 'H', (byte) ' '); // floating point registers
+
+            // convert lower case hex values to upper case (eg 8000abcd to 8000ABCD)
+            // they used c printf string substitution, so just change %x to %X (8 byte wide though, "%08x")
+            SwapBytes(0x181E0, 0x18230, (byte) 'x', (byte) 'X'); // dma section
+            SwapBytes(0x18470, 0x18B04, (byte) 'x', (byte) 'X'); // the rest of hex values for the whole debug crasher
+
+            // show V-PC for overlays to help find vram address in actors, useful
+            // yes I know it shows this page _later_, but a lot of users will only wait for the first one,
+            // no reason to have stupid question marks instead
+            ReadWriteUtils.Arr_WriteU32(bootFile, 0x31D8, 0x00000000); // replace branch with nop
         }
 
         private void WriteStartupStrings()
@@ -3180,6 +3295,10 @@ namespace MMR.Randomizer
                 {
                     WriteBankPromptText(_messageTable);
                 }
+
+                WriteArcheryDoubleRewardText(_messageTable);
+                WriteBankPostRewardText(_messageTable);
+                WriteRoyalWalletText(_messageTable);
 
                 progressReporter.ReportProgress(61, "Writing quick text...");
                 WriteQuickText();

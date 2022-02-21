@@ -8,7 +8,7 @@ namespace MMR.Randomizer.LogicMigrator
 {
     public static partial class Migrator
     {
-        public const int CurrentVersion = 8;
+        public const int CurrentVersion = 11;
 
         public static string ApplyMigrations(string logic)
         {
@@ -162,6 +162,21 @@ namespace MMR.Randomizer.LogicMigrator
             if (logicObject.Version < 8)
             {
                 AddOtherTimeTravel(logicObject);
+            }
+
+            if (logicObject.Version < 9)
+            {
+                AddBeansAndDekuPlayground(logicObject);
+            }
+
+            if (logicObject.Version < 10)
+            {
+                AddRoyalWallet(logicObject);
+            }
+
+            if (logicObject.Version < 11)
+            {
+                AddMultiLocationClockTownFairy(logicObject);
             }
 
             return JsonSerializer.Serialize(logicObject);
@@ -3797,6 +3812,59 @@ namespace MMR.Randomizer.LogicMigrator
             logicObject.Version = 8;
         }
 
+        private static void AddBeansAndDekuPlayground(JsonFormatLogic logicObject)
+        {
+            const int startIndex = 124;
+            var itemNames = new string[]
+            {
+                "OtherLimitlessBeans",
+                "OtherPlayDekuPlayground",
+            };
+
+            logicObject.Logic.InsertRange(startIndex, itemNames.Select(name => new JsonFormatLogicItem
+            {
+                Id = name,
+                RequiredItems = new List<string>(),
+                ConditionalItems = new List<List<string>>(),
+            }));
+            logicObject.Version = 9;
+        }
+
+        private static void AddRoyalWallet(JsonFormatLogic logicObject)
+        {
+            const int startIndex = 32;
+            var itemNames = new string[]
+            {
+                "UpgradeRoyalWallet",
+            };
+
+            logicObject.Logic.InsertRange(startIndex, itemNames.Select(name => new JsonFormatLogicItem
+            {
+                Id = name,
+                RequiredItems = new List<string>(),
+                ConditionalItems = new List<List<string>>(),
+            }));
+            logicObject.Version = 10;
+        }
+
+        private static void AddMultiLocationClockTownFairy(JsonFormatLogic logicObject)
+        {
+            const int startIndex = 1116;
+            var itemNames = new string[]
+            {
+                "CollectibleStrayFairyClockTownInLaundryPool",
+                "CollectibleStrayFairyClockTownInECT",
+            };
+
+            logicObject.Logic.InsertRange(startIndex, itemNames.Select(name => new JsonFormatLogicItem
+            {
+                Id = name,
+                RequiredItems = new List<string>(),
+                ConditionalItems = new List<List<string>>(),
+            }));
+            logicObject.Version = 11;
+        }
+
         private class MigrationItem
         {
             public int ID;
@@ -3818,8 +3886,10 @@ namespace MMR.Randomizer.LogicMigrator
             public List<List<string>> ConditionalItems { get; set; }
             public TimeOfDay TimeNeeded { get; set; }
             public TimeOfDay TimeAvailable { get; set; }
+            public TimeOfDay TimeSetup { get; set; }
             public bool IsTrick { get; set; }
             public string TrickTooltip { get; set; }
+            public string TrickCategory { get; set; }
         }
 
         [Flags]
@@ -3832,7 +3902,6 @@ namespace MMR.Randomizer.LogicMigrator
             Night2 = 8,
             Day3 = 16,
             Night3 = 32,
-            Any = 63,
         }
     }
 }

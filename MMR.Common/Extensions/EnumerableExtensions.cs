@@ -14,13 +14,13 @@ namespace MMR.Common.Extensions
                     elements.Skip(i + 1).Combinations(k - 1).Select(c => (new[] { e }).Concat(c)));
         }
 
-        // todo move to ListExtensions
+        // todo move to RandomExtensions
         public static T RandomOrDefault<T>(this IList<T> list, Random random)
         {
             return list.Any() ? list[random.Next(list.Count)] : default(T);
         }
 
-        // todo move to ListExtensions
+        // todo move to RandomExtensions
         public static T Random<T>(this IList<T> list, Random random)
         {
             if (!list.Any())
@@ -34,6 +34,7 @@ namespace MMR.Common.Extensions
             return list[random.Next(list.Count)];
         }
 
+        // todo move to RandomExtensions
         /// <summary>
         /// Select unique random items from a given array.
         /// </summary>
@@ -66,10 +67,10 @@ namespace MMR.Common.Extensions
             return source.Distinct(new KeyEqualityComparer<TSource, TKey>(keySelector));
         }
 
-        public static IEnumerable<T> AllowModification<T>(this IList<T> list) where T : struct
+        public static IEnumerable<T> AllowModification<T>(this IEnumerable<T> source) where T : struct
         {
             var used = new List<T>();
-            for (var item = list.Cast<T?>().FirstOrDefault(); item != null; used.Add(item.Value), item = list.Except(used).Cast<T?>().FirstOrDefault())
+            for (var item = source.Cast<T?>().FirstOrDefault(); item != null; used.Add(item.Value), item = source.Except(used).Cast<T?>().FirstOrDefault())
             {
                 yield return item.Value;
             }

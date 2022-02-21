@@ -1,5 +1,6 @@
 #include <stdbool.h>
 #include <z64.h>
+#include "Misc.h"
 #include "MMR.h"
 #include "QuestItems.h"
 #include "SaveFile.h"
@@ -83,6 +84,35 @@ void Savedata_AfterFileInit(GlobalContext* ctxt) {
     Savedata_SetStartingItems(ctxt);
 }
 
+static inline s32 GetInvertedClockSpeed(void) {
+    // Read inverted clock speed value from code used by Inverted Song of Time.
+    return *(s16*)(0x8015764E);
+}
+
+static bool ShouldAutoInvert(const SaveContext* file) {
+    switch (MISC_CONFIG.flags.autoInvert) {
+        case AUTO_INVERT_ALWAYS:
+            return true;
+        case AUTO_INVERT_FIRST_CYCLE:
+            return file->perm.unk24.songOfTimeCount == 0;
+        default:
+            return false;
+    }
+}
+
+static void HandleAutoInvert_AfterLoad(SaveContext* file) {
+    if (ShouldAutoInvert(file)) {
+        file->perm.timeSpeed = GetInvertedClockSpeed();
+    }
+}
+
+static void HandleAutoInvert_AfterSoT(SaveContext* file) {
+    // Called after Song of Time, so only invert if always.
+    if (MISC_CONFIG.flags.autoInvert == AUTO_INVERT_ALWAYS) {
+        file->perm.timeSpeed = GetInvertedClockSpeed();
+    }
+}
+
 /**
  * Hook function called after some savedata has been loaded into SaveContext.
  **/
@@ -94,6 +124,9 @@ void Savedata_AfterLoad(GlobalContext* ctxt, Camera* camera, SaveContext* file, 
     SaveFile_Read(src);
     file->extra.magicMeterSize = 0;
     file->extra.magicAmountTarget = 0;
+    if (!owlSave) {
+        HandleAutoInvert_AfterLoad(file);
+    }
 }
 
 /**
@@ -111,4 +144,7 @@ void Savedata_AfterWrite(u8* buffer, SaveContext* file, size_t size, bool owlSav
     u32 offset = SaveFile_GetFlashSectionOffset(owlSave);
     u8* dest = buffer + offset;
     SaveFile_Write(dest);
+    if (!owlSave) {
+        HandleAutoInvert_AfterSoT(file);
+    }
 }

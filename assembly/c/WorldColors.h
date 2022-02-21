@@ -30,6 +30,8 @@ struct WorldColorConfig {
     Color lightArrowEffectPri;
 };
 
+extern struct WorldColorConfig WORLD_COLOR_CONFIG;
+
 void WorldColors_Init(void);
 
 #endif // WORLD_COLORS_H

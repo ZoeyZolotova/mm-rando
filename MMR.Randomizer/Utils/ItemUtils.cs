@@ -67,6 +67,16 @@ namespace MMR.Randomizer.Utils
                 return true;
             }
 
+            if (settings.BossRemainsMode.HasFlag(BossRemainsMode.KeepWithinDungeon) && BossRemains().Contains(item))
+            {
+                return true;
+            }
+
+            if (settings.BossRemainsMode.HasFlag(BossRemainsMode.GreatFairyRewards) && BossRemains().Contains(item))
+            {
+                return true;
+            }
+
             return false;
         }
 
@@ -113,6 +123,11 @@ namespace MMR.Randomizer.Utils
         public static IEnumerable<Item> DungeonStrayFairies()
         {
             return Enumerable.Range((int)Item.CollectibleStrayFairyWoodfall1, 60).Cast<Item>();
+        }
+
+        public static IEnumerable<Item> BossRemains()
+        {
+            return Enumerable.Range((int)Item.RemainsOdolwa, 4).Cast<Item>();
         }
 
         // todo cache
@@ -201,20 +216,24 @@ namespace MMR.Randomizer.Utils
             return item == Item.RecoveryHeart || item == Item.IceTrap || JunkItems.Contains(item);
         }
 
-        public static bool IsRequired(Item item, Item locationForImportance, RandomizedResult randomizedResult)
+        public static bool CanBeRequired(Item item)
         {
             return !item.Name().Contains("Heart")
-                        && !IsStrayFairy(item)
-                        && !IsSkulltulaToken(item)
-                        && item != Item.IceTrap
-                        && randomizedResult.LocationsRequiredForMoonAccess.Contains(locationForImportance);
+                && !IsStrayFairy(item)
+                && !IsSkulltulaToken(item)
+                && item != Item.IceTrap;
+        }
+
+        public static bool IsRequired(Item item, Item locationForImportance, RandomizedResult randomizedResult)
+        {
+            return CanBeRequired(item) && randomizedResult.LocationsRequiredForMoonAccess.Contains(locationForImportance);
         }
 
         public static bool IsImportant(Item item, Item locationForImportance, RandomizedResult randomizedResult)
         {
             return !item.Name().Contains("Heart")
-                        && item != Item.IceTrap
-                        && randomizedResult.ImportantLocations.Contains(locationForImportance);
+                && item != Item.IceTrap
+                && randomizedResult.ImportantLocations.Contains(locationForImportance);
         }
 
         public static readonly ReadOnlyCollection<ReadOnlyCollection<Item>> ForbiddenStartTogether = new List<List<Item>>()
@@ -235,6 +254,7 @@ namespace MMR.Randomizer.Utils
             {
                 Item.UpgradeAdultWallet,
                 Item.UpgradeGiantWallet,
+                Item.UpgradeRoyalWallet,
             },
             new List<Item>
             {

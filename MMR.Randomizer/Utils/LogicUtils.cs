@@ -69,6 +69,7 @@ namespace MMR.Randomizer.Utils
                     TrickTooltip = logicItem.TrickTooltip,
                     DependsOnItems = logicItem.RequiredItems.Select(item => (Item)logic.FindIndex(li => li.Id == item)).ToList(),
                     Conditionals = logicItem.ConditionalItems.Select(c => c.Select(item => (Item)logic.FindIndex(li => li.Id == item)).ToList()).ToList(),
+                    TrickCategory = logicItem.TrickCategory
                 });
             }
 
@@ -171,7 +172,10 @@ namespace MMR.Randomizer.Utils
                 {
                     return null;
                 }
-                return checkedLocations[location];
+                if (!exclude.Intersect(checkedLocations[location].Required).Any())
+                {
+                    return checkedLocations[location];
+                }
             }
             var locationLogic = itemLogic[(int)location];
             var required = new List<Item>();
@@ -264,6 +268,31 @@ namespace MMR.Randomizer.Utils
                 {
                     return null;
                 }
+
+                // Hopefully this makes item importance a little smarter.
+                var shouldRemove = new List<int>();
+                for (var i = 0; i < logicPaths.Count; i++)
+                {
+                    var currentLogicPath = logicPaths[i];
+                    var currentLogicImportant = currentLogicPath.Important.Except(important);
+                    for (var j = 0; j < logicPaths.Count; j++)
+                    {
+                        if (i != j && !shouldRemove.Contains(i) && !shouldRemove.Contains(j))
+                        {
+                            var otherLogicPath = logicPaths[j];
+                            var otherLogicImportant = otherLogicPath.Important.Except(important);
+                            if (!currentLogicImportant.Except(otherLogicImportant).Any() && otherLogicImportant.Except(currentLogicImportant).Any())
+                            {
+                                shouldRemove.Add(j);
+                            }
+                        }
+                    }
+                }
+                foreach (var index in shouldRemove.OrderByDescending(x => x))
+                {
+                    logicPaths.RemoveAt(index);
+                }
+
                 required.AddRange(logicPaths.Select(lp => lp.Required.AsEnumerable()).Aggregate((a, b) => a.Intersect(b)));
                 important.AddRange(logicPaths.SelectMany(lp => lp.Required.Union(lp.Important)).Distinct());
                 importantSongLocations.AddRange(logicPaths.SelectMany(lp => lp.ImportantSongLocations).Distinct());

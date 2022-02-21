@@ -5,6 +5,7 @@
 #include <PR/ultratypes.h>
 #include <unk.h>
 #include <z64math.h>
+#include <z64animation.h>
 
 struct Actor;
 struct BgPolygon;
@@ -164,6 +165,15 @@ typedef struct {
     /* 0x158 */ u8 dynaFlags;
     /* 0x159 */ UNK_TYPE1 pad159[0x3];
 } DynaPolyActor; // size = 0x15C
+
+typedef struct {
+    /* 0x00 */ AnimationHeader* animation;
+    /* 0x04 */ f32 playSpeed;
+    /* 0x08 */ f32 startFrame;
+    /* 0x0C */ f32 frameCount;
+    /* 0x10 */ u8 mode;
+    /* 0x14 */ f32 morphFrames;
+} ActorAnimationEntry; // size = 0x18
 
 // Macro for getting the ActorPlayer pointer from the GlobalContext pointer.
 #define GET_PLAYER(Ctxt) ((ActorPlayer*)(((Ctxt)->actorCtx.actorList[2].first)))

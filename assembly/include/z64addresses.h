@@ -112,6 +112,7 @@ extern void z2_ActorRemove(ActorContext* actorCtxt, Actor* actor, GlobalContext*
 extern void z2_ActorUnload(Actor* actor);
 extern void z2_SetActorSize(Actor *actor, f32 size);
 extern void z2_SetShape(ActorShape* shape, f32 yDisplacement, void* shadowDrawFunc, f32 scale);
+extern void z2_Actor_ChangeAnimation(SkelAnime* skelAnime, ActorAnimationEntry* animation, s32 index);
 
 // Function Prototypes (Actor Cutscene).
 extern void z2_ActorCutscene_ClearWaiting(void);
@@ -201,12 +202,15 @@ extern void z2_UnloadRoom(GlobalContext* ctxt, RoomContext* roomCtxt);
 extern void z2_SetBGM2(u16 bgmId);
 
 // Function Prototypes (Text).
-extern void z2_ShowMessage(GlobalContext* ctxt, u16 messageId, u8 something); // TODO figure out something?
+extern void z2_ShowMessage(GlobalContext* ctxt, u16 messageId, Actor* actor);
 extern bool z2_IsMessageClosing(Actor* actor, GlobalContext *ctxt);
 extern u8 z2_GetMessageState(MessageContext* msgCtx);
 
 // Function Prototypes (Unknown).
+extern s32 z2_800B84D0(Actor* actor, GlobalContext* ctxt); // Actor_IsTalking
+extern s32 z2_800B85E0(Actor* actor, GlobalContext* ctxt, f32 uParm3, s32 uParm4);
 extern int z2_801242DC(GlobalContext* ctxt);
+extern u32 z2_80147624(GlobalContext* ctxt);
 
 // Relocatable Functions (kaleido_scope).
 #define z2_PauseDrawItemIcon_VRAM        0x80821AD4

@@ -30,6 +30,8 @@ ExternalEffectsConfig gExternalEffects = {
     .reverseControls = 0,
     .playSfx = 0,
     .lowHpSfx = 0,
+    .yellowIframe = 0,
+    .swapButtons = 0,
 };
 
 // Specifies camera states that can be changed via an effect.
@@ -299,6 +301,16 @@ static void HandleIFrameGlow(GlobalContext* ctxt, ActorPlayer* player) {
     }
 }
 
+#define SWAP_VALUES(T, x, y) { T temp = x; x = y; y = temp; }
+
+static void HandleSwapButtons(GlobalContext* ctxt, ActorPlayer* player) {
+    if (gExternalEffects.swapButtons) {
+        SWAP_VALUES(u16, ctxt->state.input[0].current.buttons.a, ctxt->state.input[0].current.buttons.b);
+        SWAP_VALUES(u16, ctxt->state.input[0].pressEdge.buttons.a, ctxt->state.input[0].pressEdge.buttons.b);
+        SWAP_VALUES(u16, ctxt->state.input[0].releaseEdge.buttons.a, ctxt->state.input[0].releaseEdge.buttons.b);
+    }
+}
+
 void ExternalEffects_PlayLowHpSfx(u32 id) {
     if (gExternalEffects.lowHpSfx) {
         z2_PlaySfx(gExternalEffects.lowHpSfx);
@@ -326,4 +338,5 @@ void ExternalEffects_Handle(ActorPlayer* player, GlobalContext* ctxt) {
     HandleReverseControlsEffect(ctxt, player);
     HandlePlaySfxEffect(ctxt, player);
     HandleIFrameGlow(ctxt, player);
+    HandleSwapButtons(ctxt, player);
 }

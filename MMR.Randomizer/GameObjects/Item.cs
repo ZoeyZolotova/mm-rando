@@ -116,7 +116,7 @@ namespace MMR.Randomizer.GameObjects
         [GetItemIndex(0x12C), ItemPool(ItemCategory.MagicPowers, LocationCategory.NpcRewards)]
         FairyMagic,
         
-        [StartingItemId(0xA8)]
+        [StartingItemId(0xA6)]
         [ItemName("Spin Attack"), LocationName("Woodfall Great Fairy"), Region(Region.Woodfall)]
         [GossipLocationHint("a magical being"), GossipItemHint("a magic attack"), GossipCompetitiveHint(4, ItemCategory.StrayFairies, false, nameof(GameplaySettings.StrayFairyMode), (int)StrayFairyMode.ChestsOnly, false)]
         [ShopText("Increases the power of your spin attack.", isDefinite: true)]
@@ -318,6 +318,16 @@ namespace MMR.Randomizer.GameObjects
         [GetItemIndex(0x09), ItemPool(ItemCategory.MainInventory, LocationCategory.NpcRewards)]
         UpgradeGiantWallet,
 
+        [Progressive]
+        [Downgradable]
+        [StartingItem(0xC5CE6E, 0x30)]
+        [ItemName("Royal Wallet"), LocationName("Removed by Royal Wallet"), Region(Region.Misc)]
+        [GossipItemHint("a coin case", "great wealth")]
+        [ShopText("This can hold up to a maximum of 999 rupees.")]
+        [ChestType(ChestTypeAttribute.ChestType.LargeGold)]
+        [GetItemIndex(0x44D), ItemPool(ItemCategory.RoyalWallet, LocationCategory.Fake)]
+        UpgradeRoyalWallet,
+
         //trades
         [Visible]
         [Repeatable, Temporary, Overwritable]
@@ -464,7 +474,7 @@ namespace MMR.Randomizer.GameObjects
         [RupeeRepeatable]
         [StartingItem(0xC5CE70, 0x10, true)]
         [ItemName("Piece of Heart"), LocationName("Town Archery #2"), Region(Region.EastClockTown)]
-        [GossipLocationHint("a town game"), GossipItemHint("a segment of health"), GossipCompetitiveHint(1)]
+        [GossipLocationHint("a town game"), GossipItemHint("a segment of health"), GossipCompetitiveHint(1, nameof(GameplaySettings.DoubleArcheryRewards), false)]
         [GossipCombineOrder(1), GossipCombine(UpgradeBigQuiver, "Town Archery")]
         [ShopText("Collect four to assemble a new Heart Container.")]
         [ChestType(ChestTypeAttribute.ChestType.SmallWooden)]
@@ -517,7 +527,7 @@ namespace MMR.Randomizer.GameObjects
         [RupeeRepeatable]
         [StartingItem(0xC5CE70, 0x10, true)]
         [ItemName("Piece of Heart"), LocationName("Swamp Archery #2"), Region(Region.RoadToSouthernSwamp)]
-        [GossipLocationHint("a swamp game"), GossipItemHint("a segment of health"), GossipCompetitiveHint(1)]
+        [GossipLocationHint("a swamp game"), GossipItemHint("a segment of health"), GossipCompetitiveHint(1, nameof(GameplaySettings.DoubleArcheryRewards), false)]
         [GossipCombineOrder(1), GossipCombine(UpgradeBiggestQuiver, "Swamp Archery")]
         [ShopText("Collect four to assemble a new Heart Container.")]
         [ChestType(ChestTypeAttribute.ChestType.SmallWooden)]
@@ -976,6 +986,8 @@ namespace MMR.Randomizer.GameObjects
         OtherExplosive,
         OtherArrow,
         OtherMagicBean,
+        OtherLimitlessBeans,
+        OtherPlayDekuPlayground,
         OtherTimeTravel,
         AreaWoodfallNew,
         AreaSnowheadNew,
@@ -1000,7 +1012,7 @@ namespace MMR.Randomizer.GameObjects
         [GetItemIndex(0x3F), ItemPool(ItemCategory.Navigation, LocationCategory.Chests)]
         ItemWoodfallCompass,
 
-        [Repeatable, Temporary]
+        [Repeatable, Temporary(nameof(GameplaySettings.BossKeyMode), (int)SmallKeyMode.KeepThroughTime, false)]
         [ItemName("Woodfall Boss Key"), LocationName("Woodfall Boss Key Chest"), Region(Region.WoodfallTemple)]
         [GossipLocationHint("Woodfall Temple", "the sleeping temple"), GossipItemHint("an important key", "entry to evil's lair")]
         [ShopText("The key for the boss room in Woodfall Temple.")]
@@ -1008,7 +1020,7 @@ namespace MMR.Randomizer.GameObjects
         [GetItemIndex(0x3D), ItemPool(ItemCategory.DungeonKeys, LocationCategory.BossFights)]
         ItemWoodfallBossKey,
 
-        [Repeatable, Temporary, Returnable(nameof(GameplaySettings.SmallKeyMode), (int)SmallKeyMode.KeepThroughTime, true)]
+        [Repeatable, Temporary(nameof(GameplaySettings.SmallKeyMode), (int)SmallKeyMode.KeepThroughTime, false), Returnable(nameof(GameplaySettings.SmallKeyMode), (int)SmallKeyMode.KeepThroughTime, true)]
         [ItemName("Woodfall Small Key"), LocationName("Woodfall Small Key Chest"), Region(Region.WoodfallTemple)]
         [GossipLocationHint("Woodfall Temple", "the sleeping temple"), GossipItemHint("access to a locked door", "a useful key")]
         [ShopText("A small key for use in Woodfall Temple.")]
@@ -1032,7 +1044,7 @@ namespace MMR.Randomizer.GameObjects
         [GetItemIndex(0x57), ItemPool(ItemCategory.Navigation, LocationCategory.Chests)]
         ItemSnowheadCompass,
 
-        [Repeatable, Temporary]
+        [Repeatable, Temporary(nameof(GameplaySettings.BossKeyMode), (int)SmallKeyMode.KeepThroughTime, false)]
         [ItemName("Snowhead Boss Key"), LocationName("Snowhead Boss Key Chest"), Region(Region.SnowheadTemple)]
         [GossipLocationHint("Snowhead Temple", "an icy gale"), GossipItemHint("an important key", "entry to evil's lair")]
         [ShopText("The key for the boss room in Snowhead Temple.")]
@@ -1040,7 +1052,7 @@ namespace MMR.Randomizer.GameObjects
         [GetItemIndex(0x4E), ItemPool(ItemCategory.DungeonKeys, LocationCategory.BossFights)]
         ItemSnowheadBossKey,
 
-        [Repeatable, Temporary, Returnable(nameof(GameplaySettings.SmallKeyMode), (int)SmallKeyMode.KeepThroughTime, true)]
+        [Repeatable, Temporary(nameof(GameplaySettings.SmallKeyMode), (int)SmallKeyMode.KeepThroughTime, false), Returnable(nameof(GameplaySettings.SmallKeyMode), (int)SmallKeyMode.KeepThroughTime, true)]
         [ItemName("Snowhead Small Key"), LocationName("Snowhead Block Room Chest"), Region(Region.SnowheadTemple)]
         [GossipLocationHint("Snowhead Temple", "an icy gale"), GossipItemHint("access to a locked door", "a useful key")]
         [ShopText("A small key for use in Snowhead Temple.")]
@@ -1048,7 +1060,7 @@ namespace MMR.Randomizer.GameObjects
         [GetItemIndex(0x46), ItemPool(ItemCategory.DungeonKeys, LocationCategory.Chests)]
         ItemSnowheadKey1,
 
-        [Repeatable, Temporary, Returnable(nameof(GameplaySettings.SmallKeyMode), (int)SmallKeyMode.KeepThroughTime, true)]
+        [Repeatable, Temporary(nameof(GameplaySettings.SmallKeyMode), (int)SmallKeyMode.KeepThroughTime, false), Returnable(nameof(GameplaySettings.SmallKeyMode), (int)SmallKeyMode.KeepThroughTime, true)]
         [ItemName("Snowhead Small Key"), LocationName("Snowhead Icicle Room Chest"), Region(Region.SnowheadTemple)]
         [GossipLocationHint("Snowhead Temple", "an icy gale"), GossipItemHint("access to a locked door", "a useful key")]
         [ShopText("A small key for use in Snowhead Temple.")]
@@ -1056,7 +1068,7 @@ namespace MMR.Randomizer.GameObjects
         [GetItemIndex(0x47), ItemPool(ItemCategory.DungeonKeys, LocationCategory.Chests)]
         ItemSnowheadKey2,
 
-        [Repeatable, Temporary, Returnable(nameof(GameplaySettings.SmallKeyMode), (int)SmallKeyMode.KeepThroughTime, true)]
+        [Repeatable, Temporary(nameof(GameplaySettings.SmallKeyMode), (int)SmallKeyMode.KeepThroughTime, false), Returnable(nameof(GameplaySettings.SmallKeyMode), (int)SmallKeyMode.KeepThroughTime, true)]
         [ItemName("Snowhead Small Key"), LocationName("Snowhead Bridge Room Chest"), Region(Region.SnowheadTemple)]
         [GossipLocationHint("Snowhead Temple", "an icy gale"), GossipItemHint("access to a locked door", "a useful key")]
         [ShopText("A small key for use in Snowhead Temple.")]
@@ -1080,7 +1092,7 @@ namespace MMR.Randomizer.GameObjects
         [GetItemIndex(0x58), ItemPool(ItemCategory.Navigation, LocationCategory.Chests)]
         ItemGreatBayCompass,
 
-        [Repeatable, Temporary]
+        [Repeatable, Temporary(nameof(GameplaySettings.BossKeyMode), (int)SmallKeyMode.KeepThroughTime, false)]
         [ItemName("Great Bay Boss Key"), LocationName("Great Bay Boss Key Chest"), Region(Region.GreatBayTemple)]
         [GossipLocationHint("Great Bay Temple", "the ocean temple"), GossipItemHint("an important key", "entry to evil's lair")]
         [ShopText("The key for the boss room in Great Bay Temple.")]
@@ -1088,7 +1100,7 @@ namespace MMR.Randomizer.GameObjects
         [GetItemIndex(0x4F), ItemPool(ItemCategory.DungeonKeys, LocationCategory.BossFights)]
         ItemGreatBayBossKey,
 
-        [Repeatable, Temporary, Returnable(nameof(GameplaySettings.SmallKeyMode), (int)SmallKeyMode.KeepThroughTime, true)]
+        [Repeatable, Temporary(nameof(GameplaySettings.SmallKeyMode), (int)SmallKeyMode.KeepThroughTime, false), Returnable(nameof(GameplaySettings.SmallKeyMode), (int)SmallKeyMode.KeepThroughTime, true)]
         [ItemName("Great Bay Small Key"), LocationName("Great Bay Small Key Chest"), Region(Region.GreatBayTemple)]
         [GossipLocationHint("Great Bay Temple", "the ocean temple"), GossipItemHint("access to a locked door", "a useful key")]
         [ShopText("A small key for use in Great Bay Temple.")]
@@ -1112,7 +1124,7 @@ namespace MMR.Randomizer.GameObjects
         [GetItemIndex(0x6C), ItemPool(ItemCategory.Navigation, LocationCategory.Chests)]
         ItemStoneTowerCompass,
 
-        [Repeatable, Temporary]
+        [Repeatable, Temporary(nameof(GameplaySettings.BossKeyMode), (int)SmallKeyMode.KeepThroughTime, false)]
         [ItemName("Stone Tower Boss Key"), LocationName("Stone Tower Boss Key Chest"), Region(Region.StoneTowerTemple)]
         [GossipLocationHint("Stone Tower Temple", "the cursed temple"), GossipItemHint("an important key", "entry to evil's lair")]
         [ShopText("The key for the boss room in Stone Tower Temple.")]
@@ -1120,7 +1132,7 @@ namespace MMR.Randomizer.GameObjects
         [GetItemIndex(0x53), ItemPool(ItemCategory.DungeonKeys, LocationCategory.BossFights)]
         ItemStoneTowerBossKey,
 
-        [Repeatable, Temporary, Returnable(nameof(GameplaySettings.SmallKeyMode), (int)SmallKeyMode.KeepThroughTime, true)]
+        [Repeatable, Temporary(nameof(GameplaySettings.SmallKeyMode), (int)SmallKeyMode.KeepThroughTime, false), Returnable(nameof(GameplaySettings.SmallKeyMode), (int)SmallKeyMode.KeepThroughTime, true)]
         [ItemName("Stone Tower Small Key"), LocationName("Stone Tower Armos Room Chest"), Region(Region.StoneTowerTemple)]
         [GossipLocationHint("Stone Tower Temple", "the cursed temple"), GossipItemHint("access to a locked door", "a useful key")]
         [ShopText("A small key for use in Stone Tower Temple.")]
@@ -1128,7 +1140,7 @@ namespace MMR.Randomizer.GameObjects
         [GetItemIndex(0x49), ItemPool(ItemCategory.DungeonKeys, LocationCategory.Chests)]
         ItemStoneTowerKey1,
 
-        [Repeatable, Temporary, Returnable(nameof(GameplaySettings.SmallKeyMode), (int)SmallKeyMode.KeepThroughTime, true)]
+        [Repeatable, Temporary(nameof(GameplaySettings.SmallKeyMode), (int)SmallKeyMode.KeepThroughTime, false), Returnable(nameof(GameplaySettings.SmallKeyMode), (int)SmallKeyMode.KeepThroughTime, true)]
         [ItemName("Stone Tower Small Key"), LocationName("Stone Tower Eyegore Room Chest"), Region(Region.StoneTowerTemple)]
         [GossipLocationHint("Stone Tower Temple", "the cursed temple"), GossipItemHint("access to a locked door", "a useful key")]
         [ShopText("A small key for use in Stone Tower Temple.")]
@@ -1136,7 +1148,7 @@ namespace MMR.Randomizer.GameObjects
         [GetItemIndex(0x4A), ItemPool(ItemCategory.DungeonKeys, LocationCategory.Chests)]
         ItemStoneTowerKey2,
 
-        [Repeatable, Temporary, Returnable(nameof(GameplaySettings.SmallKeyMode), (int)SmallKeyMode.KeepThroughTime, true)]
+        [Repeatable, Temporary(nameof(GameplaySettings.SmallKeyMode), (int)SmallKeyMode.KeepThroughTime, false), Returnable(nameof(GameplaySettings.SmallKeyMode), (int)SmallKeyMode.KeepThroughTime, true)]
         [ItemName("Stone Tower Small Key"), LocationName("Stone Tower Updraft Room Chest"), Region(Region.StoneTowerTemple)]
         [GossipLocationHint("Stone Tower Temple", "the cursed temple"), GossipItemHint("access to a locked door", "a useful key")]
         [ShopText("A small key for use in Stone Tower Temple.")]
@@ -1144,7 +1156,7 @@ namespace MMR.Randomizer.GameObjects
         [GetItemIndex(0x4B), ItemPool(ItemCategory.DungeonKeys, LocationCategory.Chests)]
         ItemStoneTowerKey3,
 
-        [Repeatable, Temporary, Returnable(nameof(GameplaySettings.SmallKeyMode), (int)SmallKeyMode.KeepThroughTime, true)]
+        [Repeatable, Temporary(nameof(GameplaySettings.SmallKeyMode), (int)SmallKeyMode.KeepThroughTime, false), Returnable(nameof(GameplaySettings.SmallKeyMode), (int)SmallKeyMode.KeepThroughTime, true)]
         [ItemName("Stone Tower Small Key"), LocationName("Stone Tower Death Armos Maze Chest"), Region(Region.StoneTowerTemple)]
         [GossipLocationHint("Stone Tower Temple", "the cursed temple"), GossipItemHint("access to a locked door", "a useful key")]
         [ShopText("A small key for use in Stone Tower Temple.")]
@@ -2797,7 +2809,7 @@ namespace MMR.Randomizer.GameObjects
         CollectibleOceanSpiderToken30,
 
         [Visible]
-        [ItemName("Clock Town Stray Fairy"), LocationName("Clock Town Stray Fairy"), Region(Region.LaundryPool)]
+        [ItemName("Clock Town Stray Fairy"), LocationName("Clock Town Stray Fairy"), MultiLocation(CollectibleStrayFairyClockTownInLaundryPool, CollectibleStrayFairyClockTownInECT)]
         [GossipLocationHint("a lost creature"), GossipItemHint("a lost fairy")]
         [ShopText("Return it to the Fairy Fountain in North Clock Town.")]
         [ChestType(ChestTypeAttribute.ChestType.SmallGold)]
@@ -3208,7 +3220,7 @@ namespace MMR.Randomizer.GameObjects
         CollectibleStrayFairyStoneTower5,
 
         [Visible]
-        [ItemName("Stone Tower Stray Fairy"), LocationName("Stone Tower Boss Warp"), Region(Region.StoneTowerTemple)]
+        [ItemName("Stone Tower Stray Fairy"), LocationName("Stone Tower Entrance Sun Switch"), Region(Region.StoneTowerTemple)]
         [GossipLocationHint("a lost creature"), GossipItemHint("a lost fairy")]
         [ShopText("Collect 15 and return them to the Fairy Fountain in Stone Tower.")]
         [ChestType(ChestTypeAttribute.ChestType.SmallGold), Chest(0x020E2000 + 0x162, ChestAttribute.AppearanceType.AppearsSwitch, 0x02156000 + 0xFA)]
@@ -3972,7 +3984,7 @@ namespace MMR.Randomizer.GameObjects
         [GossipLocationHint("a mountain-top snowball"), GossipItemHint("a quiver refill", "a bundle of projectiles")]
         [ShopText("Ammo for your bow.", isMultiple: true)]
         [ChestType(ChestTypeAttribute.ChestType.SmallWooden)]
-        [GetItemIndex(0x1F8), ItemPool(ItemCategory.Arrows, LocationCategory.SmallSnowballs), CollectableIndex(0x2E21)]
+        [GetItemIndex(0x1F8), ItemPool(ItemCategory.Arrows, LocationCategory.SmallSnowballs), CollectableIndex(0x2E21), CollectableIndex(0x3920)]
         CollectableSnowheadSmallSnowball1,
 
 
@@ -4982,7 +4994,7 @@ namespace MMR.Randomizer.GameObjects
         [GossipLocationHint("a mountain-top snowball"), GossipItemHint("explosives")]
         [ShopText("Explosives. You need a Bomb Bag to carry them.", isMultiple: true)]
         [ChestType(ChestTypeAttribute.ChestType.SmallWooden)]
-        [GetItemIndex(0x25D), ItemPool(ItemCategory.Bombs, LocationCategory.SmallSnowballs), CollectableIndex(0x2E20)]
+        [GetItemIndex(0x25D), ItemPool(ItemCategory.Bombs, LocationCategory.SmallSnowballs), CollectableIndex(0x2E20), CollectableIndex(0x3929)]
         CollectableSnowheadSmallSnowball2,
 
 
@@ -6382,7 +6394,7 @@ namespace MMR.Randomizer.GameObjects
         [GossipLocationHint("a mountain-top snowball"), GossipItemHint("a magic refill")]
         [ShopText("Replenishes a large amount of your magic power.")]
         [ChestType(ChestTypeAttribute.ChestType.SmallWooden)]
-        [GetItemIndex(0x2E9), ItemPool(ItemCategory.MagicJars, LocationCategory.SmallSnowballs), CollectableIndex(0x2E23)]
+        [GetItemIndex(0x2E9), ItemPool(ItemCategory.MagicJars, LocationCategory.SmallSnowballs), CollectableIndex(0x2E23), CollectableIndex(0x3922)]
         CollectableSnowheadSmallSnowball3,
 
 
@@ -7372,7 +7384,7 @@ namespace MMR.Randomizer.GameObjects
         [GossipLocationHint("a mountain-top snowball"), GossipItemHint("a magic refill")]
         [ShopText("Replenishes a small amount of your magic power.")]
         [ChestType(ChestTypeAttribute.ChestType.SmallWooden)]
-        [GetItemIndex(0x34C), ItemPool(ItemCategory.MagicJars, LocationCategory.LargeSnowballs), CollectableIndex(0x2E26)]
+        [GetItemIndex(0x34C), ItemPool(ItemCategory.MagicJars, LocationCategory.LargeSnowballs), CollectableIndex(0x2E26), CollectableIndex(0x3925)]
         CollectableSnowheadLargeSnowball3,
 
 
@@ -7392,7 +7404,7 @@ namespace MMR.Randomizer.GameObjects
         [GossipLocationHint("a mountain-top snowball"), GossipItemHint("a magic refill")]
         [ShopText("Replenishes a small amount of your magic power.")]
         [ChestType(ChestTypeAttribute.ChestType.SmallWooden)]
-        [GetItemIndex(0x34E), ItemPool(ItemCategory.MagicJars, LocationCategory.LargeSnowballs), CollectableIndex(0x2E28)]
+        [GetItemIndex(0x34E), ItemPool(ItemCategory.MagicJars, LocationCategory.LargeSnowballs), CollectableIndex(0x2E28), CollectableIndex(0x3927)]
         CollectableSnowheadLargeSnowball5,
 
 
@@ -7402,7 +7414,7 @@ namespace MMR.Randomizer.GameObjects
         [GossipLocationHint("a mountain-top snowball"), GossipItemHint("a magic refill")]
         [ShopText("Replenishes a small amount of your magic power.")]
         [ChestType(ChestTypeAttribute.ChestType.SmallWooden)]
-        [GetItemIndex(0x34F), ItemPool(ItemCategory.MagicJars, LocationCategory.LargeSnowballs), CollectableIndex(0x2E29)]
+        [GetItemIndex(0x34F), ItemPool(ItemCategory.MagicJars, LocationCategory.LargeSnowballs), CollectableIndex(0x2E29), CollectableIndex(0x3928)]
         CollectableSnowheadLargeSnowball6,
 
 
@@ -10042,6 +10054,12 @@ namespace MMR.Randomizer.GameObjects
         [MainLocation(ShopItemBusinessScrubBluePotion), Region(Region.ZoraHall)]
         ShopItemBusinessScrubBluePotionInOcean,
 
+        [MainLocation(CollectibleStrayFairyClockTown), Region(Region.LaundryPool)]
+        CollectibleStrayFairyClockTownInLaundryPool,
+
+        [MainLocation(CollectibleStrayFairyClockTown), Region(Region.EastClockTown)]
+        CollectibleStrayFairyClockTownInECT,
+
 
         GossipTerminaSouth,
         GossipSwampPotionShop,
@@ -10087,5 +10105,6 @@ namespace MMR.Randomizer.GameObjects
         [ShopText("Replenishes a small amount of your life energy.")]
         [GetItemIndex(0x0A), ItemPool(ItemCategory.Fake, LocationCategory.Fake)]
         RecoveryHeart = -2,
+
     }
 }

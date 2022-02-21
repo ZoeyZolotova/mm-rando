@@ -217,7 +217,7 @@ namespace MMR.Randomizer.Utils
             {
                 "MajoraRando",
                 DateTime.UtcNow.ToString("yy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture),
-                "\x01\x01" // versionCode
+                "\x01\x02" // versionCode
             };
             var signature = string.Join('\x00', values);
             for (var i = 0; i < signature.Length && i < 0x30; i++)

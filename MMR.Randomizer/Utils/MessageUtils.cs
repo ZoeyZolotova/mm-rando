@@ -36,6 +36,12 @@ namespace MMR.Randomizer.Utils
                     continue;
                 }
 
+                // TODO make this less hard-coded
+                if (io.NewLocation == Item.UpgradeRoyalWallet)
+                {
+                    continue;
+                }
+
                 var item = io.Item.MainLocation().HasValue ? randomizedResult.ItemList.Find(x => x.NewLocation == io.Item.MainLocation().Value) : io;
 
                 if (randomizedResult.Settings.ClearHints && !io.Item.MainLocation().HasValue)
@@ -146,7 +152,7 @@ namespace MMR.Randomizer.Utils
                         );
 
                     var allowedGossipQuotes = combined
-                        .Select(io => gossipStoneRequirements.Where(kvp => !kvp.Value.Contains(io.Item)).Select(kvp => kvp.Key))
+                        .Select(io => gossipStoneRequirements.Where(kvp => !kvp.Value.Contains(io.NewLocation.Value)).Select(kvp => kvp.Key))
                         .Aggregate((list1, list2) => list1.Intersect(list2))
                         .ToList();
                     competitiveHints.Add((messageText, allowedGossipQuotes));
@@ -243,6 +249,8 @@ namespace MMR.Randomizer.Utils
                         competitiveHints.Add((BuildRegionHint(chosen, regionHintType, random), new List<GossipQuote>()));
                     }
                 }
+
+                unusedItems.Clear();
             }
 
             List<MessageEntry> finalHints = new List<MessageEntry>();

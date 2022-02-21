@@ -38,6 +38,8 @@
 .definelabel z2_ActorDtor, 0x800B6948
 .definelabel z2_PreDraw2, 0x800B8050
 .definelabel z2_PreDraw1, 0x800B8118
+.definelabel z2_800B84D0, 0x800B84D0
+.definelabel z2_800B85E0, 0x800B85E0
 .definelabel z2_IsMessageClosing, 0x800B867C
 .definelabel z2_SetGetItem, 0x800B8A1C
 .definelabel z2_SetGetItemLongrange, 0x800B8BD0
@@ -49,6 +51,7 @@
 .definelabel z2_actor_spawn_1, 0x800BAC60
 .definelabel z2_actor_spawn_2, 0x800BAE14
 .definelabel z2_ActorRemove, 0x800BB498
+.definelabel z2_Actor_ChangeAnimation, 0x800BDC5C
 .definelabel z2_GetFloorPhysicsType, 0x800C99D4
 .definelabel z2_BaseDrawGiModel, 0x800EE320
 .definelabel z2_ActorCutscene_ClearWaiting, 0x800F1648
@@ -106,6 +109,7 @@
 .definelabel z2_SkelAnime_DrawLimb3, 0x801343C0
 .definelabel z2_UpdatePictoFlags, 0x8013A240
 .definelabel z2_InitButtonNoteColors, 0x80147564
+.definelabel z2_80147624, 0x80147624
 .definelabel z2_ShowMessage, 0x801518B0
 .definelabel z2_GetMessageState, 0x80152498
 .definelabel z2_load_scene, 0x801693D4

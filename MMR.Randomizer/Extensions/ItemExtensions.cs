@@ -48,7 +48,7 @@ namespace MMR.Randomizer.Extensions
                 {
                     return "Magic Power Upgrade";
                 }
-                if (item == Item.UpgradeAdultWallet || item == Item.UpgradeGiantWallet)
+                if (item == Item.UpgradeAdultWallet || item == Item.UpgradeGiantWallet || item == Item.UpgradeRoyalWallet)
                 {
                     return "Wallet Upgrade";
                 }
@@ -119,9 +119,9 @@ namespace MMR.Randomizer.Extensions
             return item.HasAttribute<DowngradableAttribute>();
         }
 
-        public static bool IsTemporary(this Item item)
+        public static bool IsTemporary(this Item item, GameplaySettings settings)
         {
-            return item.HasAttribute<TemporaryAttribute>();
+            return item.GetAttribute<TemporaryAttribute>()?.Condition(settings) ?? false;
         }
 
         public static ItemCategory? ItemCategory(this Item item)

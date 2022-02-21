@@ -26,10 +26,7 @@ namespace MMR.UI.Forms
 
             _startingItems = ItemUtils.StartingItems().Where(item => !item.Name().Contains("Heart")).ToList();
 
-            foreach (var item in _startingItems)
-            {
-                lStartingItems.Items.Add(item.Name());
-            }
+            PrintToListView();
 
             if (CustomStartingItemList != null)
             {
@@ -39,6 +36,15 @@ namespace MMR.UI.Forms
             else
             {
                 tStartingItemsString.Text = "--";
+            }
+        }
+
+        private void PrintToListView()
+        {
+            foreach (var item in _startingItems)
+            {
+                if (!item.Name().ToLower().Contains(tSearchString.Text.ToLower())) { continue; }
+                lStartingItems.Items.Add(new ListViewItem { Text = item.Name(), Tag = item, Checked = CustomStartingItemList.Contains(item) });
             }
         }
 
@@ -104,7 +110,7 @@ namespace MMR.UI.Forms
                 }
                 foreach (ListViewItem l in lStartingItems.Items)
                 {
-                    if (CustomStartingItemList.Contains(_startingItems[l.Index]))
+                    if (CustomStartingItemList.Contains((Item)l.Tag))
                     {
                         l.Checked = true;
                     }
@@ -143,14 +149,25 @@ namespace MMR.UI.Forms
             updating = true;
             if (e.Item.Checked)
             {
-                CustomStartingItemList.Add(_startingItems[e.Item.Index]);
+                CustomStartingItemList.Add((Item)e.Item.Tag);
             }
             else
             {
-                CustomStartingItemList.Remove(_startingItems[e.Item.Index]);
+                CustomStartingItemList.Remove((Item)e.Item.Tag);
             }
             UpdateString(CustomStartingItemList);
             updating = false;
+        }
+
+        private void tSearchString_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyData == Keys.Enter)
+            {
+                updating = true;
+                lStartingItems.Items.Clear();
+                PrintToListView();
+                updating = false;
+            }
         }
     }
 }

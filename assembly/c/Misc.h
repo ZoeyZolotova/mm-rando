@@ -15,6 +15,12 @@ enum QuestConsumeState {
     QUEST_CONSUME_NEVER,
 };
 
+enum AutoInvertState {
+    AUTO_INVERT_NEVER,
+    AUTO_INVERT_FIRST_CYCLE,
+    AUTO_INVERT_ALWAYS,
+};
+
 // Magic number for misc_config: "MISC"
 #define MISC_CONFIG_MAGIC 0x4D495343
 
@@ -42,7 +48,9 @@ typedef struct {
     u32 targetHealth        : 1;
     u32 climbAnything       : 1;
     u32 freeScarecrow       : 1;
-    u32                     : 10;
+    u32 fillWallet          : 1;
+    u32 autoInvert          : 2;
+    u32                     : 7;
 } MiscFlags;
 
 typedef union {
@@ -65,7 +73,9 @@ typedef struct {
     u32 boatArchery    : 1;
     u32 donGero        : 1;
     u32 fastBankRupees : 1;
-    u32                : 26;
+    u32 doubleArchery  : 1;
+    u32 multiBank      : 1;
+    u32                : 24;
 } MiscSpeedups;
 
 typedef struct {

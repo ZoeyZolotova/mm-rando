@@ -67,6 +67,8 @@ struct HudColorConfig {
     Color menuSubtitleText;
     Color shopCursor1;
     Color shopCursor2;
+
+    Color royalRupee;
 };
 
 extern struct HudColorConfig HUD_COLOR_CONFIG;

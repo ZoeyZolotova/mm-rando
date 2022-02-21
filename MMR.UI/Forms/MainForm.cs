@@ -93,6 +93,7 @@ namespace MMR.UI.Forms
             TooltipBuilder.SetTooltip(cNutAndStickDrops, "Adds Deku nuts and Deku sticks to drop tables in the field:\n\n - Default: No change, vanilla behavior.\n - Light: one stick and nut 1/16 chance termina bush.\n - Medium: More nuts, twice the chance\n - Extra: More sticks, more nuts, more drop locations.\n - Mayhem: You're crazy in the coconut!");
             TooltipBuilder.SetTooltip(cFloors, "Select a floortype for every floor ingame:\n\n - Default: Vanilla floortypes.\n - Sand: Link sinks slowly into every floor, affecting movement speed.\n - Ice: Every floor is slippery.\n - Snow: Similar to sand. \n - Random: Any random floortypes of the above.");
             TooltipBuilder.SetTooltip(cClockSpeed, "Modify the speed of time.");
+            TooltipBuilder.SetTooltip(cAutoInvert, "Auto-invert time at the start of a cycle.");
             TooltipBuilder.SetTooltip(cHideClock, "Clock UI will be hidden.");
             TooltipBuilder.SetTooltip(cStartingItems, "Select a starting item mode:\n\nNone - You will not start with any randomized starting items.\nRandom - You will start with randomized starting items.\nAllow Temporary Items - You will start with randomized starting items including Keg, Magic Bean and Bottles with X.");
             TooltipBuilder.SetTooltip(cBlastCooldown, "Adjust the cooldown timer after using the Blast Mask.");
@@ -130,6 +131,7 @@ namespace MMR.UI.Forms
             TooltipBuilder.SetTooltip(cGoodDogRaceRNG, "Make Gold Dog always win if you have the Mask of Truth.");
             TooltipBuilder.SetTooltip(cFasterLabFish, "Change Lab Fish to only need to be fed one fish.");
             TooltipBuilder.SetTooltip(cFasterBank, "Change the Bank reward thresholds to 200/500/1000 instead of 200/1000/5000. Also reduces maximum bank capacity from 5000 to 1000.");
+            TooltipBuilder.SetTooltip(cDoubleArcheryRewards, "Grant both archery rewards with a sufficient score.");
             TooltipBuilder.SetTooltip(cFastPush, "Increase the speed of pushing and pulling blocks and faucets.");
             TooltipBuilder.SetTooltip(cFreestanding, "Show world models as their actual item instead of the original item. This includes Pieces of Heart, Heart Containers, Skulltula Tokens, Stray Fairies, Moon's Tear and the Seahorse.");
             TooltipBuilder.SetTooltip(cEnableNightMusic, "Enables playing daytime Background music during nighttime in the field.\n(Clocktown night music can be weird)");
@@ -143,6 +145,7 @@ namespace MMR.UI.Forms
             TooltipBuilder.SetTooltip(cLenientGoronSpikes, "Goron spikes can charge midair and keep their charge. Minimum speed for goron spikes is removed.");
             TooltipBuilder.SetTooltip(cTargetHealth, "Targeting an enemy shows their health bar.");
             TooltipBuilder.SetTooltip(cFreeScarecrow, "Spawn scarecrow automatically when using ocarina if within range.");
+            TooltipBuilder.SetTooltip(cFillWallet, "Fills wallet with max rupees upon finding a wallet upgrade.");
         }
 
         /// <summary>
@@ -168,6 +171,7 @@ namespace MMR.UI.Forms
             properties.Add(typeof(GameplaySettings).GetProperty(nameof(GameplaySettings.SmallKeyMode)));
             properties.Add(typeof(GameplaySettings).GetProperty(nameof(GameplaySettings.BossKeyMode)));
             properties.Add(typeof(GameplaySettings).GetProperty(nameof(GameplaySettings.StrayFairyMode)));
+            properties.Add(typeof(GameplaySettings).GetProperty(nameof(GameplaySettings.BossRemainsMode)));
             properties.Add(typeof(GameplaySettings).GetProperty(nameof(GameplaySettings.PriceMode)));
             foreach (var propertyInfo in properties)
             {
@@ -529,7 +533,19 @@ namespace MMR.UI.Forms
                 };
                 var bTunic = CreateTunicColorButton(form);
                 tabPage.Controls.Add(bTunic);
-                tabPage.Controls.Add(CreateTunicColorCheckBox(form, bTunic));
+                tabPage.Controls.Add(CreateTunicColorCheckBox(form));
+                tabPage.Controls.Add(CreateTunicColorRandomizeButton(form));
+                tabPage.Controls.Add(new Label
+                {
+                    Name = "lTunicColorDefault",
+                    Text = "Default",
+                    Location = new Point(111, 3),
+                    Size = new Size(135, 23),
+                    TextAlign = ContentAlignment.MiddleCenter,
+                    Visible = !_configuration.CosmeticSettings.UseTunicColors.GetValueOrDefault(form, false),
+                    BorderStyle = BorderStyle.FixedSingle,
+                });
+
                 if (form != TransformationForm.FierceDeity)
                 {
                     tabPage.Controls.Add(new Label
@@ -564,10 +580,11 @@ namespace MMR.UI.Forms
             }
         }
 
-        private Button CreateEnergyColorRandomizeButton(TransformationForm transformationForm)
+        private CheckBox CreateEnergyColorRandomizeButton(TransformationForm transformationForm)
         {
-            var button = new Button
+            var button = new CheckBox
             {
+                Appearance = Appearance.Button,
                 Tag = transformationForm,
                 Name = "cEnergyRandomize",
                 Text = "🎲",
@@ -577,7 +594,7 @@ namespace MMR.UI.Forms
             };
             button.Font = new Font(button.Font.FontFamily, 12);
             TooltipBuilder.SetTooltip(button, "Randomize the energy colors for this form.");
-            button.Click += bEnergyRandomize_Click;
+            button.Click += cEnergyRandomize_Click;
             return button;
         }
 
@@ -588,7 +605,7 @@ namespace MMR.UI.Forms
                 Tag = transformationForm,
                 Name = "cEnergy",
                 Text = "Energy color:",
-                Location = new Point(6, 67),
+                Location = new Point(6, 63),
                 Size = new Size(120, 25),
             };
             checkBox.CheckedChanged += cEnergy_CheckedChanged;
@@ -618,17 +635,17 @@ namespace MMR.UI.Forms
             return buttons.ToArray();
         }
 
-        private CheckBox CreateTunicColorCheckBox(TransformationForm transformationForm, Button bTunic)
+        private CheckBox CreateTunicColorCheckBox(TransformationForm transformationForm)
         {
             var checkBox = new CheckBox
             {
                 Tag = transformationForm,
                 Name = "cTunic",
                 Text = "Tunic color:",
-                Location = new Point(6, 7),
+                Location = new Point(6, 3),
                 Size = new Size(102, 25),
             };
-            checkBox.CheckedChanged += create_cTunic_CheckedChanged(bTunic);
+            checkBox.CheckedChanged += cTunic_CheckedChanged;
             return checkBox;
         }
 
@@ -639,13 +656,58 @@ namespace MMR.UI.Forms
                 Tag = transformationForm,
                 Name = "bTunic",
                 Location = new Point(111, 3),
-                Size = new Size(135, 23),
+                Size = new Size(101, 23),
                 BackColor = Color.FromArgb(0x1E, 0x69, 0x1B),
                 FlatStyle = FlatStyle.Flat,
-                Text = "Default",
             };
             TooltipBuilder.SetTooltip(button, "Select the color of this form's Tunic.");
             button.Click += bTunic_Click;
+            return button;
+        }
+
+        private void cTunicRandomize_Click(object sender, EventArgs e)
+        {
+            _isUpdating = true;
+
+            var checkBox = (CheckBox)sender;
+            var form = (TransformationForm)checkBox.Tag;
+            var random = new Random();
+            var selected = tFormCosmetics.SelectedTab;
+            var bTunic = (Button)selected.Controls.Find($"bTunic", false)[0];
+            if (checkBox.Checked)
+            {
+                var color = RandomUtils.GetRandomColor(random);
+                // Update the color in cosmetic settings.
+                _configuration.CosmeticSettings.TunicColors[form] = color;
+                bTunic.BackColor = Color.Transparent;
+                bTunic.Text = "?";
+                bTunic.Enabled = false;
+            }
+            else
+            {
+                bTunic.BackColor = _configuration.CosmeticSettings.TunicColors[form];
+                bTunic.Text = string.Empty;
+                bTunic.Enabled = true;
+            }
+
+            _isUpdating = false;
+        }
+
+        private CheckBox CreateTunicColorRandomizeButton(TransformationForm transformationForm)
+        {
+            var button = new CheckBox
+            {
+                Appearance = Appearance.Button,
+                Tag = transformationForm,
+                Name = "cTunicRandomize",
+                Text = "🎲",
+                Location = new Point(112 + (3 * 34), 2),
+                Size = new Size(33, 25),
+                TextAlign = ContentAlignment.TopRight,
+            };
+            button.Font = new Font(button.Font.FontFamily, 12);
+            TooltipBuilder.SetTooltip(button, "Randomize the tunic color for this form.");
+            button.Click += cTunicRandomize_Click;
             return button;
         }
 
@@ -747,7 +809,7 @@ namespace MMR.UI.Forms
                 var label = (Label)checkBox.Parent.Controls.Find("lEnergyColorDefault", false)[0];
                 label.Visible = !checkBox.Checked;
 
-                var randomizeButton = (Button)checkBox.Parent.Controls.Find("cEnergyRandomize", false)[0];
+                var randomizeButton = (CheckBox)checkBox.Parent.Controls.Find("cEnergyRandomize", false)[0];
                 randomizeButton.Visible = checkBox.Checked;
             }
 
@@ -771,44 +833,55 @@ namespace MMR.UI.Forms
             }
         }
 
-        private void bEnergyRandomize_Click(object sender, EventArgs e)
+        private void cEnergyRandomize_Click(object sender, EventArgs e)
         {
             _isUpdating = true;
 
-            var button = (Button)sender;
-            var form = (TransformationForm)button.Tag;
+            var checkBox = (CheckBox)sender;
+            var form = (TransformationForm)checkBox.Tag;
             var random = new Random();
             var selected = tFormCosmetics.SelectedTab;
             for (int i = 0; i < _configuration.CosmeticSettings.EnergyColors[form].Length; i++)
             {
-                var color = RandomUtils.GetRandomColor(random);
-                // Update the color in cosmetic settings.
-                _configuration.CosmeticSettings.EnergyColors[form][i] = color;
-                // Find the respective energy color button and update its color.
                 var bEnergy = (Button)selected.Controls.Find($"bEnergy{i}", false)[0];
-                bEnergy.BackColor = color;
+                if (checkBox.Checked)
+                {
+                    var color = RandomUtils.GetRandomColor(random);
+                    // Update the color in cosmetic settings.
+                    _configuration.CosmeticSettings.EnergyColors[form][i] = color;
+                    bEnergy.BackColor = Color.Transparent;
+                    bEnergy.Text = "?";
+                    bEnergy.Enabled = false;
+                }
+                else
+                {
+                    bEnergy.BackColor = _configuration.CosmeticSettings.EnergyColors[form][i];
+                    bEnergy.Text = string.Empty;
+                    bEnergy.Enabled = true;
+                }
             }
 
             _isUpdating = false;
         }
 
-        private EventHandler create_cTunic_CheckedChanged(Button bTunic)
+        private void cTunic_CheckedChanged(object sender, EventArgs e)
         {
-            void cTunic_CheckedChanged(object sender, EventArgs e)
-            {
-                _isUpdating = true;
+            _isUpdating = true;
 
-                var checkBox = (CheckBox)sender;
-                var form = (TransformationForm)checkBox.Tag;
-                _configuration.CosmeticSettings.UseTunicColors[form] = checkBox.Checked;
-                var color = _configuration.CosmeticSettings.TunicColors[form];
-                bTunic.Enabled = checkBox.Checked;
-                bTunic.BackColor = bTunic.Enabled ? color : Color.Transparent;
-                bTunic.Text = bTunic.Enabled ? string.Empty : "Default";
+            var checkBox = (CheckBox)sender;
+            var form = (TransformationForm)checkBox.Tag;
+            _configuration.CosmeticSettings.UseTunicColors[form] = checkBox.Checked;
 
-                _isUpdating = false;
-            };
-            return cTunic_CheckedChanged;
+            var button = (Button)checkBox.Parent.Controls.Find("bTunic", false)[0];
+            button.Visible = checkBox.Checked;
+
+            var label = (Label)checkBox.Parent.Controls.Find("lTunicColorDefault", false)[0];
+            label.Visible = !checkBox.Checked;
+
+            var randomizeButton = (CheckBox)checkBox.Parent.Controls.Find("cTunicRandomize", false)[0];
+            randomizeButton.Visible = checkBox.Checked;
+
+            _isUpdating = false;
         }
 
         private void bTunic_Click(object sender, EventArgs e)
@@ -972,6 +1045,7 @@ namespace MMR.UI.Forms
             cDeathMoonCrash.Checked = _configuration.GameplaySettings.DeathMoonCrash;
             cIceTrapQuirks.Checked = _configuration.GameplaySettings.IceTrapQuirks;
             cClockSpeed.SelectedIndex = (int)_configuration.GameplaySettings.ClockSpeed;
+            cAutoInvert.SelectedIndex = (int)_configuration.GameplaySettings.AutoInvert;
             cNoDowngrades.Checked = _configuration.GameplaySettings.PreventDowngrades;
             cShopAppearance.Checked = _configuration.GameplaySettings.UpdateShopAppearance;
             cStartingItems.SelectedIndex = (int)_configuration.GameplaySettings.StartingItemMode;
@@ -982,6 +1056,7 @@ namespace MMR.UI.Forms
             cGoodDogRaceRNG.Checked = _configuration.GameplaySettings.SpeedupDogRace;
             cFasterLabFish.Checked = _configuration.GameplaySettings.SpeedupLabFish;
             cFasterBank.Checked = _configuration.GameplaySettings.SpeedupBank;
+            cDoubleArcheryRewards.Checked = _configuration.GameplaySettings.DoubleArcheryRewards;
 
             cDMult.SelectedIndex = (int)_configuration.GameplaySettings.DamageMode;
             cDType.SelectedIndex = (int)_configuration.GameplaySettings.DamageEffect;
@@ -1001,12 +1076,18 @@ namespace MMR.UI.Forms
             {
                 var form = (TransformationForm)cosmeticFormTab.Tag;
 
-                var bTunic = cosmeticFormTab.Controls.Find("bTunic", false)[0];
-                bTunic.Enabled = _configuration.CosmeticSettings.UseTunicColors.GetValueOrDefault(form);
-                bTunic.BackColor = bTunic.Enabled ? _configuration.CosmeticSettings.TunicColors.GetValueOrDefault(form) : Color.Transparent;
-
                 var cTunic = (CheckBox)cosmeticFormTab.Controls.Find("cTunic", false)[0];
-                cTunic.Checked = bTunic.Enabled;
+                cTunic.Checked = _configuration.CosmeticSettings.UseTunicColors.GetValueOrDefault(form);
+
+                var bTunic = cosmeticFormTab.Controls.Find("bTunic", false)[0];
+                bTunic.Visible = cTunic.Checked;
+                bTunic.BackColor = _configuration.CosmeticSettings.TunicColors.GetValueOrDefault(form);
+
+                var cTunicRandomize = (CheckBox)cosmeticFormTab.Controls.Find("cTunicRandomize", false)[0];
+                cTunicRandomize.Visible = cTunic.Checked;
+
+                var lTunicColorDefault = (Label)cosmeticFormTab.Controls.Find("lTunicColorDefault", false)[0];
+                lTunicColorDefault.Visible = !cTunic.Checked;
 
                 if (form != TransformationForm.FierceDeity)
                 {
@@ -1026,7 +1107,7 @@ namespace MMR.UI.Forms
                         bEnergy.BackColor = colors[i];
                         bEnergy.Visible = use;
 
-                        var cEnergyRandomize = (Button)cosmeticFormTab.Controls.Find("cEnergyRandomize", false)[0];
+                        var cEnergyRandomize = (CheckBox)cosmeticFormTab.Controls.Find("cEnergyRandomize", false)[0];
                         cEnergyRandomize.Visible = use;
 
                         var lEnergyColorDefault = (Label)cosmeticFormTab.Controls.Find("lEnergyColorDefault", false)[0];
@@ -1058,6 +1139,7 @@ namespace MMR.UI.Forms
             cLenientGoronSpikes.Checked = _configuration.GameplaySettings.LenientGoronSpikes;
             cTargetHealth.Checked = _configuration.GameplaySettings.TargetHealthBar;
             cFreeScarecrow.Checked = _configuration.GameplaySettings.FreeScarecrow;
+            cFillWallet.Checked = _configuration.GameplaySettings.FillWallet;
 
             // HUD config options
             var heartItems = ColorSelectionManager.Hearts.GetItems();
@@ -1608,18 +1690,21 @@ namespace MMR.UI.Forms
             cLenientGoronSpikes.Enabled = v;
             cTargetHealth.Enabled = v;
             cFreeScarecrow.Enabled = v;
+            cFillWallet.Enabled = v;
 
             cSkipBeaver.Enabled = v;
             cGoodDampeRNG.Enabled = v;
             cFasterLabFish.Enabled = v;
             cGoodDogRaceRNG.Enabled = v;
             cFasterBank.Enabled = v;
+            cDoubleArcheryRewards.Enabled = v;
 
             cDMult.Enabled = v;
             cDType.Enabled = v;
             cGravity.Enabled = v;
             cFloors.Enabled = v;
             cClockSpeed.Enabled = v;
+            cAutoInvert.Enabled = v;
             cBlastCooldown.Enabled = v;
             cIceTraps.Enabled = v;
             cIceTrapsAppearance.Enabled = v;
@@ -2039,6 +2124,21 @@ namespace MMR.UI.Forms
         private void cFreeScarecrow_CheckedChanged(object sender, EventArgs e)
         {
             UpdateSingleSetting(() => _configuration.GameplaySettings.FreeScarecrow = cFreeScarecrow.Checked);
+        }
+
+        private void cDoubleArcheryRewards_CheckedChanged(object sender, EventArgs e)
+        {
+            UpdateSingleSetting(() => _configuration.GameplaySettings.DoubleArcheryRewards = cDoubleArcheryRewards.Checked);
+        }
+
+        private void cFillWallet_CheckedChanged(object sender, EventArgs e)
+        {
+            UpdateSingleSetting(() => _configuration.GameplaySettings.FillWallet = cFillWallet.Checked);
+        }
+
+        private void cAutoInvert_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            UpdateSingleSetting(() => _configuration.GameplaySettings.AutoInvert = (AutoInvertState)cAutoInvert.SelectedIndex);
         }
     }
 }

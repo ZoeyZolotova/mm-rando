@@ -37,6 +37,8 @@
 0x800B6948,z2_ActorDtor
 0x800B8050,z2_PreDraw2
 0x800B8118,z2_PreDraw1
+0x800B84D0,z2_800B84D0
+0x800B85E0,z2_800B85E0
 0x800B867C,z2_IsMessageClosing
 0x800B8A1C,z2_SetGetItem
 0x800B8BD0,z2_SetGetItemLongrange
@@ -47,6 +49,7 @@
 0x800BAC60,z2_actor_spawn_1
 0x800BAE14,z2_actor_spawn_2
 0x800BB498,z2_ActorRemove
+0x800BDC5C,z2_Actor_ChangeAnimation
 0x800C99D4,z2_GetFloorPhysicsType
 0x800EE320,z2_BaseDrawGiModel
 0x800F1648,z2_ActorCutscene_ClearWaiting
@@ -104,6 +107,7 @@
 0x801343C0,z2_SkelAnime_DrawLimb3
 0x8013A240,z2_UpdatePictoFlags
 0x80147564,z2_InitButtonNoteColors
+0x80147624,z2_80147624
 0x801518B0,z2_ShowMessage
 0x80152498,z2_GetMessageState
 0x801693D4,z2_load_scene

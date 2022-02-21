@@ -114,6 +114,9 @@ namespace MMR.Randomizer.GameObjects
 
         [Description("Randomize Ocarina and Song of Time.")]
         TimeTravel,
+
+        [Description("Add the Royal Wallet to the item pool.")]
+        RoyalWallet,
     }
 
     public enum LocationCategory
