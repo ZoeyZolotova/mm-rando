@@ -1,4 +1,4 @@
-﻿<#@ template language="C#" linePragmas="false" #>
+<#@ template language="C#" linePragmas="false" #>
 <#@ assembly name="System.Core" #>
 <#@ import namespace="System.Linq" #>
 <#@ import namespace="System.Text" #>
@@ -13,6 +13,14 @@
     }
     body.dark-mode a {
       color: #111;
+    }
+    body.dark-mode div {
+        background-color: #111;
+        color: #ccc;
+    }
+    body.light-mode div {
+        background-color: #eee;
+        color: #111;
     }
     body.dark-mode button {
       background-color: #ddd;
@@ -29,6 +37,12 @@
     body.light-mode button {
       background-color: #111;
       color: #ccc;
+    }
+    #items{
+      display: flex;
+      flex: 0;
+      flex-direction: column;
+      max-width: 785px;
     }
 
     th{ text-align:left }
@@ -49,6 +63,34 @@
 
 
     #spoilerLogState { width: 560px; }
+    #index {
+      border: 1px solid black;
+      display: flex;
+      flex-direction: inline-flex;
+      float: right;
+      flex: 1;
+      right: 10px;
+      margin: 5px;
+      max-height: 700px;
+      width: 180px;
+      justify-content: center;
+      overflow-y: auto;
+      }
+    .fixed {
+    position: fixed;
+    top: 0;
+    }
+    #index.light-mode {
+        background-color: #eee;
+        color: #111;
+    }
+    #index.dark-mode a {
+      color: #ccc;
+    }
+    #index.dark-mode {
+      background-color: #111;
+      color: #ccc;
+    }
 </style>
 </head>
 <body class="light-mode">
@@ -56,10 +98,18 @@
 <label><b>Settings: </b></label><code style="word-break: break-all;"><#= spoiler.SettingsString #></code><br/>
 <label><b>Seed: </b></label><span><#= spoiler.Seed #></span><br/>
 <br/>
+<table class="index" id="index">
+    <th><h2>Termina Index</h2></th>
+    <# foreach (var region in spoiler.ItemList.GroupBy(item => item.Region).OrderBy(g => g.Key))
+        { #>
+            <tr><td><a href="#<#= region.Key.Name() #>"><#= region.Key.Name() #></a></td></tr><#
+        } #>
+</table>
 <button type="button" onclick="toggleDarkLight()" title="Toggle dark/light mode">Toggle Dark Theme</button>
 <br/>
 <br/>
 <label><b>Spoiler Log State: </b></label><input id="spoilerLogState" type="text"/><br/>
+
 <# if (spoiler.DungeonEntrances.Any()) { 
 #>
 <h2>Dungeon Entrance Replacements</h2>
@@ -90,7 +140,7 @@
  </tr>
 <# foreach (var region in spoiler.ItemList.GroupBy(item => item.Region).OrderBy(g => g.Key)) {
 #>
- <tr class="region"><td colspan="3"><#= region.Key.Name() #></td></tr>
+ <tr class="region" id="<#= region.Key.Name() #>"><td colspan="3"><#= region.Key.Name() #></td></tr>
  <# foreach (var item in region.OrderBy(item => item.NewLocationName)) { #>
  <tr data-id="<#= item.Id #>" data-newlocationid="<#= item.NewLocationId #>" class="unavailable">
     <td class="newlocation"><#= item.NewLocationName #></td>
@@ -105,18 +155,16 @@
  <tr>
      <th>Item</th>
      <th></th>
-     <th>Region</th>
      <th>Location</th>
  </tr>
 <# foreach (var itemCategory in spoiler.ItemList.Where(item => !item.IsJunk).GroupBy(item => item.ItemCategory).OrderBy(g => g.Key)) {
 #>
- <tr class="region"><td colspan="4"><#= itemCategory.Key.ToString() #></td></tr>
- <# foreach (var items in itemCategory.GroupBy(item => item.Id).OrderBy(g => g.Key)) { #>
- <tr data-id="<#= items.Key #>" data-newlocationid="<#= items.First().NewLocationId #>">
-    <td><#= items.First().Name #></td>
+ <tr class="region"><td colspan="3"><#= itemCategory.Key.ToString() #></td></tr>
+ <# foreach (var item in itemCategory.OrderBy(item => item.Id)) { #>
+ <tr data-id="<#= item.Id #>" data-newlocationid="<#= item.NewLocationId #>">
+    <td><#= item.Name #></td>
     <td><input type="checkbox"/></td>
-    <td class="spoiler newlocation"> <span data-content="<#= string.Join(" / ", items.Select(item => item.Region.Name())) #>"></span></td>
-    <td class="spoiler newlocation"> <span data-content="<#= items.First().NewLocationName #>"></span></td>
+    <td class="spoiler newlocation"> <span data-content="<#= item.NewLocationName #>"></span></td>
  </tr>
  <# } #>
 <# } #>
@@ -286,16 +334,14 @@
         
             var itemRows = document.querySelectorAll("#item-locations tr[data-newlocationid='" + locations[i] + "']");
             for (const itemRow of itemRows) {
-                var itemNames = itemRow.querySelectorAll(".newlocation");
+                var itemName = itemRow.querySelector(".newlocation");
                 var checkbox = itemRow.querySelector("input");
                 var item = logic[itemRow.dataset.id];
                 checkbox.checked = item.Acquired;
-                for (const itemName of itemNames) {
-                    if (item.Acquired) {
-                        itemName.classList.remove("spoiler");
-                    } else {
-                        itemName.classList.add("spoiler");
-                    }
+                if (item.Acquired) {
+                    itemName.classList.remove("spoiler");
+                } else {
+                    itemName.classList.add("spoiler");
                 }
             }
         }
@@ -359,7 +405,7 @@
         checkLocations(locationsToCheck);
     }
 
-    var startingLocations = [0, 97, 281, 282, 283, 284];
+    var startingLocations = [0, 96, 278, 279, 280, 281];
     for (var id of startingLocations) {
         logic[id].Checked = true;
         var row = document.querySelector("tr[data-newlocationid='" + id + "']");
@@ -408,7 +454,23 @@
     function toggleDarkLight() {
         var body = document.getElementsByTagName('body')[0];
         var currentClassBody = body.className;
+        var ind = document.getElementById('index');
         body.className = currentClassBody === "dark-mode" ? "light-mode" : "dark-mode";
+        index.className = currentClassBody === "dark-mode" ? "light-mode" : "dark-mode";
+    }
+
+    window.onscroll = function() { indFloat()};
+    var index = document.getElementById('index');
+    function indFloat()
+    {
+        if (window.pageYOffset > document.getElementById('index').offsetTop)
+        {
+            index.classList.add('fixed');
+        }
+        else
+        {
+            index.classList.remove('fixed');
+        }
     }
 </script>
 </body>
