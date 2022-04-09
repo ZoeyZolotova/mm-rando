@@ -1515,6 +1515,19 @@ namespace MMR.Randomizer.Utils
             var audiobankFile = RomData.MMFileList[RomUtils.GetFileIndexForWriting(Addresses.Audiobank)];
             audiobankFile.Data = audiobankData;
             audiobankFile.End = audiobankFile.Addr + audiobankFile.Data.Length;
+
+            // check if audiobank has overflowed past the old audioseq space and into audiotable
+            if (audiobankFile.End > RomData.MMFileList[5].Addr)
+            {
+                int wowthatsalotofbanks = audiobankFile.End - RomData.MMFileList[5].Addr;
+                string oopsy = wowthatsalotofbanks.ToString();
+                throw new Exception("\nAudio banks have overflowed into audiotable\n"
+                                     + "by "
+                                     + oopsy
+                                     + " bytes.\n\n"
+                                     + "Please try another seed for a different music roll, "
+                                     + "or bring down the amount of MMRS files with custom banks.");
+            }
         }
     }
 }
