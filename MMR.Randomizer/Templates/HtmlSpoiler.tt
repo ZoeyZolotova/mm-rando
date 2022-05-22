@@ -249,6 +249,8 @@
         }
     });
 
+    window.onbeforeunload = function() { return "Are you sure you want to leave the page?" }
+
     function checkLocations(locations) {
         var itemsToCheck = [];
         for (var i = 0; i < locations.length; i++) {
