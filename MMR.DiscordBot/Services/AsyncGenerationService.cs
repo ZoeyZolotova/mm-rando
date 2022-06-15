@@ -53,8 +53,9 @@ namespace MMR.DiscordBot.Services
             });
         }
 
-        public async Task<string> GenerateAsyncSheet(Func<string, Task> reportProgress)
+        public async Task<(string sheetLink, DateTime? oldSheetDate)> GenerateAsyncSheet(Func<string, Task> reportProgress)
         {
+            DateTime? oldSheetDate = null;
             var asyncSheet = await _asyncSheetRepository.GetLatest();
             var oldSheetFileId = asyncSheet.SheetId;
 
@@ -74,9 +75,11 @@ namespace MMR.DiscordBot.Services
             var listRequest = _driveService.Files.List();
             listRequest.Q = $"'{oldFolderId}' in parents and mimeType = 'text/plain'";
             listRequest.OrderBy = "name_natural";
+            listRequest.Fields = "files(id,createdTime)";
             var oldSpoilerLogs = await listRequest.ExecuteAsync();
             foreach (var oldSpoilerLog in oldSpoilerLogs.Files)
             {
+                oldSheetDate = oldSpoilerLog.CreatedTime;
                 await _driveService.Permissions.Create(new Google.Apis.Drive.v3.Data.Permission()
                 {
                     Type = "anyone",
@@ -253,7 +256,7 @@ namespace MMR.DiscordBot.Services
                 FolderId = driveFolder.Id,
             });
 
-            return $"https://docs.google.com/spreadsheets/d/{newSheet.Id}/edit?usp=sharing";
+            return ($"https://docs.google.com/spreadsheets/d/{newSheet.Id}/edit?usp=sharing", oldSheetDate);
         }
     }
 }

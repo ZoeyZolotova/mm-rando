@@ -331,7 +331,7 @@ namespace MMR.DiscordBot.Modules
         public async Task AsyncGenerate()
         {
             var message = await ReplyAsync("Generating Async Seeds");
-            var sheetLink = await AsyncGenerationService.GenerateAsyncSheet((progressMessage) =>
+            var (sheetLink, oldSheetDate) = await AsyncGenerationService.GenerateAsyncSheet((progressMessage) =>
             {
                 return message.ModifyAsync(mp => mp.Content = progressMessage);
             });
@@ -339,13 +339,16 @@ namespace MMR.DiscordBot.Modules
             await message.DeleteAsync();
 
             // post link to new sheet on discord
-            // TODO get previous async sheet date instead of assuming
-            await ReplyAsync(
+            var postMessage =
 @$"{MentionUtils.MentionRole(630531640480890930)}
 **{DateTime.UtcNow.ToString("MMMM yyyy")} Asyncs**
-{sheetLink}
+{sheetLink}";
+            if (oldSheetDate.HasValue)
+            {
+                postMessage += $"\n\nSpoiler Logs for {oldSheetDate.Value.ToString("MMMM yyyy")} Asyncs are now available.";
+            }
 
-Spoiler Logs for {DateTime.UtcNow.AddMonths(-1).ToString("MMMM yyyy")} Asyncs are now available.");
+            await ReplyAsync(postMessage);
         }
     }
 }
