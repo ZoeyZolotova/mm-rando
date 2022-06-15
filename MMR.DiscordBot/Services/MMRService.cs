@@ -139,8 +139,8 @@ namespace MMR.DiscordBot.Services
             IEnumerable<int> seeds;
             try
             {
-                var response = await _httpClient.GetStringAsync($"https://www.random.org/integers/?num={num}&min=-1000000000&max=1000000000&col=1&base=10&format=plain&rnd=new");
-                seeds = response.Split('\n', StringSplitOptions.RemoveEmptyEntries).Select(s => int.Parse(s) + 1000000000);
+                var response = await _httpClient.GetStringAsync($"https://www.random.org/integers/?num={num * 31}&min=0&max=1&col=31&base=2&format=plain&rnd=new");
+                seeds = response.Split('\n', StringSplitOptions.RemoveEmptyEntries).Select(s => Convert.ToInt32(s.Replace("\t", "").Trim(), 2));
             }
             catch (HttpRequestException e)
             {
