@@ -1,0 +1,51 @@
+name: .NET Desktop
+
+on:
+  push:
+    branches: [ "dev" ]
+  pull_request:
+    branches: [ "dev" ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+    - name: Install .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 5.0.x
+
+    - name: Restore
+      run: dotnet restore
+
+    - name: Test
+      run: |
+        dotnet test MMR.Common.Tests
+        dotnet test MMR.Randomizer.Tests
+#       dotnet test MMR.Yaz.Tests
+
+    - name: Set variables
+      run: |
+        $xml = [xml](Get-Content MMR.Randomizer\MMR.Randomizer.csproj)
+        $prefix = "$($xml.Project.PropertyGroup.VersionPrefix)".TrimEnd()
+        $suffix = "dev-$("${{ github.sha }}".SubString(0, 7))"
+        echo "version=$prefix-$suffix" >> $env:GITHUB_ENV
+        echo "suffix=$suffix" >> $env:GITHUB_ENV
+
+    - name: Build UI exe
+      run: dotnet publish MMR.UI\MMR.UI.csproj -p:VersionSuffix="${{ env.suffix }}" -c Release -o build -r win-x64 --no-self-contained
+
+    - name: Build CLI exe
+      run: dotnet publish MMR.CLI\MMR.CLI.csproj -p:VersionSuffix="${{ env.suffix }}" -c Release -o build -r win-x64 --no-self-contained
+
+    - name: Package
+      uses: actions/upload-artifact@v3
+      with:
+        name: MM-Randomizer-v${{ env.version }}
+        path: build/

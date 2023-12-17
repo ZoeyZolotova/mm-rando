@@ -62,7 +62,51 @@ A: Right click to see further options.
 Q: I saw a stream of someone playing MMR with music from other games, how do I add more music to MMR?  
 A: Our discord has a #music-customization channel which has a guide on making music, and a bunch of users posting their own music you can use.  
 
+### Install
+
+The latest release is available on the releases page: https://github.com/ZoeyZolotova/mm-rando/releases/latest
+
+Beta releases are available on our Discord: https://discord.gg/7jBRhhJ
+
 ### Come visit our discord
 Additional help and resources can be found at our discord: https://discord.gg/7jBRhhJ
 
 We also have a seedbot and tracker, and other tools to help you play and race other players if you're interested.
+
+----
+
+### Build MM Randomizer
+
+Please use a beta release from [our Discord](https://discord.gg/7jBRhhJ). The below information is for developers only.
+
+#### Development artifacts
+
+Development builds are available from [GitHub Actions](https://github.com/ZoeyZolotova/mm-rando/actions).
+
+#### PowerShell
+
+The script will download the source for mm-rando to a folder called `mm-rando`, build the GUI and CLI, and produce the application into `mm-rando\dist\`.
+
+You must install [Visual Studio 2019 and .NET 5.0 SDK](https://my.visualstudio.com/Downloads?q=visual%20studio%202019), and make sure the `dotnet` tool is in your path.
+
+If you can't or don't want to install these, or are having trouble, use the Docker instructions below.
+
+```pwsh
+git clone https://github.com/ZoeyZolotova/mm-rando
+cd mm-rando
+.\build.ps1
+```
+
+#### Docker (Windows PowerShell)
+
+Install Docker Desktop on Windows 10 or 11 and configure it for Windows containers (required for building the GUI):
+
+https://learn.microsoft.com/en-us/virtualization/windowscontainers/quick-start/set-up-environment?tabs=dockerce
+
+**The GUI cannot be built on Linux; the below command is for Docker configured to run Windows containers only.**
+
+```pwsh
+git clone https://github.com/ZoeyZolotova/mm-rando
+cd mm-rando
+docker run --rm -v "$(pwd):c:/mm-rando" -it mcr.microsoft.com/dotnet/sdk:5.0 pwsh -c "cd \mm-rando && .\build.ps1"
+```
