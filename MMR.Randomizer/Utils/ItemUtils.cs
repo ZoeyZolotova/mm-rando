@@ -419,7 +419,6 @@ namespace MMR.Randomizer.Utils
                 { Item.AreaGreatBayTempleAccess, Region.GreatBayTemple },
                 { Item.AreaInvertedStoneTowerTempleAccess, Region.StoneTowerTemple },
             };
-            var startingItemsDungeonRestricted = new List<Item>();
             IEnumerable<Item> filter(IEnumerable<Item> items)
             {
                 return items
@@ -469,26 +468,25 @@ namespace MMR.Randomizer.Utils
                         Item[] dungeonItems = ItemUtils.AllLocations().Where(item => item.GetAttribute<RegionAttribute>()?.Region == remainsRegion[newDungeonAccess]).ToArray();
                         if (settings.StrayFairyMode.HasFlag(StrayFairyMode.KeepWithinTemples) && settings.StrayFairyMode.HasFlag(StrayFairyMode.KeepWithinArea))
                         {
-                            startingItemsDungeonRestricted.AddRange(dungeonItems.Where(item => ItemUtils.IsStrayFairy(item)));
+                            result.AddRange(dungeonItems.Where(item => ItemUtils.IsStrayFairy(item)));
                         }
                         dungeonItems = ItemUtils.AllLocations().Where(item => item.GetAttribute<RegionAttribute>()?.Region == remainsRegion[dungeonAccess]).ToArray();
                         if (settings.DungeonNavigationMode.HasFlag(DungeonNavigationMode.KeepWithinTemples) && settings.DungeonNavigationMode.HasFlag(DungeonNavigationMode.KeepWithinArea))
                         {
-                            startingItemsDungeonRestricted.AddRange(dungeonItems.Where(item => ItemUtils.DungeonNavigation().Contains(item)));
+                            result.AddRange(dungeonItems.Where(item => ItemUtils.DungeonNavigation().Contains(item)));
                         }
                         if (settings.SmallKeyMode.HasFlag(SmallKeyMode.KeepWithinTemples) && settings.SmallKeyMode.HasFlag(SmallKeyMode.KeepWithinArea))
                         {
-                            startingItemsDungeonRestricted.AddRange(dungeonItems.Where(item => ItemUtils.SmallKeys().Contains(item)));
+                            result.AddRange(dungeonItems.Where(item => ItemUtils.SmallKeys().Contains(item)));
                         }
                         if (settings.BossKeyMode.HasFlag(BossKeyMode.KeepWithinTemples) && settings.BossKeyMode.HasFlag(BossKeyMode.KeepWithinArea))
                         {
-                            startingItemsDungeonRestricted.AddRange(dungeonItems.Where(item => ItemUtils.BossKeys().Contains(item)));
+                            result.AddRange(dungeonItems.Where(item => ItemUtils.BossKeys().Contains(item)));
                         }
                     }
                 }
             }
             BlitzJunkLocations.RemoveAll(location => (location.Location() == null && location.MainLocation() == null) || location.Entrance() != null);
-            result = result.Union(startingItemsDungeonRestricted).ToList();
             return result;
         }
 
