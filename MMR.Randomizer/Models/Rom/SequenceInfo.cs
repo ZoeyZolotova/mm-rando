@@ -9,6 +9,7 @@ namespace MMR.Randomizer.Models.Rom
     public class SequenceInfo
     {
         public string Name { get; set; }
+        public string DisplayName { get; set; }
         public string Directory { get; set; } = Values.MusicDirectory;
         public string Filename => Path.Combine(Directory, Name);
         public int Replaces { get; set; } = -1;
