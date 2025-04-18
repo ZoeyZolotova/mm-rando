@@ -121,6 +121,7 @@ namespace MMR.Randomizer.Utils
                         SequenceInfo sourceSequence = new SequenceInfo
                         {
                             Name = sourceName,
+                            DisplayName = sourceName,
                             Categories = sourceType,
                             Instrument = sourceInstrument
                         };
@@ -128,6 +129,7 @@ namespace MMR.Randomizer.Utils
                         SequenceInfo targetSequence = new SequenceInfo
                         {
                             Name = targetName,
+                            DisplayName = targetName,
                             Categories = targetType,
                             Instrument = targetInstrument
                         };
@@ -187,6 +189,7 @@ namespace MMR.Randomizer.Utils
                 RomData.SequenceList.Add(new SequenceInfo
                 {
                     Name = nameof(Properties.Resources.mmr_f_sot),
+                    DisplayName = nameof(Properties.Resources.mmr_f_sot),
                     Categories = new List<int> { 8 },
                     Instrument = 3,
                     Replaces = 0x75,
@@ -541,7 +544,7 @@ namespace MMR.Randomizer.Utils
 
                         var metadata = ReadMMRSMetaFile(currentSong.Name, mmrs.MetaFile);
 
-                        currentSong.Name = metadata.CosmeticName; // need to split songforce and songtest to retain using the filename
+                        currentSong.DisplayName = metadata.CosmeticName; // ensure the cosmetic name is what's displayed in-game; plando, spoiler log, and force/test tokens will still use filename 
                         currentSong.Categories = metadata.Categories;
 
                         // Handle custom audio samples
@@ -883,16 +886,7 @@ namespace MMR.Randomizer.Utils
 
                     if (sequenceNamesFileIndex.HasValue)
                     {
-                        name = Path.GetFileNameWithoutExtension(sequenceList[j].Name);
-                        if (Path.GetExtension(sequenceList[j].Name) == ".zseq")
-                        {
-                            name = name.Split('_')[0];
-                        }
-                        if (name.Contains("songforce"))
-                        {
-                            name = Regex.Replace(name, "(\\W|^)songforce\\W", string.Empty);
-                            name = name.Replace("songforce", string.Empty);
-                        }
+                        name = sequenceList[j].DisplayName;
                     }
                 }
 
