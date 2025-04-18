@@ -330,7 +330,7 @@ namespace MMR.Randomizer.Utils
             // if the instrument set in the .meta file is a hyphen, it's a custom bank; this is a valid instrument set
             if (instrumentSet == "-")
             {
-                song.Instrument = 0x28;
+                song.Instrument = MARK_REQUIRES_NEW_BANK;
             }
             else
             {
