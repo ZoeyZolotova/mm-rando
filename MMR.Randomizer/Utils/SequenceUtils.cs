@@ -406,7 +406,7 @@ namespace MMR.Randomizer.Utils
             }
 
             // Handle the categories
-            var categories = new List<int> { 0, 1, 3 }; // default to safe bgm categories if less than 4 lines: fields, towns, and indoors
+            var categories = new List<int> { 0, 1, 2, 3, 4, 5, 6, 7 }; // default to bgm categories if less than 4 lines
             if (lines.Count >= 4)
             {
                 categories.Clear();
