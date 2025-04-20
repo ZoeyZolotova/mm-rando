@@ -121,6 +121,8 @@ namespace MMR.Randomizer
                 return;
             }
 
+            MusicConversionUtils.ConvertMusicFiles(); // backs up music folder, copies music folder, converts any old files... might take a *long time* on the first pass if the user has a large folder
+
             RomData.PointerizedSequences = new List<SequenceInfo>();
             SequenceUtils.ReadSequenceInfo();
             SequenceUtils.ReadInstrumentSetList();
