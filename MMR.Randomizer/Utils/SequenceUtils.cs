@@ -40,7 +40,8 @@ namespace MMR.Randomizer.Utils
 
         public static MD5 md5lib; // used for zip
 
-
+        public static List<string> OLD_MUSIC_FILES = new List<string>(); // list to store the names of old music files found in the music directory
+        
         public static void ResetBudget()
         {
             MAX_BGM_BUDGET          = 0x6000;
@@ -196,6 +197,13 @@ namespace MMR.Randomizer.Utils
                 });
 
                 ScanForMMRS(directory); // scan for base mmrs in music folder
+            }
+
+            // write skipped files to a log file
+            // while they could be logged in the song log or spoiler log, the list could be hundreds of entries long
+            if (OLD_MUSIC_FILES.Count > 0)
+            {
+                File.WriteAllLines(Path.Combine(Values.MusicDirectory, "unsupported_music_files.txt"), OLD_MUSIC_FILES);
             }
         }
 
@@ -488,6 +496,12 @@ namespace MMR.Randomizer.Utils
             //  the user should be able to pack the archive with multiple sequences and multiple banks to match,
             //   where the redundancy increases likley hood of a song being able to be placed in a free audiobank slot
 
+            // add old standalone sequnce format to the skipped files list
+            foreach (string filePath in Directory.GetFiles(directory, "*.zseq"))
+            {
+                OLD_MUSIC_FILES.Add(Path.GetFileName(filePath));
+            }
+            
             foreach (string filePath in Directory.GetFiles(directory, "*.mmrs"))
             {
                 try
@@ -502,7 +516,8 @@ namespace MMR.Randomizer.Utils
                             return entry =>
                             {
                                 if (getter() != null)
-                                    throw new Exception($"Error: Multiple {fileType} files found in archive!");
+                                    return; // don't throw an exception for now, it won't log old files otherwise
+                                    //throw new Exception($"Error: Multiple {fileType} files found in archive!");
                                 setter(entry);
                             };
                         }
@@ -524,6 +539,13 @@ namespace MMR.Randomizer.Utils
                         {
                             if (entry.FullName.Contains('/')) continue;
 
+                            // the old format uses a categories.txt file as part of its format, so if the file contains it, it's probably old
+                            if (entry.Name.Equals("categories.txt"))
+                            {
+                                mmrs.CategoriesFile = entry;
+                                continue;
+                            }
+
                             string ext = Path.GetExtension(entry.Name).ToLowerInvariant();
                             if (handlers.TryGetValue(ext, out var handler))
                             {
@@ -531,8 +553,15 @@ namespace MMR.Randomizer.Utils
                             }
                         }
 
-                        if (mmrs.SequenceFile == null || mmrs.MetaFile == null)
+                        if (mmrs.SequenceFile == null || mmrs.MetaFile == null) 
+                        {
+                            // log the file using the old format
+                            if (mmrs.CategoriesFile != null)
+                            {
+                                OLD_MUSIC_FILES.Add(Path.GetFileName(filePath))
+                            }
                             continue;
+                        }
 
                         bool hasBankFile = mmrs.BankFile != null;
                         bool hasBankmetaFile = mmrs.BankmetaFile != null;
@@ -1648,6 +1677,7 @@ namespace MMR.Randomizer.Utils
             public ZipArchiveEntry BankFile { get; set; }
             public ZipArchiveEntry BankmetaFile { get; set; }
             public ZipArchiveEntry FormmaskFile { get; set; }
+            public ZipArchiveEntry CategoriesFile { get; set; } // This is used to mark mmrs files that use the old format
             public List<ZipArchiveEntry> AudioSamples { get; set; } = new();
         }
 
