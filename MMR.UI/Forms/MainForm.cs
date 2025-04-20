@@ -2076,6 +2076,18 @@ namespace MMR.UI.Forms
 
             _configuration.OutputSettings.InputPatchFilename = null;
 
+            // let users know their old music files can't be used
+            // maybe there's a better way to handle this...
+            if (SequenceUtils.OLD_MUSIC_FILES.Count > 0)
+            {
+                string old_music_message = "Unsupported music files were found during seed generation and could not be used. " +
+                               "A log of the skipped files has been saved to the music folder.\n\n" +
+                               "Log file: unsupported_music_files.txt";
+
+
+                MessageBox.Show(old_music_message, "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+
             MessageBox.Show("Generation complete!", "Success", MessageBoxButtons.OK, MessageBoxIcon.None);
         }
 
