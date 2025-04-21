@@ -287,13 +287,13 @@ In the randomizer's GUI interface, click the "Cosmetics" tab at the top of the w
 ### How Do I Randomize the Game's Music?
 In the randomizer's GUI interface, click the "Cosmetics" tab at the top of the window, then select "Random" in the "Music / Sound" section of the cosmetics page.
 
-The randomizer comes with a small variety of custom music in the randomizer installation's "music" folder, but you can find more custom music available in the Majora's Mask Randomizer Discord server in the `#music-releases` channel, on the <a href="https://github.com/mmr-music-repo/Majoras-MusicBox-House/tree/mmr-music-repo" target="_blank">Majora's Music-Box House GitHub repository</a>, or other places on the internet where users post custom music for Majora's Mask Randomizer.
+The randomizer comes with a small variety of custom music in the randomizer installation's "music" folder, but you can find more custom music available in the Majora's Mask Randomizer Discord server in the `#music-releases` channel, on the <a href="https://github.com/MajorasMusicBoxHouse/Majoras-MusicBox-House" target="_blank">Majora's Music-Box House GitHub repository</a>, or other places on the internet where users post custom music for Majora's Mask Randomizer.
 
 > [!TIP]
 > To add more music to Majora's Mask Randomizer, just place the music files you download into your randomizer installation's "music" folder.
 
 > [!IMPORTANT]
-> Both standalone sequence files (`.zseq`) and packed music files (`.mmrs`) work with the latest release of Majora's Mask Randomizer. However, standalone sequence files are deprecated and should be converted into a packed music file if possible as support for them may be removed in the future. You can convert standalone sequence files into packed music files using the `Generate MMRS File.py` script found in the <a href="https://github.com/mmr-music-repo/Majoras-MusicBox-House/tree/mmr-music-repo" target="_blank">Majora's Music-Box House GitHub repository</a>.
+> Both standalone sequence files (`.zseq`) and packed music files (`.mmrs`) work with the latest release of Majora's Mask Randomizer. However, standalone sequence files are deprecated and should be converted into a packed music file if possible as support for them may be removed in the future. You can convert standalone sequence files into packed music files using the `Generate MMRS File.py` script found in the <a href="https://github.com/MajorasMusicBoxHouse/Majoras-MusicBox-House" target="_blank">Majora's Music-Box House GitHub repository</a>.
 
 <h2>
   Majora's Mask Randomizer Discord Server <a href="#table-of-contents" title="Return to Table of Contents">🔝</a>
