@@ -292,9 +292,6 @@ The randomizer comes with a small variety of custom music in the randomizer inst
 > [!TIP]
 > To add more music to Majora's Mask Randomizer, just place the music files you download into your randomizer installation's "music" folder.
 
-> [!IMPORTANT]
-> Both standalone sequence files (`.zseq`) and packed music files (`.mmrs`) work with the latest release of Majora's Mask Randomizer. However, standalone sequence files are deprecated and should be converted into a packed music file if possible as support for them may be removed in the future. You can convert standalone sequence files into packed music files using the `Generate MMRS File.py` script found in the <a href="https://github.com/MajorasMusicBoxHouse/Majoras-MusicBox-House" target="_blank">Majora's Music-Box House GitHub repository</a>.
-
 <h2>
   Majora's Mask Randomizer Discord Server <a href="#table-of-contents" title="Return to Table of Contents">🔝</a>
 </h2>
