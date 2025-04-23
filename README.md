@@ -244,7 +244,7 @@ This is intended behavior. In the vanilla game, Business Scrubs do not remove it
 ### Why Am I Not Getting the Right Item from a Cow?
 For the pair two cows in the secret grottoes and the cows in the Romani Ranch barn at night, the cow's zones overlap so you will trigger one of the cows to give you its item instead of the other. If the "Close Cows" option in the "Comfort" tab is enabled, then the cows will no longer have the zone overlap issue.
 
-### Why Won't My ROM Doesn’t Work with Majora's Mask Randomizer?
+### Why Doesn't My ROM Work with Majora's Mask Randomizer?
 The ROM file you use to create a seed needs to be a clean and unmodified Majora's Mask NTSC-U version 1.0 ROM file in the big endian byte order (`.z64`). If your ROM file is modified in any way and/or not in the correct byte order, then it *will not* work with the randomizer.
 
 > [!IMPORTANT]
