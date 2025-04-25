@@ -56,6 +56,8 @@ namespace MMR.Randomizer.Utils
             RomData.SequenceList = new List<SequenceInfo>();
             RomData.TargetSequences = new List<SequenceInfo>();
 
+            OLD_MUSIC_FILES.Clear();
+
             // if file exists, we read the file instead of the resource
             string[] lines;
             if (File.Exists(Path.Combine(Values.MusicDirectory, "SEQS.txt")))
@@ -79,126 +81,123 @@ namespace MMR.Randomizer.Utils
             }
 
             // multiple directory search
-            var directories = new List<string>();
             if (!Directory.Exists(Values.MusicDirectory))
             {
                 Directory.CreateDirectory(Values.MusicDirectory); // we still need for MM-only
             }
-            directories.AddRange(Directory.GetDirectories(Values.MusicDirectory).ToList());
-            foreach (string d in directories.ToList()) // another layer deep to be safe
-            {
-                try
-                {
-                    List<string> deeper_directories = Directory.GetDirectories(d, "*", SearchOption.AllDirectories).ToList();
-                    directories.AddRange(deeper_directories);
-                }
-                catch (UnauthorizedAccessException)
-                {
-                    throw new Exception("GetDirectories: Cannot access some or all directories in the music folder!");
-                }
-            }
-            directories.Add(Values.MusicDirectory);
+
+            // Build iterable list of directories in the music folder
+            IEnumerable<string> directories = new[] { Values.MusicDirectory }.Concat(Directory.EnumerateDirectories(Values.MusicDirectory, "*", SearchOption.AllDirectories));
 
             foreach (string directory in directories)
             {
-                int i = 0;
-                while (i < lines.Length)
+                try
                 {
-                    try
+                    int i = 0;
+                    while (i < lines.Length)
                     {
-                        string sourceName = lines[i];
-                        List<int> sourceType = new List<int>();
-                        foreach (string part in lines[i + 1].Split(','))
+                        try
                         {
-                            sourceType.Add(Convert.ToInt32(part, 16));
+                            string sourceName = lines[i];
+                            List<int> sourceType = new List<int>();
+                            foreach (string part in lines[i + 1].Split(','))
+                            {
+                                sourceType.Add(Convert.ToInt32(part, 16));
+                            }
+
+                            int sourceInstrument = Convert.ToInt32(lines[i + 2], 16);
+
+                            var targetName = lines[i];
+                            var targetType = sourceType;
+                            var targetInstrument = Convert.ToInt32(lines[i + 2], 16);
+
+                            SequenceInfo sourceSequence = new SequenceInfo
+                            {
+                                Name = sourceName,
+                                DisplayName = sourceName,
+                                Categories = sourceType,
+                                Instrument = sourceInstrument
+                            };
+
+                            SequenceInfo targetSequence = new SequenceInfo
+                            {
+                                Name = targetName,
+                                DisplayName = targetName,
+                                Categories = targetType,
+                                Instrument = targetInstrument
+                            };
+
+                            if (sourceSequence.Name.StartsWith("mm-"))
+                            {
+                                targetSequence.Replaces = Convert.ToInt32(lines[i + 3], 16);
+                                sourceSequence.MM_seq = Convert.ToInt32(lines[i + 3], 16);
+                                if (i + 4 < lines.Length && lines[i + 4] == "no-recycle")
+                                {
+                                    //Debug.WriteLine("Player does not want to reuse song: " + sourceSequence.Name);
+                                    sourceSequence.Name = "drop";
+                                    i += 1;
+                                }
+                                i += 4;
+                                if (RomData.TargetSequences.Find(u => u.Name == sourceName) != null)
+                                {
+                                    continue; //old already have it
+                                }
+                                RomData.TargetSequences.Add(targetSequence);
+                            }
+                            else
+                            {
+                                i += 3;
+                                if (File.Exists(Path.Combine(directory, sourceName)) == false)
+                                {
+                                    // if sequence file doesn't exist, was removed by user, ignore it
+                                    continue;
+                                }
+                                sourceSequence.Directory = directory;
+                            }
+                            ;
+
+                            if (sourceSequence.MM_seq != 0x18 && sourceSequence.Name != "drop")
+                            {
+                                RomData.SequenceList.Add(sourceSequence);
+                            }
+                            ;
                         }
-
-                        int sourceInstrument = Convert.ToInt32(lines[i + 2], 16);
-
-                        var targetName = lines[i];
-                        var targetType = sourceType;
-                        var targetInstrument = Convert.ToInt32(lines[i + 2], 16);
-
-                        SequenceInfo sourceSequence = new SequenceInfo
+                        catch (Exception e)
                         {
-                            Name = sourceName,
-                            DisplayName = sourceName,
-                            Categories = sourceType,
-                            Instrument = sourceInstrument
-                        };
-
-                        SequenceInfo targetSequence = new SequenceInfo
-                        {
-                            Name = targetName,
-                            DisplayName = targetName,
-                            Categories = targetType,
-                            Instrument = targetInstrument
-                        };
-
-                        if (sourceSequence.Name.StartsWith("mm-"))
-                        {
-                            targetSequence.Replaces = Convert.ToInt32(lines[i + 3], 16);
-                            sourceSequence.MM_seq = Convert.ToInt32(lines[i + 3], 16);
-                            if (i + 4 < lines.Length && lines[i + 4] == "no-recycle")
+                            string aboveLines = "";
+                            string nl = "\n";
+                            if (i > 3)
                             {
-                                //Debug.WriteLine("Player does not want to reuse song: " + sourceSequence.Name);
-                                sourceSequence.Name = "drop";
-                                i += 1;
+                                aboveLines += lines[i - 3] + nl + lines[i - 2] + nl + lines[i - 1] + nl;
                             }
-                            i += 4;
-                            if (RomData.TargetSequences.Find(u => u.Name == sourceName) != null)
-                            {
-                                continue; //old already have it
-                            }
-                            RomData.TargetSequences.Add(targetSequence);
+                            throw new Exception("Error while reading SEQS.txt:\n"
+                                               + e.Message + "\n\n"
+                                               + "Caused by the line with the arrow:\n\n"
+                                               + aboveLines
+                                               + lines[i] + "  <--\n"
+                                               + lines[i + 1] + nl + lines[i + 2] + nl + lines[i + 3]);
                         }
-                        else
-                        {
-                            i += 3;
-                            if (File.Exists(Path.Combine(directory, sourceName)) == false)
-                            {
-                                // if sequence file doesn't exist, was removed by user, ignore it
-                                continue;
-                            }
-                            sourceSequence.Directory = directory;
-                        };
+                    } // end while (i < lines.Length)
 
-                        if (sourceSequence.MM_seq != 0x18 && sourceSequence.Name != "drop")
-                        {
-                            RomData.SequenceList.Add(sourceSequence);
-                        };
-                    }
-                    catch (Exception e)
+                    // MMR changes the music that plays when the player uses SOT
+                    // however the original SOT doesn't have a unique sequence/slot, so we have to use an unused one
+                    RomData.SequenceList.Add(new SequenceInfo
                     {
-                        string aboveLines = "";
-                        string nl = "\n";
-                        if (i > 3)
-                        {
-                            aboveLines += lines[i - 3] + nl + lines[i - 2] + nl + lines[i - 1] + nl;
-                        }
-                        throw new Exception("Error while reading SEQS.txt:\n"
-                                           + e.Message + "\n\n"
-                                           + "Caused by the line with the arrow:\n\n"
-                                           + aboveLines
-                                           + lines[i] + "  <--\n"
-                                           + lines[i+1] + nl + lines[i+2] + nl + lines[i+3]);
-                    }
-                } // end while (i < lines.Length)
+                        Name = nameof(Properties.Resources.mmr_f_sot),
+                        DisplayName = nameof(Properties.Resources.mmr_f_sot),
+                        Categories = new List<int> { 8 },
+                        Instrument = 3,
+                        Replaces = 0x75,
+                    });
 
-                // MMR changes the music that plays when the player uses SOT
-                // however the original SOT doesn't have a unique sequence/slot, so we have to use an unused one
-                RomData.SequenceList.Add(new SequenceInfo
+                    ScanForMMRS(directory); // scan for base mmrs in music folder
+                }
+                catch (UnauthorizedAccessException)
                 {
-                    Name = nameof(Properties.Resources.mmr_f_sot),
-                    DisplayName = nameof(Properties.Resources.mmr_f_sot),
-                    Categories = new List<int> { 8 },
-                    Instrument = 3,
-                    Replaces = 0x75,
-                });
-
-                ScanForMMRS(directory); // scan for base mmrs in music folder
+                    throw new Exception($"GetDirectories: Cannot access the following directory: {directory}");
+                }
             }
-
+            
             // write skipped files to a log file
             // while they could be logged in the song log or spoiler log, the list could be hundreds of entries long
             if (OLD_MUSIC_FILES.Count > 0)
@@ -246,7 +245,7 @@ namespace MMR.Randomizer.Utils
             throw new Exception("GetSequenceSize: Sequence File is missing");
         }
 
-        private static int ReadMMRSInstrumentBank(SequenceInfo song, SequenceBinaryData combo, ZipArchiveEntry bankFile, ZipArchiveEntry bankmetaFile)
+        private static bool ReadMMRSInstrumentBank(SequenceInfo song, SequenceBinaryData combo, ZipArchiveEntry bankFile, ZipArchiveEntry bankmetaFile)
         {
             /// the instrument set named "zbank" is a binary, comes with a metadata file
 /// returns true/false if this sequence uses a bank... except because its c# and bool is not an int, we us int rather than use a convert class
@@ -270,10 +269,10 @@ namespace MMR.Randomizer.Utils
                     Hash = BitConverter.ToInt64(md5lib.ComputeHash(bankData), 0),
                 };
 
-                return 1; // bank was used
+                return true; // bank was used
             }
 
-            return 0; // no bank
+            return false; // no bank
 
         }
 
@@ -355,7 +354,7 @@ namespace MMR.Randomizer.Utils
             var customBankIncluded = ReadMMRSInstrumentBank(song, sequence, mmrs.BankFile, mmrs.BankmetaFile);
 
             // now that we have bank expansion working without known issues, bank overwriting causes more glitches for us than it helps
-            if (song.Instrument > 0x28 || customBankIncluded == 1)
+            if (song.Instrument > 0x28 || customBankIncluded)
             {
                 song.Instrument = MARK_REQUIRES_NEW_BANK;
                 foreach (var seq in song.SequenceBinaryList)
@@ -363,7 +362,7 @@ namespace MMR.Randomizer.Utils
                     seq.InstrumentSet.BankSlot = song.Instrument;
                 }
             }
-            if (song.Instrument == MARK_REQUIRES_NEW_BANK && customBankIncluded = 0)
+            if (song.Instrument == MARK_REQUIRES_NEW_BANK && !customBankIncluded)
             {
                 #if DEBUG
                 throw new Exception($"Error: File with no bank has a bad instrument set: {instrumentSet}");
@@ -372,7 +371,10 @@ namespace MMR.Randomizer.Utils
                 #endif
             }
 
-            claimedBankCount += customBankIncluded;
+            if (customBankIncluded)
+            {
+                claimedBankCount++;
+            }
 
             ReadMMRSFormmask(song, sequence, mmrs.FormmaskFile);
 
