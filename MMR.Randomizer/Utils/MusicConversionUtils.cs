@@ -275,59 +275,39 @@ namespace MMR.Randomizer.Utils
         {
             /// creates conversion folder, then copies and converts every file in the original music folder
             /// into the new music folder
-            
+    
             Directory.CreateDirectory(convFolder);
 
-            var mmrsFiles = Directory.GetFiles(baseFolder, "*.mmrs", SearchOption.AllDirectories);
-            var zseqFiles = Directory.GetFiles(baseFolder, "*.zseq", SearchOption.AllDirectories);
             var allFiles = Directory.GetFiles(baseFolder, "*", SearchOption.AllDirectories);
-
-            foreach (var inputFile in zseqFiles)
-            {
-                string relativePath = Path.GetRelativePath(baseFolder, inputFile);
-                string destinationFile = Path.Combine(convFolder, relativePath);
-                string destinationDir = Path.GetDirectoryName(destinationFile);
-
-                if (!Directory.Exists(destinationDir))
-                    Directory.CreateDirectory(destinationDir);
-
-                File.Copy(inputFile, destinationFile, overwrite: true);
-
-                ConvertStandalone(destinationFile, destinationDir);
-            }
-
-            foreach (var inputFile in mmrsFiles)
-            {
-                string relativePath = Path.GetRelativePath(baseFolder, inputFile);
-                string destinationFile = Path.Combine(convFolder, relativePath);
-                string destinationDir = Path.GetDirectoryName(destinationFile);
-
-                if (!Directory.Exists(destinationDir))
-                    Directory.CreateDirectory(destinationDir);
-
-                File.Copy(inputFile, destinationFile, overwrite: true);
-
-                ConvertArchive(destinationFile, destinationDir);
-            }
 
             foreach (var inputFile in allFiles)
             {
                 string extension = Path.GetExtension(inputFile).ToLower();
+                string relativePath = Path.GetRelativePath(baseFolder, inputFile);
+                string destinationFile = Path.Combine(convFolder, relativePath);
+                string destinationDir = Path.GetDirectoryName(destinationFile);
 
-                if (extension != ".mmrs" && extension != ".zseq")
+                if (!Directory.Exists(destinationDir))
+                    Directory.CreateDirectory(destinationDir);
+
+                File.Copy(inputFile, destinationFile, overwrite: true);
+
+                switch (extension)
                 {
-                    string relativePath = Path.GetRelativePath(baseFolder, inputFile);
-                    string destinationFile = Path.Combine(convFolder, relativePath);
-                    string destinationDir = Path.GetDirectoryName(destinationFile);
+                    case ".zseq":
+                        ConvertStandalone(destinationFile, destinationDir);
+                        break;
 
-                    if (!Directory.Exists(destinationDir))
-                        Directory.CreateDirectory(destinationDir);
+                    case ".mmrs":
+                        ConvertArchive(destinationFile, destinationDir);
+                        break;
 
-                    File.Copy(inputFile, destinationFile, overwrite: true);
+                    default:
+                        break;
                 }
             }
         }
-
+        
         public static void WriteMetadata(string folder, string baseName, string cosmeticName, string metaBank, string songType, string categories, List<string> zsounds = null)
         {
             /// writes metadata file
