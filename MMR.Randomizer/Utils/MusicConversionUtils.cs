@@ -363,7 +363,9 @@ namespace MMR.Randomizer.Utils
             {
                 standaloneSeq.Copy(filepath);
 
-                cosmeticName = string.IsNullOrWhiteSpace(Regex.Replace(Regex.Replace(standaloneSeq.Filename, @"(\W|^)(songforce|songtest)(\W|$)", " ", RegexOptions.IgnoreCase), @"\s+", " ").Trim()) ? "???" : standaloneSeq.Filename;
+                cosmeticName = Regex.Replace(standaloneSeq.Filename, @"(^|\W)(songforce|songtest)(?=\W|$)", " ", RegexOptions.IgnoreCase);
+                cosmeticName = Regex.Replace(cosmeticName, @"\s+", " ").Trim();
+                cosmeticName = string.IsNullOrWhiteSpace(cosmeticName) ? "???" : cosmeticName;
 
                 metaBank = standaloneSeq.InstrumentSet;
                 var rawCategories = standaloneSeq.Categories;
@@ -447,7 +449,9 @@ namespace MMR.Randomizer.Utils
                 archive.Unpack(filename, filepath);
                 File.Delete(filepath);
 
-                cosmeticName = string.IsNullOrWhiteSpace(Regex.Replace(Regex.Replace(filename, @"(\W|^)(songforce|songtest)(\W|$)", " ", RegexOptions.IgnoreCase), @"\s+", " ").Trim()) ? "???" : filename;
+                cosmeticName = Regex.Replace(filename, @"(^|\W)(songforce|songtest)(?=\W|$)", " ", RegexOptions.IgnoreCase);
+                cosmeticName = Regex.Replace(cosmeticName, @"\s+", " ").Trim();
+                cosmeticName = string.IsNullOrWhiteSpace(cosmeticName) ? "???" : cosmeticName;
 
                 using (var reader = new StreamReader(Path.Combine(originalTemp, archive.Categories)))
                 {
