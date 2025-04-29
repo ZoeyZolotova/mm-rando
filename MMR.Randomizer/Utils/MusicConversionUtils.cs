@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace MMR.Randomizer.Utils
 {
@@ -362,12 +363,11 @@ namespace MMR.Randomizer.Utils
             {
                 standaloneSeq.Copy(filepath);
 
-                cosmeticName = standaloneSeq.Filename.Replace("songforce", "").Replace("songtest", "").Trim(" _-".ToCharArray());
-                metaBank = standaloneSeq.InstrumentSet;
+                cosmeticName = string.IsNullOrWhiteSpace(Regex.Replace(Regex.Replace(standaloneSeq.Filename, @"(\W|^)(songforce|songtest)(\W|$)", " ", RegexOptions.IgnoreCase), @"\s+", " ").Trim()) ? "???" : standaloneSeq.Filename;
 
+                metaBank = standaloneSeq.InstrumentSet;
                 var rawCategories = standaloneSeq.Categories;
                 var cleanedCategories = new List<string>();
-
                 foreach (var category in rawCategories)
                 {
                     string cleaned = category.Trim();
@@ -447,7 +447,7 @@ namespace MMR.Randomizer.Utils
                 archive.Unpack(filename, filepath);
                 File.Delete(filepath);
 
-                cosmeticName = filename.Replace("songforce", "").Replace("songtest", "").Trim(" _-".ToCharArray());
+                cosmeticName = string.IsNullOrWhiteSpace(Regex.Replace(Regex.Replace(filename, @"(\W|^)(songforce|songtest)(\W|$)", " ", RegexOptions.IgnoreCase), @"\s+", " ").Trim()) ? "???" : filename;
 
                 using (var reader = new StreamReader(Path.Combine(originalTemp, archive.Categories)))
                 {
