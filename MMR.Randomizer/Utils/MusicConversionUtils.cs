@@ -12,13 +12,35 @@ namespace MMR.Randomizer.Utils
         // fanfare categories to ensure correct song type
         private static readonly string[] FANFARE_CATEGORIES =
         {   //groups
-            "8", "9", "10",
+            "ItemFanfares",
+            "EventFanfares",
+            "ClearFanfares",
+
             // individual
-            "108", "109", "119", "120", "121", "122",
-            "124", "137", "139", "13D", "13F", "141",
-            "152", "155", "177", "178", "179", "17C",
-            "17E",
+            "EventFail1",
+            "EventFail2",
+            "EventSuccess",
+            "GameOver",
+            "BossDefeated",
+            "ItemGet",
+            "HeartContainerGet",
+            "MaskGet",
+            "HeartPieceGet",
+            "TruthRevealed",
+            "GoronRaceWin",
+            "HorseRaceWin",
+            "SongGet",
+            "SoaringTheme",
+            "TempleAppears",
+            "TempleClearShort",
+            "TempleClearLong",
+            "GiantsLeave",
+            "MoonDestroyed",
         };
+
+        // Reverse lookup dictionaries
+        static readonly Dictionary<int, string> IndividualNameLookup = Enum.GetValues(typeof(MusicGroups.Individual)).Cast<MusicGroups.Individual>().GroupBy(v => (int)v).ToDictionary(g => g.Key, g => g.First().ToString());
+        static readonly Dictionary<int, string> GroupNameLookup = Enum.GetValues(typeof(MusicGroups.Group)).Cast<MusicGroups.Group>().GroupBy(v => (int)v).ToDictionary(g => g.Key, g => g.First().ToString());
 
         public static void BackupMusicFolder(string folder)
         {
@@ -275,7 +297,7 @@ namespace MMR.Randomizer.Utils
         {
             /// creates conversion folder, then copies and converts every file in the original music folder
             /// into the new music folder
-    
+            
             Directory.CreateDirectory(convFolder);
 
             var allFiles = Directory.GetFiles(baseFolder, "*", SearchOption.AllDirectories);
@@ -307,7 +329,7 @@ namespace MMR.Randomizer.Utils
                 }
             }
         }
-        
+
         public static void WriteMetadata(string folder, string baseName, string cosmeticName, string metaBank, string songType, string categories, List<string> zsounds = null)
         {
             /// writes metadata file
@@ -347,7 +369,25 @@ namespace MMR.Randomizer.Utils
                 cosmeticName = standaloneSeq.Filename.Replace("songforce", "").Replace("songtest", "").Trim(" _-".ToCharArray());
                 metaBank = standaloneSeq.InstrumentSet;
 
-                categories = standaloneSeq.Categories;
+                var rawCategories = standaloneSeq.Categories;
+                var cleanedCategories = new List<string>();
+
+                foreach (var category in rawCategories)
+                {
+                    string cleaned = category.Trim();
+
+                    if (cleaned.StartsWith("0x", StringComparison.OrdinalIgnoreCase))
+                        cleaned = cleaned.Substring(2);
+
+                    int value = Convert.ToInt32(cleaned, 16);
+
+                    if (Enum.IsDefined(typeof(MusicGroups.Individual), value))
+                        cleanedCategories.Add(Enum.GetName(typeof(MusicGroups.Individual), value));
+                    else if (Enum.IsDefined(typeof(MusicGroups.Group), value))
+                        cleanedCategories.Add(Enum.GetName(typeof(MusicGroups.Group), value));
+                }
+
+                categories = cleanedCategories.ToArray();
 
                 bool[] ffOrBgm = new bool[categories.Length];
                 for (int i = 0; i < categories.Length; i++)
@@ -431,13 +471,19 @@ namespace MMR.Randomizer.Utils
                         if (cleanedCategory.StartsWith("0x", StringComparison.OrdinalIgnoreCase))
                             cleanedCategory = cleanedCategory.Substring(2);
 
-                        cleanedCategories.Add(cleanedCategory);
+                        // Convert to a string value
+                        var value = Convert.ToInt32(cleanedCategory, 16);
+
+                        if (Enum.IsDefined(typeof(MusicGroups.Individual), value))
+                            cleanedCategories.Add(Enum.GetName(typeof(MusicGroups.Individual), value));
+                        else if (Enum.IsDefined(typeof(MusicGroups.Group), value))
+                            cleanedCategories.Add(Enum.GetName(typeof(MusicGroups.Group), value));
                     }
 
                     bool[] ffOrBgm = new bool[cleanedCategories.Count];
                     for (int i = 0; i < cleanedCategories.Count; i++)
                     {
-                        ffOrBgm[i] = FANFARE_CATEGORIES.Contains(cleanedCategories[i].ToUpper());
+                        ffOrBgm[i] = FANFARE_CATEGORIES.Contains(cleanedCategories[i]);
                     }
 
                     if (Array.TrueForAll(ffOrBgm, x => x))
