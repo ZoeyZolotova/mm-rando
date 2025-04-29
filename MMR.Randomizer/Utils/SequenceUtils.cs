@@ -1298,7 +1298,7 @@ namespace MMR.Randomizer.Utils
             }
 
             // we always put songtest music on fileselect, titlescreen, ctd1, and combat music
-            SequenceInfo fileselectSlot = RomData.TargetSequences.Find(u => u.Name.Contains("mm-fileselect"));
+            SequenceInfo fileselectSlot = RomData.TargetSequences.Find(u => u.Replaces == 0x18); // Use the replacement sequence ID instead of the name
             AssignSequenceSlot(fileselectSlot, songtestSequence, sequences, "SONGTEST", log); // file select
 
             // since we know songtest is the focus, we can adjust the budget first at the start
