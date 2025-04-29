@@ -49,6 +49,49 @@ namespace MMR.Randomizer.Utils
             MAX_TYPE2_MUSIC_BUDGET  = 0x6000;
         }
 
+        public static bool TryParseCategory(string input, out int value)
+        {
+            /// parses the categories from a .meta or seqs.txt file; allowing plaintext names or the original hex names
+            value = 0;
+            string trimmed = input.Trim();
+
+            // Try to parse just the hex value
+            if (int.TryParse(trimmed, System.Globalization.NumberStyles.HexNumber, null, out int parsed))
+            {
+                value = parsed;
+                return true;
+            }
+
+            // Try parsing low spec music group name
+            if (Enum.TryParse<MusicGroups.Group>(trimmed, ignoreCase: true, out var group))
+            {
+                value = (int)group;
+                return true;
+            }
+
+            // Try parsing exact spec music group name
+            if (Enum.TryParse<MusicGroups.Individual>(trimmed, ignoreCase: true, out var individual))
+            {
+                value = (int)individual;
+                return true;
+            }
+
+            // Try matching display names to enums
+            if (MusicGroups.GroupDisplayNames.TryGetValue(trimmed, out group))
+            {
+                value = (int)group;
+                return true;
+            }
+
+            if (MusicGroups.IndividualDisplayNames.TryGetValue(trimmed, out individual))
+            {
+                value = (int)individual;
+                return true;
+            }
+
+            return false;
+        }
+
         public static void ReadSequenceInfo()
         {
             md5lib = MD5.Create();
@@ -102,7 +145,18 @@ namespace MMR.Randomizer.Utils
                             List<int> sourceType = new List<int>();
                             foreach (string part in lines[i + 1].Split(','))
                             {
-                                sourceType.Add(Convert.ToInt32(part, 16));
+                                if (TryParseCategory(part, out int c) && !sourceType.Contains(c))
+                                {
+                                    sourceType.Add(c);
+                                }
+                                else
+                                {
+                                    #if DEBUG
+                                    throw new Exception($"Invalid category in SEQS.txt: '{part}'");
+                                    #else
+                                    continue;
+                                    #endif
+                                }
                             }
 
                             int sourceInstrument = Convert.ToInt32(lines[i + 2], 16);
@@ -248,7 +302,7 @@ namespace MMR.Randomizer.Utils
         private static bool ReadMMRSInstrumentBank(SequenceInfo song, SequenceBinaryData combo, ZipArchiveEntry bankFile, ZipArchiveEntry bankmetaFile)
         {
             /// the instrument set named "zbank" is a binary, comes with a metadata file
-/// returns true/false if this sequence uses a bank... except because its c# and bool is not an int, we us int rather than use a convert class
+            /// returns true/false if this sequence uses a bank... except because its c# and bool is not an int, we us int rather than use a convert class
             
             if (bankFile != null && bankmetaFile != null) // custom bank detected
             {
@@ -426,11 +480,11 @@ namespace MMR.Randomizer.Utils
                     var trimmedCategory = category.Trim();
                     if (string.IsNullOrEmpty(trimmedCategory)) continue;
 
-                    try
+                    if (TryParseCategory(trimmedCategory, out int c) && !categories.Contains(c))
                     {
-                        categories.Add(Convert.ToInt32(trimmedCategory, 16));
+                        categories.Add(c);
                     }
-                    catch
+                    else
                     {
                         #if DEBUG
                         throw new Exception($"Error: Bad category '{trimmedCategory}' in song: '{songname}'.");
