@@ -38,10 +38,6 @@ namespace MMR.Randomizer.Utils
             "MoonDestroyed",
         };
 
-        // Reverse lookup dictionaries
-        static readonly Dictionary<int, string> IndividualNameLookup = Enum.GetValues(typeof(MusicGroups.Individual)).Cast<MusicGroups.Individual>().GroupBy(v => (int)v).ToDictionary(g => g.Key, g => g.First().ToString());
-        static readonly Dictionary<int, string> GroupNameLookup = Enum.GetValues(typeof(MusicGroups.Group)).Cast<MusicGroups.Group>().GroupBy(v => (int)v).ToDictionary(g => g.Key, g => g.First().ToString());
-
         public static void BackupMusicFolder(string folder)
         {
             /// backs up the music folder into a zip file with the .old extension
