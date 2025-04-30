@@ -1718,5 +1718,24 @@ namespace MMR.Randomizer.Utils
             public List<int> Categories { get; set; } = new();
             public List<Dictionary<string, object>> Commands { get; set; } = new();
         }
+        
+        public class SEQSYaml
+        {
+            /// Class to store SEQS.yml information
+            [YamlMember(Alias = "display name")]
+            public string DisplayName { get; set; }
+
+            [YamlMember(Alias = "music groups")]
+            public List<string> MusicGroups { get; set; }
+
+            [YamlMember(Alias = "instrument set")]
+            public int InstrumentSet { get; set; }
+
+            [YamlMember(Alias = "sequence id")]
+            public int SequenceId { get; set; }
+
+            [YamlMember(Alias = "no recycle")]
+            public bool NoRecycle { get; set; } = false;
+        }
     }
 }
