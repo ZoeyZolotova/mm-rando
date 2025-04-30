@@ -385,7 +385,7 @@ namespace MMR.Randomizer.Utils
             var serializer = new SerializerBuilder()
                 .WithNamingConvention(CamelCaseNamingConvention.Instance)
                 .WithEventEmitter(next => new FlowStyleListEmitter(next))
-                .ConfigureDefaultValuesHandling(DefaultValuesHandling.Preserve)
+                .ConfigureDefaultValuesHandling(DefaultValuesHandling.OmitDefaults)
                 .Build();
 
             string yamlOutput = serializer.Serialize(yaml);
