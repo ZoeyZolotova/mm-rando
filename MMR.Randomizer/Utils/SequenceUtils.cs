@@ -13,6 +13,7 @@ using MMR.Randomizer.Models;
 using MMR.Common.Utils;
 using MMR.Randomizer.Asm;
 using System.Text.RegularExpressions;
+using YamlDotNet.Serialization;
 
 namespace MMR.Randomizer.Utils
 {
@@ -102,26 +103,20 @@ namespace MMR.Randomizer.Utils
             OLD_MUSIC_FILES.Clear();
 
             // if file exists, we read the file instead of the resource
-            string[] lines;
-            if (File.Exists(Path.Combine(Values.MusicDirectory, "SEQS.txt")))
+            var deserializer = new DeserializerBuilder().Build();
+            string seqsContent;
+
+            if (File.Exists(Path.Combine(Values.MusicDirectory, "SEQS.yml")))
             {
-                Debug.WriteLine("We found a user SEQS.txt file that we can use");
-                var list = new List<string>();
-                string line;
-                using (StreamReader sr = new StreamReader(Path.Combine(Values.MusicDirectory, "SEQS.txt")))
-                {
-                    while ((line = sr.ReadLine()) != null)
-                    {
-                        list.Add(line);
-                    }
-                }
-                lines = list.ToArray();
+                Debug.WriteLine("We found a user SEQS.yml file that we can use");
+                seqsContent = File.ReadAllText(Path.Combine(Values.MusicDirectory, "SEQS.yml"));
             }
             else
             {
-                // load SEQS.txt from source memory
-                lines = Properties.Resources.SEQS.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
+                seqsContent = Properties.Resources.SEQS;
             }
+
+            var sequenceEntries = deserializer.Deserialize<Dictionary<string, SEQSYaml>>(seqsContent);
 
             // multiple directory search
             if (!Directory.Exists(Values.MusicDirectory))
@@ -136,102 +131,79 @@ namespace MMR.Randomizer.Utils
             {
                 try
                 {
-                    int i = 0;
-                    while (i < lines.Length)
+                    foreach (var entry in sequenceEntries)
                     {
-                        try
+                        string seqName = entry.Key;
+                        SEQSYaml data = entry.Value;
+
+                        var seqCategories = new List<int>();
+                        foreach (string part in data.MusicGroups)
                         {
-                            string sourceName = lines[i];
-                            List<int> sourceType = new List<int>();
-                            foreach (string part in lines[i + 1].Split(','))
+                            if (TryParseCategory(part, out int c) && !seqCategories.Contains(c))
                             {
-                                if (TryParseCategory(part, out int c) && !sourceType.Contains(c))
-                                {
-                                    sourceType.Add(c);
-                                }
-                                else
-                                {
-                                    #if DEBUG
-                                    throw new Exception($"Invalid category in SEQS.txt: '{part}'");
-                                    #else
-                                    continue;
-                                    #endif
-                                }
-                            }
-
-                            int sourceInstrument = Convert.ToInt32(lines[i + 2], 16);
-
-                            var targetName = lines[i];
-                            var targetType = sourceType;
-                            var targetInstrument = Convert.ToInt32(lines[i + 2], 16);
-
-                            SequenceInfo sourceSequence = new SequenceInfo
-                            {
-                                Name = sourceName,
-                                DisplayName = sourceName,
-                                Categories = sourceType,
-                                Instrument = sourceInstrument
-                            };
-
-                            SequenceInfo targetSequence = new SequenceInfo
-                            {
-                                Name = targetName,
-                                DisplayName = targetName,
-                                Categories = targetType,
-                                Instrument = targetInstrument
-                            };
-
-                            if (sourceSequence.Name.StartsWith("mm-"))
-                            {
-                                targetSequence.Replaces = Convert.ToInt32(lines[i + 3], 16);
-                                sourceSequence.MM_seq = Convert.ToInt32(lines[i + 3], 16);
-                                if (i + 4 < lines.Length && lines[i + 4] == "no-recycle")
-                                {
-                                    //Debug.WriteLine("Player does not want to reuse song: " + sourceSequence.Name);
-                                    sourceSequence.Name = "drop";
-                                    i += 1;
-                                }
-                                i += 4;
-                                if (RomData.TargetSequences.Find(u => u.Name == sourceName) != null)
-                                {
-                                    continue; //old already have it
-                                }
-                                RomData.TargetSequences.Add(targetSequence);
+                                seqCategories.Add(c);
                             }
                             else
                             {
-                                i += 3;
-                                if (File.Exists(Path.Combine(directory, sourceName)) == false)
-                                {
-                                    // if sequence file doesn't exist, was removed by user, ignore it
-                                    continue;
-                                }
+#if DEBUG
+                                throw new Exception($"Invalid category in YAML for '{seqName}': '{part}'");
+#else
+                                continue;
+#endif
+                            }
+                        }
+
+                        int seqInstrument = data.InstrumentSet;
+                        int seqId = data.SequenceId;
+
+                        SequenceInfo targetSequence = new SequenceInfo
+                        {
+                            Name = seqName,
+                            DisplayName = data.DisplayName ?? seqName,
+                            Categories = seqCategories,
+                            Instrument = seqInstrument,
+                        };
+
+                        SequenceInfo sourceSequence = new SequenceInfo
+                        {
+                            Name = seqName,
+                            DisplayName = data.DisplayName ?? seqName,
+                            Categories = seqCategories,
+                            Instrument = seqInstrument,
+                        };
+
+                        if (sourceSequence.Name.StartsWith("mm-"))
+                        {
+                            targetSequence.Replaces = data.SequenceId;
+                            sourceSequence.MM_seq = data.SequenceId;
+
+                            if (data.NoRecycle)
+                            {
+                                sourceSequence.Name = "drop";
+                            }
+
+                            if (RomData.TargetSequences.Find(u => u.Name == seqName) == null)
+                            {
+                                RomData.TargetSequences.Add(targetSequence);
+                            }
+                        }
+                        else
+                        {
+                            if (File.Exists(Path.Combine(directory, seqName)))
+                            {
                                 sourceSequence.Directory = directory;
                             }
-                            ;
+                            else
+                            {
+                                continue;
+                            }
+                        }
 
-                            if (sourceSequence.MM_seq != 0x18 && sourceSequence.Name != "drop")
-                            {
-                                RomData.SequenceList.Add(sourceSequence);
-                            }
-                            ;
-                        }
-                        catch (Exception e)
+                        if (sourceSequence.MM_seq != 0x18 && sourceSequence.Name != "drop")
                         {
-                            string aboveLines = "";
-                            string nl = "\n";
-                            if (i > 3)
-                            {
-                                aboveLines += lines[i - 3] + nl + lines[i - 2] + nl + lines[i - 1] + nl;
-                            }
-                            throw new Exception("Error while reading SEQS.txt:\n"
-                                               + e.Message + "\n\n"
-                                               + "Caused by the line with the arrow:\n\n"
-                                               + aboveLines
-                                               + lines[i] + "  <--\n"
-                                               + lines[i + 1] + nl + lines[i + 2] + nl + lines[i + 3]);
+                            RomData.SequenceList.Add(sourceSequence);
                         }
-                    } // end while (i < lines.Length)
+                    }
 
                     // MMR changes the music that plays when the player uses SOT
                     // however the original SOT doesn't have a unique sequence/slot, so we have to use an unused one
