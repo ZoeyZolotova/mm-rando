@@ -76,6 +76,7 @@ namespace MMR.Randomizer.Constants
             SecretGrotto         = 0x13B,
             MilkBar              = 0x13C,
             WoodsOfMystery       = 0x13E,
+            MysteryWoods         = 0x13E, // Just in case
             HorseRace            = 0x140,
             GormanBrosTheme      = 0x142,
             WitchesTheme         = 0x143,
@@ -219,6 +220,7 @@ namespace MMR.Randomizer.Constants
             { "Secret Grotto", Individual.SecretGrotto },
             { "Milk Bar", Individual.MilkBar },
             { "Woods of Mystery", Individual.WoodsOfMystery },
+            { "Mystery Woods", Individual.MysteryWoods },
             { "Horse Race", Individual.HorseRace },
 
             { "Gorman Bros.' Theme", Individual.GormanBrosTheme },
