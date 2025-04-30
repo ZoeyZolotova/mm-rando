@@ -356,12 +356,12 @@ namespace MMR.Randomizer.Utils
                     InstrumentSet = metaBank,
                     SongType = songType,
                     MusicGroups = categories,
-                    AudioSamples = new Dictionary<string, MMRSMetadataYAML.Sample>()
+                    AudioSamples = null
                 }
             };
 
             // Optional audio sample info from zsounds
-            if (zsounds != null)
+            if (zsounds != null && zsounds.Count > 0)
             {
                 var index = 0;
                 foreach (var kvp in zsounds)
