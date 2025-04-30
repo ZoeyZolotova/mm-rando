@@ -80,7 +80,7 @@ namespace MMR.Randomizer.Constants
             HorseRace            = 0x140,
             GormanBrosTheme      = 0x142,
             WitchesTheme         = 0x143,
-            KotakeAndKoumesTheme = 0x143, // Just in case
+            KoumeAndKotakesTheme = 0x143, // Just in case
             ItemShop             = 0x144,
             OwlsTheme            = 0x145,
             KaeporaGaeborasTheme = 0x145, // Just in case
@@ -231,10 +231,10 @@ namespace MMR.Randomizer.Constants
             { "Witches' Theme", Individual.WitchesTheme },
             { "Witches Theme", Individual.WitchesTheme },
 
-            { "Kotake & Koume's Theme", Individual.KotakeAndKoumesTheme },
-            { "Kotake and Koume's Theme", Individual.KotakeAndKoumesTheme },
-            { "Kotake & Koumes Theme", Individual.KotakeAndKoumesTheme },
-            { "Kotake and Koumes Theme", Individual.KotakeAndKoumesTheme },
+            { "Koume & Kotake's Theme", Individual.KotakeAndKoumesTheme },
+            { "Koume and Kotake's Theme", Individual.KotakeAndKoumesTheme },
+            { "Koume & Kotakes Theme", Individual.KotakeAndKoumesTheme },
+            { "Koume and Kotakes Theme", Individual.KotakeAndKoumesTheme },
 
             { "Item Shop", Individual.ItemShop },
 
