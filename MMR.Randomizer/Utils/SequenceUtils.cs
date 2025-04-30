@@ -12,21 +12,31 @@ using MMR.Randomizer.Models.Settings;
 using MMR.Randomizer.Models;
 using MMR.Common.Utils;
 using MMR.Randomizer.Asm;
-using System.Text.RegularExpressions;
-using Microsoft.Toolkit.HighPerformance.Extensions;
-using System.Data;
 using YamlDotNet.Serialization;
 
 namespace MMR.Randomizer.Utils
 {
     public class SequenceUtils
     {
-        // these are places the player may never visit, if they do they are visited very briefly, and very little music is heard
-        // 0F:sharp kills you, 05:clock tower, 7C:giantsleave, 04:skullkid theme
-        // 42:gormon brothers, 27:musicbox house, 31:mayor's office, 45:kaepora's theme
-        // 72:wagonride, 0E:boatcruise, 29:zelda, 2D:giants, 
-        // 2E:guruguru, 7B:maskreveal(gaints summon cutscene), 73:keaton, 70:calling giants
-        // 7D is reunion, 0x50 is sword school
+        // These are scenes the play may never visit, if they do, then they are visited very briefly and very little music is heard
+        // 0x0F: Sharp's Curse
+        // 0x05: Clock Tower Interior
+        // 0x7C: Giants Leave
+        // 0x04: Majora's Theme
+        // 0x42: Gorman Bros.' Theme
+        // 0x27: Music-Box House
+        // 0x31: Mayor Dotour's Office
+        // 0x45: Kaepora Gaebora's Theme
+        // 0x72: Cremia's Theme
+        // 0x0E: Old Koume's Boat Cruise
+        // 0x29: Zelda's Theme
+        // 0x2D: Giants' Theme
+        // 0x2E: Guru-Guru's Theme
+        // 0x7B: The Moon Enraged
+        // 0x73: Keaton's Theme
+        // 0x70: Giants Appear
+        // 0x7D: Reunion Theme
+        // 0x50: Swordsman's School
         public static List<int> lowUseMusicSlots = new List<int> { 0x0F, 0x05, 0x7C, 0x04,
                                                                    0x42, 0x27, 0x31, 0x45,
                                                                    0x72, 0x0E, 0x29, 0x2D,
@@ -39,7 +49,7 @@ namespace MMR.Randomizer.Utils
         public static int New_AudioBankTable = 0; // for mmfilelist
         public static int NewInstrumentSetAddress; // for bgm shuffle functions to work on
         public static int CurrentFreeBank = 0x29;
-        public const int REQUIRES_NEW_BANK = 0x28; // 28 used to be the only free bank, this is legacy supported
+        public const  int REQUIRES_NEW_BANK = 0x28; // 28 used to be the only free bank, this is legacy supported
 
         public static MD5 md5lib; // used for zip
 
@@ -54,6 +64,8 @@ namespace MMR.Randomizer.Utils
 
         public static bool TryParseCategory(object input, out int value)
         {
+            /// Ensures that categories return their proper int value if they are a string
+            
             value = 0;
 
             // Handle ints
@@ -164,11 +176,11 @@ namespace MMR.Randomizer.Utils
                             }
                             else
                             {
-    #if DEBUG
+#if DEBUG
                                 throw new Exception($"Invalid category in YAML for '{seqName}': '{part}'");
-    #else
+#else
                                 continue;
-    #endif
+#endif
                             }
                         }
 
@@ -363,7 +375,7 @@ namespace MMR.Randomizer.Utils
             }
         }
 
-        private static void ReadMMRSSequence(SequenceInfo song, MMRSArchiveContents mmrs, int? instrumentSet) //string instrumentSet)
+        private static void ReadMMRSSequence(SequenceInfo song, MMRSArchiveContents mmrs, string instrumentSet)
         {
 
             var claimedBankCount = 0;
@@ -378,15 +390,15 @@ namespace MMR.Randomizer.Utils
             var sequence = new SequenceBinaryData() { SequenceBinary = rawSeqData };
 
             // Handle the instrument set
-            if (instrumentSet == null) //"-")
+            if (instrumentSet == "custom" || instrumentSet == "-")
             {
-                song.Instrument = REQUIRES_NEW_BANK; // hyphen in instrument set field is custom, set equal to 0x28
+                song.Instrument = REQUIRES_NEW_BANK;
             }
             else
             {
                 try
                 {
-                    song.Instrument = (int)instrumentSet; //Convert.ToInt32(instrumentSet, 16);
+                    song.Instrument = Convert.ToInt32(instrumentSet, 16);
                 }
                 catch (FormatException e)
                 {
@@ -424,115 +436,6 @@ namespace MMR.Randomizer.Utils
             song.SequenceBinaryList.Add(sequence);
         }
 
-        private static MMRSMetadata ReadMMRSMetaFile(string songname, ZipArchiveEntry metaFile)
-        {
-            /// Reads the file containing the metadata for the randomizer music file to work with the randomizer
-
-            if (metaFile == null)
-                throw new Exception($"Error: No metadata file available for song: '{songname}'");
-
-            // Valid Song Types
-            var validTypes = new HashSet<string> { "bgm", "fanfare" };
-
-            // Available META commands
-            var validMetaCommands = new HashSet<string> { "ZSOUND" };
-
-            List<string> lines = new List<string>();
-            using (var reader = new StreamReader(metaFile.Open(), Encoding.Default))
-            {
-                string line;
-
-                while ((line = reader.ReadLine()) != null)
-                    lines.Add(line.TrimEnd());
-            }
-
-            // Handle the song type
-            string songType = "bgm"; // Default to BGM
-            if (lines.Count >= 3)
-            {
-                string trimmedLoweredSongType = lines[2].Trim().ToLower();
-
-                if (validTypes.Contains(trimmedLoweredSongType))
-                {
-                    songType = trimmedLoweredSongType;
-                }
-            }
-
-            //Handle the categories
-            var categories = new List<int> { 0, 1, 3 }; // Default to safe BGM categories: Fields, Towns, and Indoors
-            if (lines.Count >= 4)
-            {
-                categories.Clear(); // There is a categories line, so clear the defaults
-
-                foreach (var category in lines[3].Split(','))
-                {
-                    var trimmedCategory = category.Trim();
-                    if (string.IsNullOrEmpty(trimmedCategory)) continue;
-
-                    if (TryParseCategory(trimmedCategory, out int c) && !categories.Contains(c))
-                    {
-                        categories.Add(c);
-                    }
-                    else
-                    {
-#if DEBUG
-                        throw new Exception($"Error: Bad category '{trimmedCategory}' in song: '{songname}'.");
-#else
-                        continue;
-#endif
-                    }
-                }
-            }
-
-            // Handle META commands
-            var commands = new List<Dictionary<string, object>>();
-            if (lines.Count >= 5)
-            {
-                for (int i = 4; i < lines.Count; i++)
-                {
-                    var line = lines[i];
-                    var tokens = line.Split(':');
-
-                    if (tokens.Length > 0 && validMetaCommands.Contains(tokens[0]))
-                    {
-                        if (tokens[0].ToUpper() == "ZSOUND" && tokens.Length == 3) // MMR only has support for the old zsound command format for now
-                        {
-                            var zsound = new Dictionary<string, object>
-                            {
-                                // type, index, and key_region are all part of the new format used by OOTR:
-                                // ZSOUND:INST:0:NORM:file.zsound, ZSOUND:DRUM:0::file.zsound, ZSOUND:SFX:0::file.zsound
-                                //
-                                // The new format links samples by: parsing the bank, indexing the structures,
-                                // then modifying the sample addresses in said structures to where the custom
-                                // samples have been injected into the ROM
-                                //
-                                // MMR doesn't have that functionality, so it relies on the old method
-                                //
-                                { "type", null }, // Instrument type: INST, DRUM, SFX
-                                { "index", null }, // Index in the related structure list
-                                { "key_region", null }, // For INST: LOW, NORM, HIGH; for DRUM and SFX: leave empty
-                                { "file", tokens[1] },
-                                { "temp_addr", Convert.ToUInt32(tokens[2], 16) }, // This is unused in the new format
-                            };
-
-                            commands.Add(zsound);
-
-                        }
-                    }
-                }
-            }
-
-            return new MMRSMetadata
-            {
-                CosmeticName = lines[0],
-                //InstrumentSet = lines[1],
-                SongType = songType,
-                Categories = categories,
-                Commands = commands
-            };
-
-        }
-
         private static MMRSMetadata ReadMMRSMetaYaml(string songname, ZipArchiveEntry metaFile)
         {
             /// Reads the file containing the metadata for the randomizer music file to work with the randomizer
@@ -540,8 +443,9 @@ namespace MMR.Randomizer.Utils
             if (metaFile == null)
                 throw new Exception($"Error: No metadata file available for song: '{songname}'");
 
-            // Valid Song Types
+            // Valid values
             var validTypes = new HashSet<string> { "bgm", "fanfare" };
+            var validGames = new HashSet<string> { "oot", "mm" }; // game is mainly for Nax and OOTMM, might be used in the future though if OOTRS support is added
 
             MMRSMetadataYAML yamlData;
 
@@ -653,7 +557,7 @@ namespace MMR.Randomizer.Utils
                             {
                                 if (getter() != null)
                                     return;
-                                    //throw new Exception($"Error: Multiple {fileType} files found in archive!");
+
                                 setter(entry);
                              };
                         }
@@ -662,8 +566,6 @@ namespace MMR.Randomizer.Utils
                         {
                             // Only allow a single file type for each file, except zsounds which may require multiple
                             { ".seq",      CreateSetter(() => mmrs.SequenceFile,     e => mmrs.SequenceFile = e, "sequence") },
-                            //{ ".zseq",     CreateSetter(() => mmrs.SequenceFile,     e => mmrs.SequenceFile = e, "sequence") }, // Should .zseq and .aseq support be removed
-                            //{ ".aseq",     CreateSetter(() => mmrs.SequenceFile,     e => mmrs.SequenceFile = e, "sequence") }, // so that .seq is standard between OOTR and MMR?
                             { ".meta",     CreateSetter(() => mmrs.MetaFile,         e => mmrs.MetaFile = e,     "meta") },
                             { ".zbank",    CreateSetter(() => mmrs.BankFile,         e => mmrs.BankFile = e,     "zbank") },
                             { ".bankmeta", CreateSetter(() => mmrs.BankmetaFile,     e => mmrs.BankmetaFile = e, "bankmeta") },
@@ -711,7 +613,7 @@ namespace MMR.Randomizer.Utils
 
                         var metadata = ReadMMRSMetaYaml(currentSong.Name, mmrs.MetaFile);
 
-                        currentSong.DisplayName = metadata.CosmeticName; // For now, just use cosmetic name instead of filename; split it up later for songforce/test to use filename
+                        currentSong.DisplayName = metadata.CosmeticName;
                         currentSong.Categories = metadata.Categories;
 
                         // Handle custom audio samples
@@ -747,25 +649,7 @@ namespace MMR.Randomizer.Utils
 
                         if (currentSong != null && currentSong.SequenceBinaryList != null)
                         {
-//#if DEBUG
-//                            // Make sure sequence isn't empty during debugging otherwise index out of range error
-//                            Debug.WriteLine($"SequenceBinaryList for {currentSong.Name}:");
-//                            foreach (var sequenceBinaryData in currentSong.SequenceBinaryList)
-//                            {
-//                                Debug.WriteLine($"  Binary Data Length: {sequenceBinaryData.SequenceBinary.Length}");
-
-//                                // Print the binary data in hex format for debugging
-//                                Debug.WriteLine("  Binary Data (Hex):");
-//                                foreach (byte b in sequenceBinaryData.SequenceBinary)
-//                                {
-//                                    Debug.Write($"{b:X2} "); // Print each byte in hex format
-//                                }
-//                                Debug.WriteLine(""); // New line after printing the data
-//                            }
-//#endif
-
                             RomData.SequenceList.Add(currentSong);
-
                         }
                     }
                 }
@@ -1827,7 +1711,7 @@ namespace MMR.Randomizer.Utils
 
         private class MMRSArchiveContents
         {
-            /// Temporary class to store files contained in the music file archive
+            /// Intermediary class to store files contained in the music file archive
             public ZipArchiveEntry MetaFile { get; set; }
             public ZipArchiveEntry SequenceFile { get; set; }
             public ZipArchiveEntry BankFile { get; set; }
@@ -1839,60 +1723,18 @@ namespace MMR.Randomizer.Utils
 
         private class MMRSMetadata
         {
-            /// Temporary class to store metadata information from the META file
+            /// Intermediary class to store metadata information from the META file
             public string CosmeticName { get; set; }
-            //public string InstrumentSet { get; set; }
-            public int? InstrumentSet { get; set; }
+            public string InstrumentSet { get; set; }
             public string SongType { get; set; }
             public List<int> Categories { get; set; } = new();
             public List<Dictionary<string, object>> Commands { get; set; } = new();
         }
 
-        private class MMRSMetadataYAML
-        {
-            [YamlMember(Alias = "game")]
-            public string Game {  get; set; }
-
-            [YamlMember(Alias = "metadata")]
-            public Meta Metadata { get; set; }
-
-            public class Meta
-            {
-                [YamlMember(Alias = "display name")]
-                public string DisplayName { get; set; }
-
-                [YamlMember(Alias = "instrument set")]
-                public int? InstrumentSet { get; set; } // instead of using "-" use "~" (null) to indicate custom banks because I don't want to write a custom deserialization function
-
-                [YamlMember(Alias = "song type")]
-                public string SongType { get; set; }
-
-                [YamlMember(Alias = "music groups")]
-                public List<object> MusicGroups { get; set; }
-
-                [YamlMember(Alias = "audio samples")]
-                public Dictionary<string, Sample> AudioSamples { get; set; }
-
-            }
-
-            public class Sample
-            {
-                [YamlMember(Alias = "instrument type")]
-                public string Type { get; set; } = null;
-
-                [YamlMember(Alias = "list index")]
-                public int? Index { get; set; } = null;
-
-                [YamlMember(Alias = "key region")]
-                public string KeyRegion { get; set; } = null;
-
-                [YamlMember(Alias = "temp address")]
-                public int? TempAddress { get; set; } = null;
-            }
-        }
-
         public class SEQSYaml
         {
+            /// Store SEQS data as YAML instead of plaintext
+
             [YamlMember(Alias = "display name")]
             public string DisplayName { get; set; }
 
