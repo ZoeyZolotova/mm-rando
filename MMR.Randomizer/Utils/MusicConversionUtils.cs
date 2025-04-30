@@ -366,7 +366,7 @@ namespace MMR.Randomizer.Utils
                 var index = 0;
                 foreach (var kvp in zsounds)
                 {
-                    string filename = kvp.Key;
+                    string filename = $"{kvp.Key}.zsound"; // don't know if the extension is needed, but just in case...
                     uint tempAddr = kvp.Value;
 
                     yaml.Metadata.AudioSamples[$"{filename}"] = new MMRSMetadataYAML.Sample
