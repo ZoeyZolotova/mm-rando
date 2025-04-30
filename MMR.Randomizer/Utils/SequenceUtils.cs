@@ -497,19 +497,19 @@ namespace MMR.Randomizer.Utils
 
                     var type = sample.Type?.Trim().ToUpperInvariant();
                     var keyRegion = sample.KeyRegion?.Trim().ToUpperInvariant();
-                    var listIndex = sample.Index;
+                    var listIndex = sample.Index == -1 ? null : sample.Index;
                     var tempAddr = sample.TempAddress;
 
-                    if (type == null && (listIndex != null && listIndex != -1) && sample.KeyRegion != null)
+                    if (type == null && listIndex != null && sample.KeyRegion != null)
                     {
                         throw new InvalidOperationException($"Error: Audio sample '{entry.Key}': If type is null, index and key_region must also be null.");
                     }
                     else
                     {
-                        if (!validTypes.Contains(type))
+                        if (!validTypes.Contains(type) && type != null)
                             throw new InvalidOperationException($"Sample '{entry.Key}': Invalid instrument type '{type}'.");
 
-                        if (listIndex == null || listIndex == -1)
+                        if (validTypes.Contains(type) && listIndex == null)
                             throw new InvalidOperationException($"Sample '{entry.Key}': Index must not be null when type is '{type}'.");
 
                         if (type != null && tempAddr != null)
@@ -526,7 +526,6 @@ namespace MMR.Randomizer.Utils
                                 throw new InvalidOperationException($"Error: Audio sample '{entry.Key}': key_region must be null or empty for {type}.");
                         }
                     }
-
                     // type, index, and key_region are all part of the new format used by OOTR:
                     // ZSOUND:INST:0:NORM:file.zsound, ZSOUND:DRUM:0::file.zsound, ZSOUND:SFX:0::file.zsound
                     //
@@ -539,7 +538,7 @@ namespace MMR.Randomizer.Utils
                     var zsound = new Dictionary<string, object>
                     {
                         { "type", sample.Type }, // Instrument type: INST, DRUM, SFX
-                        { "index", listIndex == -1 ? null : listIndex }, // Index in the related structure list
+                        { "index", listIndex }, // Index in the related structure list
                         { "key_region", type == "INST" ? keyRegion : null }, // For INST: LOW, NORM, HIGH; for DRUM and SFX: leave empty
                         { "file", entry.Key },
                         { "temp_addr", tempAddr }, // This is unused in the new format
