@@ -53,7 +53,7 @@ namespace MMR.Randomizer.Utils
 
         public static MD5 md5lib; // used for zip
 
-        public static List<string> OLD_MUSIC_FILES = new List<string>();
+        public static List<string> OLD_MUSIC_FILES = new ();
 
         public static void ResetBudget()
         {
@@ -135,7 +135,6 @@ namespace MMR.Randomizer.Utils
             OLD_MUSIC_FILES.Clear();
 
             // if file exists, we read the file instead of the resource
-            var deserializer = new DeserializerBuilder().Build();
             string seqsContent;
 
             if (File.Exists(Path.Combine(Values.MusicDirectory, "SEQS.yml")))
@@ -148,7 +147,7 @@ namespace MMR.Randomizer.Utils
                 seqsContent = Properties.Resources.SEQS;
             }
 
-            var sequenceEntries = deserializer.Deserialize<Dictionary<string, SEQSYaml>>(seqsContent);
+            var sequenceEntries = YamlSerializer.Deserialize<Dictionary<string, SEQSYaml>>(seqsContent);
 
             // multiple directory search
             if (!Directory.Exists(Values.MusicDirectory))
@@ -338,12 +337,13 @@ namespace MMR.Randomizer.Utils
             if (formmaskFile != null)
             {
                 using var reader = new StreamReader(formmaskFile.Open(), Encoding.Default);
-                var formMaskJson = reader.ReadToEnd();
+                var formMaskData = reader.ReadToEnd();
                 try
                 {
                     // playState is configured in the file as "play in these states", but in the code it's "mute in these states"
                     // so we need to reverse it
-                    var playState = JsonSerializer.Deserialize<SequencePlayState[]>(formMaskJson);
+                    //var playState = JsonSerializer.Deserialize<SequencePlayState[]>(formMaskData);
+                    var playState = YamlSerializer.Deserialize<SequencePlayState[]>(formMaskData);
 
                     // ensure backwards compatibility with 1.15 sequences
                     if (!playState.Any(s => s.HasFlag(SequencePlayState.FierceDeity) && !s.HasFlag(SequencePlayState.Human)))
@@ -447,16 +447,15 @@ namespace MMR.Randomizer.Utils
             var validTypes = new HashSet<string> { "bgm", "fanfare" };
             var validGames = new HashSet<string> { "oot", "mm" }; // game is mainly for Nax and OOTMM, might be used in the future though if OOTRS support is added
 
-            var validSoundTypes = new HashSet<string> { "INST", "DRUM", "SFX" }; // Valid types for audio samples
-            var validKeyRegions = new HashSet<string> { "LOW", "PRIM", "HIGH" }; // valid key regions for INST type
+            var validSoundTypes = new HashSet<string> { "INST", "DRUM", "SFX" };
+            var validKeyRegions = new HashSet<string> { "LOW", "PRIM", "HIGH" };
 
             MMRSMetadataYAML yamlData;
 
             using (var reader = new StreamReader(metaFile.Open(), Encoding.Default))
             {
-                var deserializer = new DeserializerBuilder().IgnoreUnmatchedProperties().Build();
-
-                yamlData = deserializer.Deserialize<MMRSMetadataYAML>(reader);
+                var yamlText = reader.ReadToEnd();
+                yamlData = YamlSerializer.Deserialize<MMRSMetadataYAML>(yamlText);
             }
 
             if (yamlData == null || yamlData.Metadata == null)
@@ -507,7 +506,7 @@ namespace MMR.Randomizer.Utils
                     }
                     else
                     {
-                        if (!validSoundTypes.Contains(type))
+                        if (!validTypes.Contains(type))
                             throw new InvalidOperationException($"Sample '{entry.Key}': Invalid instrument type '{type}'.");
 
                         if (listIndex == null || listIndex == -1)
@@ -558,9 +557,9 @@ namespace MMR.Randomizer.Utils
                 Categories = categories,
                 Commands = commands
             };
-                    
+
         }
-        
+
         public static void ScanForMMRS(string directory)
         {
             // check if user has added mmrs packed sequence files to the music folder
