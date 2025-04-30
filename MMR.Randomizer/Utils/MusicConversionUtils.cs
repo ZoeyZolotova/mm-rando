@@ -1,15 +1,32 @@
 using MMR.Randomizer.Constants;
+using MMR.Randomizer.Models.Rom;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Text.RegularExpressions;
+using YamlDotNet.Serialization.NamingConventions;
+using YamlDotNet.Serialization;
+using YamlDotNet.Core.Events;
+using YamlDotNet.Core;
+using YamlDotNet.Serialization.EventEmitters;
 
 namespace MMR.Randomizer.Utils
 {
     class MusicConversionUtil
     {
+        public class FlowStyleListEmitter : ChainedEventEmitter
+        {
+            public FlowStyleListEmitter(IEventEmitter nextEmitter) : base(nextEmitter) { }
+
+            public override void Emit(SequenceStartEventInfo eventInfo, IEmitter emitter)
+            {
+                eventInfo.Style = SequenceStyle.Flow;
+                base.Emit(eventInfo, emitter);
+            }
+        }
+
         // fanfare categories to ensure correct song type
         private static readonly string[] FANFARE_CATEGORIES =
         {   //groups
@@ -48,10 +65,10 @@ namespace MMR.Randomizer.Utils
             string tempZipFolder = Path.Combine(Path.GetTempPath(), $"mmr_music_folder_{Guid.NewGuid()}");
             string finalBackupPath = Path.Combine(folder, $"music.old");
 
-            ZipFile.CreateFromDirectory(folder, tempZipFolder, CompressionLevel.Optimal, includeBaseDirectory: false);
-
             if (File.Exists(finalBackupPath))
                 File.Delete(finalBackupPath);
+
+            ZipFile.CreateFromDirectory(folder, tempZipFolder, CompressionLevel.Optimal, includeBaseDirectory: false);
             
             File.Move(tempZipFolder, finalBackupPath);
 
@@ -166,7 +183,7 @@ namespace MMR.Randomizer.Utils
             public string Categories { get; set; }
             public Dictionary<string, (string ZBank, string BankMeta)> Banks { get; set; } = new();
             public Dictionary<string, string> FormMasks { get; set; } = new();
-            public Dictionary<string, string> ZSounds { get; set; } = new();
+            public Dictionary<string, uint> ZSounds { get; set; } = new();
             public string TempFolder { get; set; }
 
             private static readonly string[] SEQ_EXTS = new[] { ".seq", ".zseq", ".aseq" };
@@ -251,7 +268,7 @@ namespace MMR.Randomizer.Utils
                         }
 
                         var name = parts[0];
-                        var tempAddr = parts[1];
+                        var tempAddr = Convert.ToUInt32(parts[1], 16);
 
                         var oldPath = Path.Combine(TempFolder, fileName);
                         var newPath = Path.Combine(TempFolder, $"{name}.zsound");
@@ -327,22 +344,53 @@ namespace MMR.Randomizer.Utils
             }
         }
 
-        public static void WriteMetadata(string folder, string baseName, string cosmeticName, string metaBank, string songType, string categories, List<string> zsounds = null)
+        public static void WriteMetadata(string folder, string baseName, string cosmeticName, string metaBank, string songType, List<object> categories, Dictionary<string, uint> zsounds = null)
         {
-            /// writes metadata file
-            
-            var metadata = new List<string>
+            // Prepare the YAML object
+            var yaml = new MMRSMetadataYAML
             {
-                cosmeticName,
-                metaBank,
-                songType,
-                categories
+                Game = "mm",
+                Metadata = new MMRSMetadataYAML.Meta
+                {
+                    DisplayName = cosmeticName,
+                    InstrumentSet = metaBank,
+                    SongType = songType,
+                    MusicGroups = categories,
+                    AudioSamples = new Dictionary<string, MMRSMetadataYAML.Sample>()
+                }
             };
 
-            if (zsounds != null && zsounds.Count > 0)
-                metadata.AddRange(zsounds);
+            // Optional audio sample info from zsounds
+            if (zsounds != null)
+            {
+                var index = 0;
+                foreach (var kvp in zsounds)
+                {
+                    string filename = kvp.Key;
+                    uint tempAddr = kvp.Value;
 
-            File.WriteAllLines(Path.Combine(folder, $"{baseName}.meta"), metadata);
+                    yaml.Metadata.AudioSamples[$"{filename}"] = new MMRSMetadataYAML.Sample
+                    {
+                        Type = "~",
+                        Index = -1,
+                        KeyRegion = "~",
+                        TempAddress = tempAddr
+                    };
+
+                    index++;
+                }
+            }
+
+            // Serialize to YAML
+            var serializer = new SerializerBuilder()
+                .WithNamingConvention(CamelCaseNamingConvention.Instance)
+                .WithEventEmitter(next => new FlowStyleListEmitter(next))
+                .ConfigureDefaultValuesHandling(DefaultValuesHandling.Preserve)
+                .Build();
+
+            string yamlOutput = serializer.Serialize(yaml);
+
+            File.WriteAllText(Path.Combine(folder, $"{baseName}.meta"), yamlOutput);
         }
 
         public static void ConvertStandalone(string destinationFile, string destinationDir)
@@ -369,7 +417,7 @@ namespace MMR.Randomizer.Utils
 
                 metaBank = standaloneSeq.InstrumentSet;
                 var rawCategories = standaloneSeq.Categories;
-                var cleanedCategories = new List<string>();
+                List<object> cleanedCategories = new ();
                 foreach (var category in rawCategories)
                 {
                     string cleaned = category.Trim();
@@ -385,7 +433,7 @@ namespace MMR.Randomizer.Utils
                         cleanedCategories.Add(Enum.GetName(typeof(MusicGroups.Group), value));
                 }
 
-                categories = cleanedCategories.ToArray();
+                categories = cleanedCategories.OfType<string>().ToArray();
 
                 bool[] ffOrBgm = new bool[categories.Length];
                 for (int i = 0; i < categories.Length; i++)
@@ -400,9 +448,7 @@ namespace MMR.Randomizer.Utils
                 else
                     songType = "bgm";
 
-                string categoriesString = string.Join(",", categories);
-
-                WriteMetadata(standaloneSeq.TempFolder, standaloneSeq.Filename, cosmeticName, metaBank, songType, categoriesString);
+                WriteMetadata(standaloneSeq.TempFolder, standaloneSeq.Filename, cosmeticName, metaBank, songType, cleanedCategories);
 
                 standaloneSeq.Pack(standaloneSeq.Filename, destinationDir);
             }
@@ -435,8 +481,8 @@ namespace MMR.Randomizer.Utils
             string cosmeticName = "";
             string metaBank = "";
             string songType = "";
-            string categories = "";
-            List<string> zsounds = new List<string>();
+            List<object> categories = new ();
+            Dictionary<string, uint> zsounds = new ();
 
             string filename = Path.GetFileNameWithoutExtension(destinationFile);
             string filepath = Path.GetFullPath(destinationFile);
@@ -455,15 +501,13 @@ namespace MMR.Randomizer.Utils
 
                 using (var reader = new StreamReader(Path.Combine(originalTemp, archive.Categories)))
                 {
-                    categories = reader.ReadLine();
+                    string raw = reader.ReadLine();
                     string[] categoriesList;
 
-                    if (categories.Contains("-"))
-                        categoriesList = categories.Split('-');
+                    if (raw.Contains("-"))
+                        categoriesList = raw.Split('-');
                     else
-                        categoriesList = categories.Split(',');
-
-                    var cleanedCategories = new List<string>();
+                        categoriesList = raw.Split(',');
 
                     foreach (var category in categoriesList)
                     {
@@ -475,15 +519,15 @@ namespace MMR.Randomizer.Utils
                         var value = Convert.ToInt32(cleanedCategory, 16);
 
                         if (Enum.IsDefined(typeof(MusicGroups.Individual), value))
-                            cleanedCategories.Add(Enum.GetName(typeof(MusicGroups.Individual), value));
+                            categories.Add(Enum.GetName(typeof(MusicGroups.Individual), value));
                         else if (Enum.IsDefined(typeof(MusicGroups.Group), value))
-                            cleanedCategories.Add(Enum.GetName(typeof(MusicGroups.Group), value));
+                            categories.Add(Enum.GetName(typeof(MusicGroups.Group), value));
                     }
 
-                    bool[] ffOrBgm = new bool[cleanedCategories.Count];
-                    for (int i = 0; i < cleanedCategories.Count; i++)
+                    bool[] ffOrBgm = new bool[categories.Count];
+                    for (int i = 0; i < categories.Count; i++)
                     {
-                        ffOrBgm[i] = FANFARE_CATEGORIES.Contains(cleanedCategories[i]);
+                        ffOrBgm[i] = FANFARE_CATEGORIES.Contains(categories[i]);
                     }
 
                     if (Array.TrueForAll(ffOrBgm, x => x))
@@ -492,8 +536,6 @@ namespace MMR.Randomizer.Utils
                         throw new Exception($"ERROR: Mixed categories for categories.txt in .mmrs file: {filename}.mmrs!");
                     else
                         songType = "bgm";
-
-                    categories = string.Join(",", cleanedCategories);
                 }
 
                 foreach (var (baseName, ext) in archive.Sequences)
@@ -515,7 +557,7 @@ namespace MMR.Randomizer.Utils
                         File.Copy(Path.Combine(originalTemp, zbank), Path.Combine(songFolder, zbank), true);
                         File.Copy(Path.Combine(originalTemp, bankmeta), Path.Combine(songFolder, bankmeta), true);
 
-                        metaBank = "-";
+                        metaBank = "custom";
 
                         foreach (var item in Directory.GetFiles(originalTemp, "*.zsound"))
                         {
@@ -524,8 +566,7 @@ namespace MMR.Randomizer.Utils
 
                         foreach (var z in archive.ZSounds)
                         {
-                            string command = $"ZSOUND:{z.Key}.zsound:{z.Value}";
-                            zsounds.Add(command);
+                            zsounds[z.Key] = z.Value;
                         }
                     }
 
