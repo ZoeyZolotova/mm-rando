@@ -1,344 +1,603 @@
-mm-terminafield
-0,102
-3
-2
-mm-snowheadmountains
-0,113
-15
-13
-mm-greatbaycoast
-0,1,110
-1D
-10
-mm-ikanacanyon
-0,1,111
-1E
-11
-mm-southernswamp
-0,1,10C
-1C
-C
-mm-clocktown1
-1,115
-19
-15
-mm-clocktown2
-1,116
-19
-16
-mm-clocktown3
-1,117
-19
-17
-mm-goroncity
-1,3,130
-26
-30
-mm-romaniranch
-0,1,12F
-7
-2F
-mm-zorahall
-1,3,136
-B
-36
-mm-dekupalace
-1,0,112
-19
-12
-mm-caves
-2,13B
-1A
-3B
-mm-snowheadtemple
-2,165
-15
-65
-mm-greatbaytemple
-2,166
-16
-66
-mm-piratefortress
-2,114
-3
-14
-mm-ikanacastle
-2,16F
-21
-6F
-mm-stonetower
-2,106
-19
-6
-mm-invertedstonetower
-2,107
-19
-7
-mm-woodfalltemple
-2,11C
-14
-1C
-mm-clocktower
-3,6,105
-17
-5
-mm-guruguru
-3,6,12E
-5
-2E
-mm-milkbar
-3,4,13C
-20
-3C
-mm-house
-3,11F
-3
-1F
-mm-shop
-3,144
-C
-44
-mm-shootinggallery
-3,4,146
-A
-46
-mm-laboratory
-3,6,12C
-D
-2C
-mm-observatory
-3,13A
-17
-3A
-mm-musicbox
-3,4,6,127
-5
-27
-mm-goronrace
-4,126
-26
-26
-mm-minigame
-4,5,125
-3
-25
-mm-wagonride
-4,3,6,172
-8
-72
-mm-boatcruise
-4,3,6,10E
-5
-E
-mm-horserace
-4,140
-8
-40
-mm-meeting
-5,6,3,131
-3
-31
-mm-aliens
-5,6,10D
-16
-D
-mm-swordschool
-3,5,4,150
-18
-50
-mm-sharp
-3,6,5,10F
-3
-F
-mm-chase
-5,7,103
-3
-3
-mm-skullkid
-6,104
-11
-4
-mm-maskreveal
-5,17B
-11
-7B
-mm-fairyfountain
-6,1,3,128
-6
-28
-mm-fileselect
-6,3,118
-6
-18
-mm-keaton
-6,173
-27
-73
-mm-kaepora
-145
-10
-45
-mm-witches
-6,3,143
-E
-43
-mm-gormanbros
-6,1,142
-8
-42
-mm-mysterywoods
-6,1,3,4,0,13E
-4
-3E
-mm-zelda
-6,1,3,129
-6
-29
-mm-reunion
-6,17D
-21
-7D
-mm-healed
-6,3,10B
-17
-B
-mm-giants
-6,3,12D
-12
-2D
-mm-miniboss
-7,138
-3
-38
-mm-boss
-7,11B
-3
-1B
-mm-mask
-7,16B
-11
-6B
-mm-incarnation
-7,4,5,16A
-11
-6A
-mm-wrath
-7,169
-11
-69
-mm-f-chasefail
-9,108
-3
-8
-mm-f-fail
-9,109
-3
-9
-mm-f-clearshort
-8,119
-3
-19
-mm-f-gameover
-9,120
-F
-20
-mm-f-bossdown
-10,9,121
-3
-21
-mm-f-gotitem
-8,122
-F
-22
-mm-f-heart
-8,124
-F
-24
-mm-f-mask
-8,137
-F
-37
-mm-f-smallitem
-8,139
-F
-39
-mm-f-meet
-8,13D
-3
-3D
-mm-f-goronwin
-8,13F
-26
-3F
-mm-f-horsewin
-8,141
-8
-41
-mm-f-song
-8,152
-6
-52
-mm-f-soar
-8,9,155
-9
-55
-mm-f-dungeonopen
-9,8,177
-F
-77
-mm-f-dungeonclearshort
-10,178
-F
-78
-mm-f-dungeonclearlong
-10,179
-F
-79
-mm-f-moonclear
-10,17E
-21
-7E
-mm-f-giantsleave
-10,17C
-21
-7C
-mm-kamaros-mask-item-dance
-171
-A
-71
-mm-c-giantscs
-16,170
-21
-70
-mm-c-titlescreen
-16,176
-23
-76
-mm-combat
-5,4,11A
-3
-1A
-mm-japas-basspractice
-16C
-13
-6C
-mm-tijo-drumpractice
-16D
-13
-6D
-mm-evan-pianopractice
-16E
-13
-6E
-mm-finalhours
-157
-17
-57
-mm-opening-a-chest
-12B
-3
-2B
-mm-kamaros-dance-rosa-sisters
-12A
-1F
-2A
+# Majora's Mask Randomizer SEQS YML File
+
+mm-terminafield:
+  display name: "Termina Field"
+  music groups: ["Fields", "TerminaField"]
+  instrument set: 0x03
+  sequence id: 0x02
+  no recycle: false
+
+mm-snowheadmountains:
+  display name: "Snowhead"
+  music groups: ["Fields", "Snowhead"]
+  instrument set: 0x15
+  sequence id: 0x13
+  no recycle: false
+
+mm-greatbaycoast:
+  display name: "Great Bay Coast"
+  music groups: ["Fields", "Towns", "GreatBay"]
+  instrument set: 0x1D
+  sequence id: 0x10
+  no recycle: false
+
+mm-ikanacanyon:
+  display name: "Ikana Canyon"
+  music groups: ["Fields", "Towns", "IkanaCanyon"]
+  instrument set: 0x1E
+  sequence id: 0x11
+  no recycle: false
+
+mm-southernswamp:
+  display name: "Southern Swamp"
+  music groups: ["Fields", "Towns", "SouthernSwamp"]
+  instrument set: 0x1C
+  sequence id: 0x0C
+  no recycle: false
+
+mm-clocktown1:
+  display name: "Clock Town (Day 1)"
+  music groups: ["Towns", "ClockTown1"]
+  instrument set: 0x19
+  sequence id: 0x15
+  no recycle: false
+
+mm-clocktown2:
+  display name: "Clock Town (Day 2)"
+  music groups: ["Towns", "ClockTown2"]
+  instrument set: 0x19
+  sequence id: 0x16
+  no recycle: false
+
+mm-clocktown3:
+  display name: "Clock Town (Day 3)"
+  music groups: ["Towns", "ClockTown3"]
+  instrument set: 0x19
+  sequence id: 0x17
+  no recycle: false
+
+mm-goroncity:
+  display name: "Goron Shrine"
+  music groups: ["Towns", "GoronShrine"]
+  instrument set: 0x26
+  sequence id: 0x30
+  no recycle: false
+
+mm-romaniranch:
+  display name: "Romani Ranch"
+  music groups: ["Fields", "Towns", "RomaniRanch"]
+  instrument set: 0x07
+  sequence id: 0x2F
+  no recycle: false
+
+mm-zorahall:
+  display name: "Zora Hall"
+  music groups: ["Towns", "Indoors", "ZoraHall"]
+  instrument set: 0x0B
+  sequence id: 0x36
+  no recycle: false
+
+mm-dekupalace:
+  display name: "Deku Palace"
+  music groups: ["Fields", "Towns", "DekuPalace"]
+  instrument set: 0x19
+  sequence id: 0x12
+  no recycle: false
+
+mm-caves:
+  display name: "Secret Grotto"
+  music groups: ["Dungeons", "SecretGrotto"]
+  instrument set: 0x1A
+  sequence id: 0x3B
+  no recycle: false
+
+mm-snowheadtemple:
+  display name: "Snowhead Temple"
+  music groups: ["Dungeons", "SnowheadTemple"]
+  instrument set: 0x15
+  sequence id: 0x65
+  no recycle: false
+
+mm-greatbaytemple:
+  display name: "Great Bay Temple"
+  music groups: ["Dungeons", "GreatBayTemple"]
+  instrument set: 0x16
+  sequence id: 0x66
+  no recycle: false
+
+mm-piratefortress:
+  display name: "Pirates' Fortress"
+  music groups: ["Dungeons", "PiratesFortress"]
+  instrument set: 0x03
+  sequence id: 0x14
+  no recycle: false
+
+mm-ikanacastle:
+  display name: "Ancient Castle of Ikana"
+  music groups: ["Dungeons", "IkanaCastle"]
+  instrument set: 0x21
+  sequence id: 0x6F
+  no recycle: false
+
+mm-stonetower:
+  display name: "Stone Tower"
+  music groups: ["Dungeons", "StoneTower"]
+  instrument set: 0x19
+  sequence id: 0x06
+  no recycle: false
+
+mm-invertedstonetower:
+  display name: "Inverted Stone Tower"
+  music groups: ["Dungeons", "InvertedStoneTower"]
+  instrument set: 0x19
+  sequence id: 0x07
+  no recycle: false
+
+mm-woodfalltemple:
+  display name: "Woodfall Temple"
+  music groups: ["Dungeons", "WoodfallTemple"]
+  instrument set: 0x14
+  sequence id: 0x1C
+  no recycle: false
+
+mm-clocktower:
+  display name: "Clock Tower Interior"
+  music groups: ["Indoors", "CalmThemes", "ClockTower"]
+  instrument set: 0x17
+  sequence id: 0x05
+  no recycle: false
+
+mm-guruguru:
+  display name: "Guru-Guru's Theme"
+  music groups: ["Indoors", "CalmThemes", "GuruGurusTheme"]
+  instrument set: 0x05
+  sequence id: 0x2E
+  no recycle: false
+
+mm-milkbar:
+  display name: "Milk Bar"
+  music groups: ["Indoors", "Minigames", "MilkBar"]
+  instrument set: 0x20
+  sequence id: 0x3C
+  no recycle: false
+
+mm-house:
+  display name: "House"
+  music groups: ["Indoors", "House"]
+  instrument set: 0x03
+  sequence id: 0x1F
+  no recycle: false
+
+mm-shop:
+  display name: "Item Shop"
+  music groups: ["Indoors", "ItemShop"]
+  instrument set: 0x0C
+  sequence id: 0x44
+  no recycle: false
+
+mm-shootinggallery:
+  display name: "Minigame Shop"
+  music groups: ["Indoors", "Minigames", "MinigameShop"]
+  instrument set: 0x0A
+  sequence id: 0x46
+  no recycle: false
+
+mm-laboratory:
+  display name: "Curiosity Shop & Marine Research Lab"
+  music groups: ["Indoors", "CalmThemes", "CuriosityShop"]
+  instrument set: 0x0D
+  sequence id: 0x2C
+  no recycle: false
+
+
+mm-observatory:
+  display name: "Astral Observatory"
+  music groups: ["Indoors", "AstralObservatory"]
+  instrument set: 0x17
+  sequence id: 0x3A
+  no recycle: false
+
+mm-musicbox:
+  display name: "Music-Box House"
+  music groups: ["Indoors", "Minigames", "CalmThemes", "MusicBoxHouse"]
+  instrument set: 0x05
+  sequence id: 0x27
+  no recycle: false
+
+mm-goronrace:
+  display name: "Goron Race"
+  music groups: ["Minigames", "GoronRace"]
+  instrument set: 0x26
+  sequence id: 0x26
+  no recycle: false
+
+mm-minigame:
+  display name: "Minigame"
+  music groups: ["Minigames", "ActionThemes", "MinigameTheme"]
+  instrument set: 0x03
+  sequence id: 0x25
+  no recycle: false
+
+mm-wagonride:
+  display name: "Cremia's Theme"
+  music groups: ["Indoors", "Minigames", "CalmThemes", "CremiasTheme"]
+  instrument set: 0x08
+  sequence id: 0x72
+  no recycle: false
+
+mm-boatcruise:
+  display name: "Old Koume's Boat Cruise"
+  music groups: ["Indoors", "Minigames", "CalmThemes", "BoatCruise"]
+  instrument set: 0x05
+  sequence id: 0x0E
+  no recycle: false
+
+mm-horserace:
+  display name: "Horse Race"
+  music groups: ["Minigames", "HorseRace"]
+  instrument set: 0x08
+  sequence id: 0x40
+  no recycle: false
+
+mm-meeting:
+  display name: "Mayor Dotour's Office"
+  music groups: ["Indoors", "ActionThemes", "CalmThemes", "MayorsOffice"]
+  instrument set: 0x03
+  sequence id: 0x31
+  no recycle: false
+
+mm-aliens:
+  display name: "Aliens' Theme"
+  music groups: ["ActionThemes", "CalmThemes", "AliensTheme"]
+  instrument set: 0x16
+  sequence id: 0x0D
+  no recycle: false
+
+mm-swordschool:
+  display name: "Swordsmans' School"
+  music groups: ["Indoors", "Minigames", "ActionThemes", "SwordSchool"]
+  instrument set: 0x18
+  sequence id: 0x50
+  no recycle: false
+
+mm-sharp:
+  display name: "Sharp's Curse"
+  music groups: ["Indoors", "ActionThemes", "CalmThemes", "SharpsCurse"]
+  instrument set: 0x03
+  sequence id: 0x0F
+  no recycle: false
+
+mm-chase:
+  display name: "Pursuit Theme"
+  music groups: ["ActionThemes", "Fights", "PursuitTheme"]
+  instrument set: 0x03
+  sequence id: 0x03
+  no recycle: false
+
+mm-skullkid:
+  display name: "Majora's Theme"
+  music groups: ["CalmThemes", "MajorasTheme"]
+  instrument set: 0x11
+  sequence id: 0x04
+  no recycle: false
+
+mm-maskreveal:
+  display name: "The Moon Enraged"
+  music groups: ["ActionThemes", "MoonEnraged"]
+  instrument set: 0x11
+  sequence id: 0x7B
+  no recycle: false
+
+mm-fairyfountain:
+  display name: "Great Fairy's Fountain"
+  music groups: ["Towns", "Indoors", "CalmThemes", "GreatFairysFountain"]
+  instrument set: 0x06
+  sequence id: 0x28
+  no recycle: false
+
+mm-fileselect:
+  display name: "File Select"
+  music groups: ["Indoors", "CalmThemes", "FileSelect"]
+  instrument set: 0x06
+  sequence id: 0x18
+  no recycle: false
+
+mm-keaton:
+  display name: "Keaton's Theme"
+  music groups: ["CalmThemes", "KeatonsTheme"]
+  instrument set: 0x27
+  sequence id: 0x73
+  no recycle: false
+
+mm-kaepora:
+  display name: "Kaepora Gaebora's Theme"
+  music groups: ["CalmThemes", "OwlsTheme"]
+  instrument set: 0x27
+  sequence id: 0x45
+  no recycle: false
+
+mm-witches:
+  display name: "Koume & Kotake's Theme"
+  music groups: ["Indoors", "CalmThemes", "WitchesTheme"]
+  instrument set: 0x0E
+  sequence id: 0x43
+  no recycle: false
+
+mm-gormanbros:
+  display name: "Gorman Bros.' Theme"
+  music groups: ["Fields", "CalmThemes", "GormanBrosTheme"]
+  instrument set: 0x08
+  sequence id: 0x42
+  no recycle: false
+
+mm-mysterywoods:
+  display name: "Woods of Mystery"
+  music groups: ["Fields", "Towns", "Indoors", "Minigames", "CalmThemes", "WoodsOfMystery"]
+  instrument set: 0x04
+  sequence id: 0x3E
+  no recycle: false
+
+mm-zelda:
+  display name: "Zelda's Theme"
+  music groups: ["Towns", "Indoors", "CalmThemes", "ZeldasTheme"]
+  instrument set: 0x06
+  sequence id: 0x29
+  no recycle: false
+
+mm-reunion:
+  display name: "Reunion Theme"
+  music groups: ["CalmThemes", "ReunionTheme"]
+  instrument set: 0x21
+  sequence id: 0x7D
+  no recycle: false
+
+mm-healed:
+  display name: "Song of Healing Theme"
+  music groups: ["Indoors", "CalmThemes", "HealingTheme"]
+  instrument set: 0x17
+  sequence id: 0x0B
+  no recycle: false
+
+mm-giants:
+  display name: "Giants' Theme"
+  music groups: ["Indoors", "CalmThemes", "GiantsTheme"]
+  instrument set: 0x12
+  sequence id: 0x2D
+  no recycle: false
+
+mm-miniboss:
+  display name: "Miniboss Battle"
+  music groups: ["Fights", "BigEnemy"]
+  instrument set: 0x03
+  sequence id: 0x38
+  no recycle: false
+
+mm-boss:
+  display name: "Boss Battle"
+  music groups: ["Fights", "BossEnemy"]
+  instrument set: 0x03
+  sequence id: 0x1B
+  no recycle: false
+
+mm-mask:
+  display name: "Majora's Mask"
+  music groups: ["Fights", "MajorasMask"]
+  instrument set: 0x11
+  sequence id: 0x6B
+  no recycle: false
+
+mm-incarnation:
+  display name: "Majora's Incarnation"
+  music groups: ["Minigames", "ActionThemes", "Fights", "MajorasIncarnation"]
+  instrument set: 0x11
+  sequence id: 0x6A
+  no recycle: false
+
+mm-wrath:
+  display name: "Majora's Wrath"
+  music groups: ["Fights", "MajorasWrath"]
+  instrument set: 0x11
+  sequence id: 0x69
+  no recycle: false
+
+mm-f-chasefail:
+  display name: "Event Failure 1"
+  music groups: ["EventFanfares", "EventFail1"]
+  instrument set: 0x03
+  sequence id: 0x08
+  no recycle: false
+
+mm-f-fail:
+  display name: "Event Failure 2"
+  music groups: ["EventFanfares", "EventFail2"]
+  instrument set: 0x03
+  sequence id: 0x09
+  no recycle: false
+
+mm-f-clearshort:
+  display name: "Event Success"
+  music groups: ["ItemFanfares", "EventSuccess"]
+  instrument set: 0x03
+  sequence id: 0x19
+  no recycle: false
+
+mm-f-gameover:
+  display name: "Game Over"
+  music groups: ["EventFanfares", "GameOver"]
+  instrument set: 0x0F
+  sequence id: 0x20
+  no recycle: false
+
+mm-f-bossdown:
+  display name: "Boss Defeated"
+  music groups: ["EventFanfares", "ClearFanfares", "BossDefeated"]
+  instrument set: 0x03
+  sequence id: 0x21
+  no recycle: false
+
+mm-f-gotitem:
+  display name: "Item Get"
+  music groups: ["ItemFanfares", "ItemGet"]
+  instrument set: 0x0F
+  sequence id: 0x22
+  no recycle: false
+
+mm-f-heart:
+  display name: "Heart Container Get"
+  music groups: ["ItemFanfares", "HeartContainerGet"]
+  instrument set: 0x0F
+  sequence id: 0x24
+  no recycle: false
+
+mm-f-mask:
+  display name: "Mask Get"
+  music groups: ["ItemFanfares", "MaskGet"]
+  instrument set: 0x0F
+  sequence id: 0x37
+  no recycle: false
+
+mm-f-smallitem:
+  display name: "Heart Piece Get"
+  music groups: ["ItemFanfares", "HeartPieceGet"]
+  instrument set: 0x0F
+  sequence id: 0x39
+  no recycle: false
+
+mm-f-meet:
+  display name: "The Truth Revealed"
+  music groups: ["ItemFanfares", "TruthRevealed"]
+  instrument set: 0x03
+  sequence id: 0x3D
+  no recycle: false
+
+mm-f-goronwin:
+  display name: "Goron Race Win"
+  music groups: ["ItemFanfares", "GoronRaceWin"]
+  instrument set: 0x26
+  sequence id: 0x3F
+  no recycle: false
+
+mm-f-horsewin:
+  display name: "Horse Race Win"
+  music groups: ["ItemFanfares", "HorseRaceWin"]
+  instrument set: 0x08
+  sequence id: 0x41
+  no recycle: false
+
+mm-f-song:
+  display name: "Song Get"
+  music groups: ["ItemFanfares", "SongGet"]
+  instrument set: 0x06
+  sequence id: 0x52
+  no recycle: false
+
+mm-f-soar:
+  display name: "Song of Soaring"
+  music groups: ["ItemFanfares", "EventFanfares", "SoaringTheme"]
+  instrument set: 0x09
+  sequence id: 0x55
+  no recycle: false
+
+mm-f-dungeonopen:
+  display name: "Temple Appears"
+  music groups: ["ItemFanfares", "EventFanfares", "TempleAppears"]
+  instrument set: 0x0F
+  sequence id: 0x77
+  no recycle: false
+
+mm-f-dungeonclearshort:
+  display name: "Temple Clear (Short)"
+  music groups: ["ClearFanfares", "TempleClearShort"]
+  instrument set: 0x0F
+  sequence id: 0x78
+  no recycle: false
+
+mm-f-dungeonclearlong:
+  display name: "Temple Clear (Long)"
+  music groups: ["ClearFanfares", "TempleClearLong"]
+  instrument set: 0x0F
+  sequence id: 0x79
+  no recycle: false
+
+mm-f-moonclear:
+  display name: "The Moon Destroyed"
+  music groups: ["ClearFanfares", "MoonDestroyed"]
+  instrument set: 0x21
+  sequence id: 0x7E
+  no recycle: false
+
+mm-f-giantsleave:
+  display name: "The Giants Farewell"
+  music groups: ["ClearFanfares", "GiantsLeave"]
+  instrument set: 0x21
+  sequence id: 0x7C
+  no recycle: false
+
+mm-kamaros-mask-item-dance:
+  display name: "Kamaro's Theme"
+  music groups: ["KamarosTheme"]
+  instrument set: 0x0A
+  sequence id: 0x71
+
+mm-c-giantscs:
+  display name: "The Giants Appear"
+  music groups: ["Cutscenes", "GiantsAppear"]
+  instrument set: 0x21
+  sequence id: 0x70
+  no recycle: false
+
+mm-c-titlescreen:
+  display name: "Title Demo"
+  music groups: ["Cutscenes", "TitleDemo"]
+  instrument set: 0x23
+  sequence id: 0x76
+  no recycle: false
+
+mm-combat:
+  display name: "Enemy Battle"
+  music groups: ["Minigames", "ActionThemes", "Fights", "SmallEnemy"]
+  instrument set: 0x03
+  sequence id: 0x1A
+  no recycle: false
+
+mm-japas-basspractice:
+  display name: "Japas' Room"
+  music groups: ["JapasRoom"]
+  instrument set: 0x13
+  sequence id: 0x6C
+  no recycle: false
+
+mm-tijo-drumpractice:
+  display name: "Tijo's Room"
+  music groups: ["TijosRoom"]
+  instrument set: 0x13
+  sequence id: 0x6D
+  no recycle: false
+
+mm-evan-pianopractice:
+  display name: "Evan's Room"
+  music groups: ["EvansRoom"]
+  instrument set: 0x13
+  sequence id: 0x6E
+  no recycle: false
+
+mm-finalhours:
+  display name: "Final Hours"
+  music groups: ["CalmThemes", "FinalHours"]
+  instrument set: 0x17
+  sequence id: 0x57
+  no recycle: false
+
+mm-opening-a-chest:
+  display name: "Opening Chest"
+  music groups: ["OpenChest"]
+  instrument set: 0x03
+  sequence id: 0x2B
+  no recycle: false
+
+mm-kamaros-dance-rosa-sisters:
+  display name: "Rosa Sisters' Theme"
+  music groups: ["CalmThemes", "RosaSistersTheme"]
+  instrument set: 0x1F
+  sequence id: 0x2A
+  no recycle: false
