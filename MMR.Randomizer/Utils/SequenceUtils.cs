@@ -505,7 +505,7 @@ namespace MMR.Randomizer.Utils
                     var zsound = new Dictionary<string, object>
                     {
                         { "type", sample.Type }, // Instrument type: INST, DRUM, SFX
-                        { "index", sample.Index }, // Index in the related structure list
+                        { "index", sample.Index == -1 ? null : sample.Index }, // Index in the related structure list
                         { "key_region", sample.KeyRegion }, // For INST: LOW, NORM, HIGH; for DRUM and SFX: leave empty
                         { "file", entry.Key },
                         { "temp_addr", sample.TempAddress }, // This is unused in the new format
