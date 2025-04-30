@@ -448,7 +448,7 @@ namespace MMR.Randomizer.Utils
             var validGames = new HashSet<string> { "oot", "mm" }; // game is mainly for Nax and OOTMM, might be used in the future though if OOTRS support is added
 
             var validSoundTypes = new HashSet<string> { "INST", "DRUM", "SFX" };
-            var validKeyRegions = new HashSet<string> { "LOW", "PRIM", "HIGH" };
+            var validKeyRegions = new HashSet<string> { "LOW", "PRIM", "HIGH" }; // PRIM makes more sense than NORM
 
             MMRSMetadataYAML yamlData;
 
@@ -518,7 +518,7 @@ namespace MMR.Randomizer.Utils
                         if (type == "INST")
                         {
                             if (string.IsNullOrEmpty(keyRegion) || !validKeyRegions.Contains(keyRegion))
-                                throw new InvalidOperationException($"Error: Audio sample '{entry.Key}': key_region must be one of LOW, NORM, HIGH for INST.");
+                                throw new InvalidOperationException($"Error: Audio sample '{entry.Key}': key_region must be one of LOW, PRIM, HIGH for INST.");
                         }
                         else // DRUM or SFX
                         {
