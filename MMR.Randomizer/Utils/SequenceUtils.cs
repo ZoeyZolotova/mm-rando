@@ -447,6 +447,9 @@ namespace MMR.Randomizer.Utils
             var validTypes = new HashSet<string> { "bgm", "fanfare" };
             var validGames = new HashSet<string> { "oot", "mm" }; // game is mainly for Nax and OOTMM, might be used in the future though if OOTRS support is added
 
+            var validSoundTypes = new HashSet<string> { "INST", "DRUM", "SFX" }; // Valid types for audio samples
+            var validKeyRegions = new HashSet<string> { "LOW", "PRIM", "HIGH" }; // valid key regions for INST type
+
             MMRSMetadataYAML yamlData;
 
             using (var reader = new StreamReader(metaFile.Open(), Encoding.Default))
@@ -493,6 +496,38 @@ namespace MMR.Randomizer.Utils
                 {
                     var sample = entry.Value;
 
+                    var type = sample.Type?.Trim().ToUpperInvariant();
+                    var keyRegion = sample.KeyRegion?.Trim().ToUpperInvariant();
+                    var listIndex = sample.Index;
+                    var tempAddr = sample.TempAddress;
+
+                    if (type == null && (listIndex != null && listIndex != -1) && sample.KeyRegion != null)
+                    {
+                        throw new InvalidOperationException($"Error: Audio sample '{entry.Key}': If type is null, index and key_region must also be null.");
+                    }
+                    else
+                    {
+                        if (!validTypes.Contains(type))
+                            throw new InvalidOperationException($"Sample '{entry.Key}': Invalid instrument type '{type}'.");
+
+                        if (listIndex == null || listIndex == -1)
+                            throw new InvalidOperationException($"Sample '{entry.Key}': Index must not be null when type is '{type}'.");
+
+                        if (type != null && tempAddr != null)
+                            throw new InvalidOperationException($"Sample '{entry.Key}': temp_addr must be null in the new format.");
+
+                        if (type == "INST")
+                        {
+                            if (string.IsNullOrEmpty(keyRegion) || !validKeyRegions.Contains(keyRegion))
+                                throw new InvalidOperationException($"Error: Audio sample '{entry.Key}': key_region must be one of LOW, NORM, HIGH for INST.");
+                        }
+                        else // DRUM or SFX
+                        {
+                            if (!string.IsNullOrEmpty(keyRegion))
+                                throw new InvalidOperationException($"Error: Audio sample '{entry.Key}': key_region must be null or empty for {type}.");
+                        }
+                    }
+
                     // type, index, and key_region are all part of the new format used by OOTR:
                     // ZSOUND:INST:0:NORM:file.zsound, ZSOUND:DRUM:0::file.zsound, ZSOUND:SFX:0::file.zsound
                     //
@@ -505,10 +540,10 @@ namespace MMR.Randomizer.Utils
                     var zsound = new Dictionary<string, object>
                     {
                         { "type", sample.Type }, // Instrument type: INST, DRUM, SFX
-                        { "index", sample.Index == -1 ? null : sample.Index }, // Index in the related structure list
-                        { "key_region", sample.KeyRegion }, // For INST: LOW, NORM, HIGH; for DRUM and SFX: leave empty
+                        { "index", listIndex == -1 ? null : listIndex }, // Index in the related structure list
+                        { "key_region", type == "INST" ? keyRegion : null }, // For INST: LOW, NORM, HIGH; for DRUM and SFX: leave empty
                         { "file", entry.Key },
-                        { "temp_addr", sample.TempAddress }, // This is unused in the new format
+                        { "temp_addr", tempAddr }, // This is unused in the new format
                     };
 
                     commands.Add(zsound);
@@ -523,9 +558,9 @@ namespace MMR.Randomizer.Utils
                 Categories = categories,
                 Commands = commands
             };
-
+                    
         }
-
+        
         public static void ScanForMMRS(string directory)
         {
             // check if user has added mmrs packed sequence files to the music folder
