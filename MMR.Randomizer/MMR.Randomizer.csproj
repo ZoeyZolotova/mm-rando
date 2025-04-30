@@ -29,7 +29,6 @@
     <PackageReference Include="SixLabors.ImageSharp.Drawing" Version="1.0.0-beta0007" />
     <PackageReference Include="System.CodeDom" Version="4.7.0" />
     <PackageReference Include="VCDiff" Version="3.2.7" />
-    <PackageReference Include="YamlDotNet" Version="16.3.0" />
   </ItemGroup>
 
   <ItemGroup>
