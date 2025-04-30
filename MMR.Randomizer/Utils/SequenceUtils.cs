@@ -507,7 +507,7 @@ namespace MMR.Randomizer.Utils
                     }
                     else
                     {
-                        if (!validTypes.Contains(type))
+                        if (!validSoundTypes.Contains(type))
                             throw new InvalidOperationException($"Sample '{entry.Key}': Invalid instrument type '{type}'.");
 
                         if (listIndex == null || listIndex == -1)
