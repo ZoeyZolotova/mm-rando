@@ -20,7 +20,7 @@ namespace MMR.Randomizer.Utils
     public class SequenceUtils
     {
         // These are scenes the play may never visit, if they do, then they are visited very briefly and very little music is heard
-        public static readonly List<int> lowUseMusicSlots = new ()
+        public static readonly List<int> lowUseMusicSlots = new()
         {
             MAJORAS_THEME,        // 0x04: Majora's Theme
             CLOCK_TOWER_INTERIOR, // 0x05: Clock Tower Interior
@@ -53,7 +53,7 @@ namespace MMR.Randomizer.Utils
 
         public static MD5 md5lib; // Used for zip
 
-        public static List<string> OLD_MUSIC_FILES = new (); // Holds the names of old music files, only written out if the old music warning displays
+        public static List<string> OLD_MUSIC_FILES = new(); // Holds the names of old music files, only written out if the old music warning displays
 
         public static void ResetBudget()
         {
@@ -230,7 +230,7 @@ namespace MMR.Randomizer.Utils
                     {
                         Name = nameof(Properties.Resources.mmr_f_sot),
                         DisplayName = "MMR - Song of Time",
-                        Categories = new List<int> { 0x08 },
+                        Categories = new List<int> { (int)MusicGroups.Category.ItemFanfares },
                         Instrument = 0x03,
                         Replaces = INTRO_CUTSCENE_2,
                     });
