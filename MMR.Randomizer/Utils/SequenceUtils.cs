@@ -205,7 +205,7 @@ namespace MMR.Randomizer.Utils
                         if (sourceSequence.Name.StartsWith("mm-"))
                         {
                             targetSequence.Replaces = data.SequenceId;
-                            sourceSequence.MM_seq = data.SequenceId;
+                            sourceSequence.SeqId = data.SequenceId;
 
                             if (data.NoRecycle)
                             {
@@ -229,7 +229,7 @@ namespace MMR.Randomizer.Utils
                             }
                         }
 
-                        if (sourceSequence.MM_seq != 0x18 && sourceSequence.Name != "drop")
+                        if (sourceSequence.SeqId != 0x18 && sourceSequence.Name != "drop")
                         {
                             RomData.SequenceList.Add(sourceSequence);
                         }
@@ -281,7 +281,7 @@ namespace MMR.Randomizer.Utils
                 var codeFile = RomData.MMFileList[codeFID];
                 int audioseqIndexTableOffset = Addresses.SeqTable - codeFile.Addr;
 
-                int entryaddr = audioseqIndexTableOffset + (seq.MM_seq * 16); // table entries are 16 bytes wide
+                int entryaddr = audioseqIndexTableOffset + (seq.SeqId * 16); // table entries are 16 bytes wide
                 var size = (int)ReadWriteUtils.Arr_ReadU32(codeFile.Data, entryaddr + 4);
                 return RoundTo16(size);
             }
@@ -756,7 +756,7 @@ namespace MMR.Randomizer.Utils
             }
 
             // create some pointerized slots that are otherwise ignored, beacuse this pool gets re-used later for new song slots
-            RomData.PointerizedSequences.Add(new SequenceInfo() { Name = "mm-introcutscene1", MM_seq = 0x1E, PreviousSlot = 0x1E, Replaces = 0x76 });
+            RomData.PointerizedSequences.Add(new SequenceInfo() { Name = "mm-introcutscene1", SeqId = 0x1E, PreviousSlot = 0x1E, Replaces = 0x76 });
         }
 
         public static void ConvertSequenceSlotToPointer(int seqSlotIndex, int substituteSlotIndex)
@@ -861,9 +861,9 @@ namespace MMR.Randomizer.Utils
                 else if (j != -1)
                 {
                     // new song to replace old slot found
-                    if (sequenceList[j].MM_seq != -1)
+                    if (sequenceList[j].SeqId != -1)
                     {
-                        newentry.Data = oldSeq[sequenceList[j].MM_seq].Data;
+                        newentry.Data = oldSeq[sequenceList[j].SeqId].Data;
                         WriteOutput("Slot " + i.ToString("X2") + " -> " + sequenceList[j].Name);
 
                     }
@@ -1206,7 +1206,7 @@ namespace MMR.Randomizer.Utils
                     {
                         Name = replacementSong.Name,
                         Directory = replacementSong.Directory,
-                        MM_seq = replacementSong.MM_seq,
+                        SeqId = replacementSong.SeqId,
                         Categories = replacementSong.Categories,
                         Instrument = replacementSong.Instrument,
                         SequenceBinaryList = replacementSong.SequenceBinaryList,
@@ -1468,7 +1468,7 @@ namespace MMR.Randomizer.Utils
             /// if their sum is greater than the size of the buffer they clip into each other when one loads, this kills one, usually bgm
 
             var combatSequences = RomData.SequenceList.FindAll(u => u.Categories.Contains(5));
-            var BGMSlots = RomData.TargetSequences.FindAll(u => u.Categories.Contains(0) || u.Categories.Contains(2) || u.MM_seq == 0x12); // 0x12 is deku palace, which has an enemy
+            var BGMSlots = RomData.TargetSequences.FindAll(u => u.Categories.Contains(0) || u.Categories.Contains(2) || u.SeqId == 0x12); // 0x12 is deku palace, which has an enemy
             var usedBGMSequences = new List<SequenceInfo>();
             foreach (var slot in BGMSlots)
             {
