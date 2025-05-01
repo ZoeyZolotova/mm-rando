@@ -1,4 +1,5 @@
 using MMR.Randomizer.Constants;
+using static MMR.Randomizer.Constants.AudioSequences;
 using MMR.Randomizer.Models.Rom;
 using System;
 using System.Collections.Generic;
@@ -19,41 +20,40 @@ namespace MMR.Randomizer.Utils
     public class SequenceUtils
     {
         // These are scenes the play may never visit, if they do, then they are visited very briefly and very little music is heard
-        // 0x0F: Sharp's Curse
-        // 0x05: Clock Tower Interior
-        // 0x7C: Giants Leave
-        // 0x04: Majora's Theme
-        // 0x42: Gorman Bros.' Theme
-        // 0x27: Music-Box House
-        // 0x31: Mayor Dotour's Office
-        // 0x45: Kaepora Gaebora's Theme
-        // 0x72: Cremia's Theme
-        // 0x0E: Old Koume's Boat Cruise
-        // 0x29: Zelda's Theme
-        // 0x2D: Giants' Theme
-        // 0x2E: Guru-Guru's Theme
-        // 0x7B: The Moon Enraged
-        // 0x73: Keaton's Theme
-        // 0x70: Giants Appear
-        // 0x7D: Reunion Theme
-        // 0x50: Swordsman's School
-        public static List<int> lowUseMusicSlots = new List<int> { 0x0F, 0x05, 0x7C, 0x04,
-                                                                   0x42, 0x27, 0x31, 0x45,
-                                                                   0x72, 0x0E, 0x29, 0x2D,
-                                                                   0x2E, 0x7B, 0x73, 0x70, 0x7D, 0x50 };
+        public static readonly List<int> lowUseMusicSlots = new ()
+        {
+            MAJORAS_THEME,        // 0x04: Majora's Theme
+            CLOCK_TOWER_INTERIOR, // 0x05: Clock Tower Interior
+            BOAT_CRUISE,          // 0x0E: Old Koume's Boat Cruise
+            SHARPS_CURSE,         // 0x0F: Sharp's Curse
+            MUSIC_BOX_HOUSE,      // 0x27: Music-Box House
+            ZELDAS_THEME,         // 0x29: Zelda's Theme
+            GIANTS_THEME,         // 0x2D: Giants' Theme
+            GURU_GURUS_THEME,     // 0x2E: Guru-Guru's Theme
+            MAYORS_OFFICE,        // 0x31: Mayor Dotour's Office
+            GORMAN_BROS_THEME,    // 0x42: Gorman Bros.' Theme
+            OWLS_THEME,           // 0x45: Kaepora Gaebora's Theme
+            SWORDSMANS_SCHOOL,    // 0x50: Swordsman's School
+            GIANTS_APPEAR,        // 0x70: The Giants Appear
+            CREMIAS_THEME,        // 0x72: Cremia's Theme
+            KEATONS_THEME,        // 0x73: Keaton's Theme
+            MOON_ENRAGED,         // 0x7B: The Moon Enraged
+            GIANTS_LEAVE,         // 0x7C: The Giants Leave
+            REUNION_THEME,        // 0x7D: Reunion Theme
+        };
 
-        public static int MAX_BGM_BUDGET = 0x6000; // vanilla: 0x3800
+        public static int MAX_BGM_BUDGET = 0x6000; // Vanilla: 0x3800
         public static int MAX_COMBAT_BUDGET = 0x6000; // unk
-        public static int MAX_TYPE2_MUSIC_BUDGET = 0x6000; // vanilla: 0x4100
+        public static int MAX_TYPE2_MUSIC_BUDGET = 0x6000; // Vanilla: 0x4100
 
-        public static int New_AudioBankTable = 0; // for mmfilelist
-        public static int NewInstrumentSetAddress; // for bgm shuffle functions to work on
+        public static int New_AudioBankTable = 0; // For mmfilelist
+        public static int NewInstrumentSetAddress; // For BGM shuffle, used to store AudioBankTable address
         public static int CurrentFreeBank = 0x29;
-        public const  int REQUIRES_NEW_BANK = 0x28; // 28 used to be the only free bank, this is legacy supported
+        public const  int REQUIRES_NEW_BANK = 0x28; // 0x28 used to be the only free bank, used to indicate custom banks
 
-        public static MD5 md5lib; // used for zip
+        public static MD5 md5lib; // Used for zip
 
-        public static List<string> OLD_MUSIC_FILES = new ();
+        public static List<string> OLD_MUSIC_FILES = new (); // Holds the names of old music files, only written out if the old music warning displays
 
         public static void ResetBudget()
         {
@@ -64,7 +64,7 @@ namespace MMR.Randomizer.Utils
 
         public static bool TryParseCategory(object input, out int value)
         {
-            /// Ensures that categories return their proper int value if they are a string
+            // Ensures that categories return their proper int value if they are a string
             
             value = 0;
 
@@ -96,28 +96,16 @@ namespace MMR.Randomizer.Utils
                 }
 
                 // Try enum values
-                if (Enum.TryParse<MusicGroups.Group>(trimmed, true, out var group))
+                if (Enum.TryParse<MusicGroups.Category>(trimmed, true, out var category))
                 {
-                    value = (int)group;
+                    value = (int)category;
                     return true;
                 }
 
-                if (Enum.TryParse<MusicGroups.Individual>(trimmed, true, out var individual))
+                // Try dictionary
+                if (MusicGroups.CategoryDisplayNames.TryGetValue(trimmed, out category))
                 {
-                    value = (int)individual;
-                    return true;
-                }
-
-                // Try dictionaries
-                if (MusicGroups.GroupDisplayNames.TryGetValue(trimmed, out group))
-                {
-                    value = (int)group;
-                    return true;
-                }
-
-                if (MusicGroups.IndividualDisplayNames.TryGetValue(trimmed, out individual))
-                {
-                    value = (int)individual;
+                    value = (int)category;
                     return true;
                 }
             }
@@ -132,9 +120,9 @@ namespace MMR.Randomizer.Utils
             RomData.SequenceList = new List<SequenceInfo>();
             RomData.TargetSequences = new List<SequenceInfo>();
 
-            OLD_MUSIC_FILES.Clear();
+            OLD_MUSIC_FILES.Clear(); // Ensure the list of old files is empty before searching
 
-            // if file exists, we read the file instead of the resource
+            // If the user has a SEQS.yml file, use it instead of the one in resources
             string seqsContent;
 
             if (File.Exists(Path.Combine(Values.MusicDirectory, "SEQS.yml")))
@@ -149,12 +137,13 @@ namespace MMR.Randomizer.Utils
 
             var sequenceEntries = YamlSerializer.Deserialize<Dictionary<string, SEQSYaml>>(seqsContent);
 
-            // multiple directory search
+            // If the music directory doesn't exist, create it because it's required still
             if (!Directory.Exists(Values.MusicDirectory))
             {
-                Directory.CreateDirectory(Values.MusicDirectory); // we still need for MM-only
+                Directory.CreateDirectory(Values.MusicDirectory);
             }
 
+            // Search through every directory in the music folder
             IEnumerable<string> directories = new[] { Values.MusicDirectory }.Concat(Directory.EnumerateDirectories(Values.MusicDirectory, "*", SearchOption.AllDirectories));
 
             foreach (string directory in directories)
@@ -164,7 +153,7 @@ namespace MMR.Randomizer.Utils
                     foreach (var entry in sequenceEntries)
                     {
                         string seqName = entry.Key;
-                        SEQSYaml data = entry.Value;
+                        var data = entry.Value;
 
                         var seqCategories = new List<int>();
                         foreach (var part in data.MusicGroups)
@@ -186,7 +175,7 @@ namespace MMR.Randomizer.Utils
                         int seqInstrument = data.InstrumentSet;
                         int seqId = data.SequenceId;
 
-                        SequenceInfo targetSequence = new SequenceInfo
+                        SequenceInfo targetSequence = new()
                         {
                             Name = seqName,
                             DisplayName = data.DisplayName ?? seqName,
@@ -194,7 +183,7 @@ namespace MMR.Randomizer.Utils
                             Instrument = seqInstrument,
                         };
 
-                        SequenceInfo sourceSequence = new SequenceInfo
+                        SequenceInfo sourceSequence = new()
                         {
                             Name = seqName,
                             DisplayName = data.DisplayName ?? seqName,
@@ -229,24 +218,24 @@ namespace MMR.Randomizer.Utils
                             }
                         }
 
-                        if (sourceSequence.SeqId != 0x18 && sourceSequence.Name != "drop")
+                        if (sourceSequence.SeqId != FILE_SELECT && sourceSequence.Name != "drop")
                         {
                             RomData.SequenceList.Add(sourceSequence);
                         }
                     }
 
-                    // MMR changes the music that plays when the player uses SOT
-                    // however the original SOT doesn't have a unique sequence/slot, so we have to use an unused one
+                    // MMR shortens the Song of Time cutscene and uses a custom sequence
+                    // It uses an unused slot because Song of Time doesn't have its own slot
                     RomData.SequenceList.Add(new SequenceInfo
                     {
                         Name = nameof(Properties.Resources.mmr_f_sot),
                         DisplayName = "MMR - Song of Time",
-                        Categories = new List<int> { 8 },
-                        Instrument = 3,
-                        Replaces = 0x75,
+                        Categories = new List<int> { 0x08 },
+                        Instrument = 0x03,
+                        Replaces = INTRO_CUTSCENE_2,
                     });
 
-                    ScanForMMRS(directory); // scan for base mmrs in music folder
+                    ScanForMMRS(directory); // Scan for .mmrs files in the music directory
                 }
                 catch (UnauthorizedAccessException)
                 {
@@ -254,8 +243,8 @@ namespace MMR.Randomizer.Utils
                 }
             }
 
-            // write skipped files to a log file
-            // while they could be logged in the song log or spoiler log, the list could be hundreds of entries long
+            // Write any skipped files to a log file
+            // This is contained within its own file because it could be hundreds of lines long
             if (OLD_MUSIC_FILES.Count > 0)
             {
                 File.WriteAllLines(Path.Combine(Values.MusicDirectory, "unsupported_music_files.txt"), OLD_MUSIC_FILES);
@@ -269,23 +258,23 @@ namespace MMR.Randomizer.Utils
 
         public static int GetSequenceSize(SequenceInfo seq)
         {
-            // if it was loading at the MMRS read time, the sequence is already loaded in memory
+            // The sequence should be loaded into memory if it was in an MMRS file
             if (seq.SequenceBinaryList != null && seq.SequenceBinaryList.Count > 0)
             {
                 return RoundTo16(seq.SequenceBinaryList[0].SequenceBinary.Length);
             }
-            else if (seq.Name.StartsWith("mm-")) // vanilla mm, look up from audioseq index table
+            else if (seq.Name.StartsWith("mm-")) // Look up vanilla sequences from AudioSeq index table
             {
-                // we know code file is already decompressed at this point
+                // The code file ahould already be decompressed
                 int codeFID = RomUtils.GetFileIndexForWriting(Addresses.SeqTable);
                 var codeFile = RomData.MMFileList[codeFID];
                 int audioseqIndexTableOffset = Addresses.SeqTable - codeFile.Addr;
 
-                int entryaddr = audioseqIndexTableOffset + (seq.SeqId * 16); // table entries are 16 bytes wide
-                var size = (int)ReadWriteUtils.Arr_ReadU32(codeFile.Data, entryaddr + 4);
+                int entryaddr = audioseqIndexTableOffset + (seq.SeqId * 16); // Table entries are 16 bytes wide
+                int size = (int)ReadWriteUtils.Arr_ReadU32(codeFile.Data, entryaddr + 4);
                 return RoundTo16(size);
             }
-            else // not already loaded, we have to search for the file and look it up
+            else // The sequence is not loaded into memory, so search for the sequence file
             {
                 byte[] data;
                 if (File.Exists(seq.Filename))
@@ -303,18 +292,30 @@ namespace MMR.Randomizer.Utils
 
         private static bool ReadMMRSInstrumentBank(SequenceInfo song, SequenceBinaryData combo, ZipArchiveEntry bankFile, ZipArchiveEntry bankmetaFile)
         {
-            /// the instrument set named "zbank" is a binary, comes with a metadata file
-            /// returns true/false if this sequence uses a bank... except because its c# and bool is not an int, we us int rather than use a convert class
+            // Instrument bank files are a binary file with the ".zbank" extension, they're paired with a binary metadata file with the ".bankmeta" extension
+            // Returns true/false if the music file uses a custom instrument bank
 
-            if (bankFile != null && bankmetaFile != null) // custom bank detected
+            if (bankFile != null && bankmetaFile != null)
             {
-                // read bank file
-                byte[] bankData = new byte[bankFile.Length];
-                bankFile.Open().Read(bankData, 0, bankData.Length);
+                // The Bankmeta file that music files use is 8 bytes long
+                if (bankmetaFile.Length != 8)
+                    throw new Exception($"Error: Bankmeta file is too short for file: '{song.Name}'. Expected 8 bytes, but got {bankmetaFile.Length} bytes instead.");
 
-                // read bankmeta file
-                byte[] bankmetaData = new byte[bankmetaFile.Length];
-                bankmetaFile.Open().Read(bankmetaData, 0, bankmetaData.Length);
+                byte[] bankmetaData = new byte[8];
+
+                using var bankmetaReader = bankmetaFile.Open();
+                bankmetaReader.Read(bankmetaData, 0, 8);
+
+                int minLen = 0x08 + (bankmetaData[4] * 0x04) + (bankmetaData[5] * 0x04);
+
+                // The bank should have at least as many bytes as there are drum and instrument pointers
+                if (bankFile.Length < minLen)
+                    throw new Exception($"Error: Zbank file is too short for file: '{song.Name}'. Expected at least {minLen} bytes, but got {bankFile.Length} bytes instead.");
+
+                byte[] bankData = new byte[bankFile.Length];
+
+                using var bankStream = bankFile.Open();
+                bankStream.Read(bankData, 0, bankData.Length);
 
                 combo.InstrumentSet = new InstrumentSetInfo()
                 {
@@ -324,28 +325,29 @@ namespace MMR.Randomizer.Utils
                     Modified = 1,
                     Hash = BitConverter.ToInt64(md5lib.ComputeHash(bankData), 0),
                 };
-                return true; // bank was used
+
+                return true; // The music file uses a custom bank
             }
 
-            return false; // no bank
+            return false; // The music file does not use a custom bank
         }
 
-        private static void ReadMMRSFormmask(SequenceInfo song, SequenceBinaryData combo, ZipArchiveEntry formmaskFile)
+        private static void ReadMMRSFormmask(SequenceBinaryData combo, ZipArchiveEntry formmaskFile)
         {
-            /// read form mask file, that controls which channels of the sequence turn on and off
+            // Read the Formmask (".formmask") file, it's a single JSON/YAML list that determines which
+            // sequence channels should be turned on and off for each of Link's states
 
             if (formmaskFile != null)
             {
                 using var reader = new StreamReader(formmaskFile.Open(), Encoding.Default);
-                var formMaskData = reader.ReadToEnd();
+                string formMaskData = reader.ReadToEnd();
                 try
                 {
-                    // playState is configured in the file as "play in these states", but in the code it's "mute in these states"
-                    // so we need to reverse it
-                    //var playState = JsonSerializer.Deserialize<SequencePlayState[]>(formMaskData);
-                    var playState = YamlSerializer.Deserialize<SequencePlayState[]>(formMaskData);
+                    // playState is a boolean bitfield, in the file it's "play with these states", but in the code it's "mute these states"
+                    // so it needs to be reversed
+                    var playState = YamlSerializer.Deserialize<SequencePlayState[]>(formMaskData); // all JSON is valid YAML
 
-                    // ensure backwards compatibility with 1.15 sequences
+                    // Backwards compatibility for version 1.15 and lower sequence files
                     if (!playState.Any(s => s.HasFlag(SequencePlayState.FierceDeity) && !s.HasFlag(SequencePlayState.Human)))
                     {
                         for (var i = 0; i < playState.Length; i++)
@@ -357,7 +359,7 @@ namespace MMR.Randomizer.Utils
                         }
                     }
 
-                    // ensure unused cumulative states don't cause music to get muted in those states
+                    // Ensure unused cumulative states won't cause the channel to be muted when in those states
                     foreach (var cumulativeState in Enum.GetValues<SequencePlayState>().Where(s => s > SequencePlayState.All))
                     {
                         if (!playState.Any(s => s.HasFlag(cumulativeState)))
@@ -370,26 +372,28 @@ namespace MMR.Randomizer.Utils
                 }
                 catch (Exception e)
                 {
-                    throw new Exception($"Sequence formmask file is invalid - {e.Message}", e);
+                    throw new Exception($"Error: Music file's Formmask file is invalid: {e.Message}", e);
                 }
             }
         }
 
         private static void ReadMMRSSequence(SequenceInfo song, MMRSArchiveContents mmrs, string instrumentSet)
         {
+            int claimedBankCount = 0;
+            ZipArchiveEntry sequenceFile = mmrs.SequenceFile ?? throw new FileNotFoundException($"ReadMMRSSequence: Sequence file is missing.");
 
-            var claimedBankCount = 0;
-
-            var sequenceFile = mmrs.SequenceFile;
-
-            if (sequenceFile == null)
-                throw new FileNotFoundException($"ReadMMRSSequence: Sequence file is missing.");
+            // The sequence file shouldn't be empty
+            if (sequenceFile.Length == 0)
+                throw new Exception($"Error: Sequence file for '{song.Name}' contains no data.");
 
             byte[] rawSeqData = new byte[sequenceFile.Length];
-            sequenceFile.Open().Read(rawSeqData, 0, rawSeqData.Length);
-            var sequence = new SequenceBinaryData() { SequenceBinary = rawSeqData };
 
-            // Handle the instrument set
+            using var stream = sequenceFile.Open();
+            stream.Read(rawSeqData, 0, rawSeqData.Length);
+
+            SequenceBinaryData sequence = new() { SequenceBinary = rawSeqData };
+
+            // If the value is "custom" or "-", then the music file uses a custom bank
             if (instrumentSet == "custom" || instrumentSet == "-")
             {
                 song.Instrument = REQUIRES_NEW_BANK;
@@ -408,7 +412,8 @@ namespace MMR.Randomizer.Utils
 
             var customBankIncluded = ReadMMRSInstrumentBank(song, sequence, mmrs.BankFile, mmrs.BankmetaFile);
 
-            // now that we have bank expansion working without known issues, bank overwriting causes more glitches for us than it helps
+            // Before AudioBankTable expansion, MMR used to overwrite the original instrument bank
+            // However, this causes more problems now that expansion is available, so if an old instrument bank exists, treat it as custom
             if (song.Instrument > 0x28 || customBankIncluded)
             {
                 song.Instrument = REQUIRES_NEW_BANK;
@@ -431,30 +436,30 @@ namespace MMR.Randomizer.Utils
                 claimedBankCount++;
             }
 
-            ReadMMRSFormmask(song, sequence, mmrs.FormmaskFile);
+            ReadMMRSFormmask(sequence, mmrs.FormmaskFile);
 
             song.SequenceBinaryList.Add(sequence);
         }
 
         private static MMRSMetadata ReadMMRSMetaYaml(string songname, ZipArchiveEntry metaFile)
         {
-            /// Reads the file containing the metadata for the randomizer music file to work with the randomizer
+            // Reads and collects the music files metadata from the .meta YAML file
 
             if (metaFile == null)
                 throw new Exception($"Error: No metadata file available for song: '{songname}'");
 
             // Valid values
             var validTypes = new HashSet<string> { "bgm", "fanfare" };
-            var validGames = new HashSet<string> { "oot", "mm" }; // game is mainly for Nax and OOTMM, might be used in the future though if OOTRS support is added
+            var validGames = new HashSet<string> { "oot", "mm" }; // Game is mainly for OOTMM, but could be useful if OOTRS support is added
 
             var validSoundTypes = new HashSet<string> { "INST", "DRUM", "SFX" };
-            var validKeyRegions = new HashSet<string> { "LOW", "PRIM", "HIGH" }; // PRIM makes more sense than NORM
+            var validKeyRegions = new HashSet<string> { "LOW", "PRIM", "HIGH" };
 
             MMRSMetadataYAML yamlData;
 
             using (var reader = new StreamReader(metaFile.Open(), Encoding.Default))
             {
-                var yamlText = reader.ReadToEnd();
+                string yamlText = reader.ReadToEnd();
                 yamlData = YamlSerializer.Deserialize<MMRSMetadataYAML>(yamlText);
             }
 
@@ -464,10 +469,21 @@ namespace MMR.Randomizer.Utils
             string songType = validTypes.Contains(yamlData.Metadata.SongType?.ToLower()) ? yamlData.Metadata.SongType.ToLower() : "bgm";
 
             //Handle the categories
-            var categories = new List<int> { 0, 1, 3, 4, 5, 6, 7 }; // Default to all BGM
+            var categories = new List<int> // Default to all BGM
+            {
+                (int)MusicGroups.Category.Fields,
+                (int)MusicGroups.Category.Towns,
+                (int)MusicGroups.Category.Dungeons,
+                (int)MusicGroups.Category.Indoors,
+                (int)MusicGroups.Category.Minigames,
+                (int)MusicGroups.Category.ActionThemes,
+                (int)MusicGroups.Category.CalmThemes,
+                (int)MusicGroups.Category.Fights,
+            };
             if (yamlData.Metadata.MusicGroups != null && yamlData.Metadata.MusicGroups.Any())
             {
                 categories.Clear();
+                MusicGroups.Type? firstType = null;
 
                 foreach (var category in yamlData.Metadata.MusicGroups)
                 {
@@ -475,6 +491,20 @@ namespace MMR.Randomizer.Utils
                     {
                         if (!categories.Contains(cat))
                             categories.Add(cat);
+
+                        // BGM and Fanfare categories can't be mixed, so get the type
+                        var currentType = MusicGroups.GetCategoryType(cat);
+
+                        // After the first category, if any categories are mismatched then drop them entirely
+                        // Might be good to throw an error or log the file... but this is fine for now
+                        if (firstType == null)
+                        {
+                            firstType = currentType;
+                        }
+                        else if (firstType != currentType)
+                        {
+                            continue;
+                        }
                     }
                     else
                     {
@@ -495,10 +525,10 @@ namespace MMR.Randomizer.Utils
                 {
                     var sample = entry.Value;
 
-                    var type = sample.Type?.Trim().ToUpperInvariant();
-                    var keyRegion = sample.KeyRegion?.Trim().ToUpperInvariant();
-                    var listIndex = sample.Index == -1 ? null : sample.Index;
-                    var tempAddr = sample.TempAddress;
+                    string type = sample.Type?.Trim().ToUpperInvariant();
+                    string keyRegion = sample.KeyRegion?.Trim().ToUpperInvariant();
+                    int? listIndex = sample.Index == -1 ? null : sample.Index;
+                    uint? tempAddr = sample.TempAddress;
 
                     if (type == null && listIndex != null && sample.KeyRegion != null)
                     {
@@ -518,7 +548,7 @@ namespace MMR.Randomizer.Utils
                         if (type == "INST")
                         {
                             if (string.IsNullOrEmpty(keyRegion) || !validKeyRegions.Contains(keyRegion))
-                                throw new InvalidOperationException($"Error: Audio sample '{entry.Key}': key_region must be one of LOW, PRIM, HIGH for INST.");
+                                throw new InvalidOperationException($"Error: Audio sample '{entry.Key}': key_region must be one of LOW, NORM, HIGH for INST.");
                         }
                         else // DRUM or SFX
                         {
@@ -526,6 +556,7 @@ namespace MMR.Randomizer.Utils
                                 throw new InvalidOperationException($"Error: Audio sample '{entry.Key}': key_region must be null or empty for {type}.");
                         }
                     }
+
                     // type, index, and key_region are all part of the new format used by OOTR:
                     // ZSOUND:INST:0:NORM:file.zsound, ZSOUND:DRUM:0::file.zsound, ZSOUND:SFX:0::file.zsound
                     //
@@ -561,15 +592,19 @@ namespace MMR.Randomizer.Utils
 
         public static void ScanForMMRS(string directory)
         {
-            // check if user has added mmrs packed sequence files to the music folder
-            //  mmrs is just a zip that has all the small files:
-            //  the sequence itself, the categories, and the instrument set value (as part of the zseq name)
-            //    if the song requires a custom audiobank, the bank and bank meta data are also here (where the name is the bank being replaced)
-            //    if the song requires custom instrument samples, those are also here
-            //  the user should be able to pack the archive with multiple sequences and multiple banks to match,
-            //   where the redundancy increases likley hood of a song being able to be placed in a free audiobank slot
+            // Check the directory for MMRS files the user added
+            // MMRS is a zip file with a custom file extension ".mmrs" and can contain the following:
+            //   - Sequence file (.seq; required)
+            //   - Metadata file (.meta; required)
+            //   - Instrument bank file (.zbank)
+            //   - Instrument bank metadata file (.bankmeta)
+            //   - Custom audio sample file (.zsound)
+            //   - Formmask array file (.formmask)
+            //
+            // Only one file for each file type is allowed except custom audio sample files
+            // an instrument bank may contain multiple sounds, so multiple may be required
 
-            // check for old standalone files
+            // Check for old standalone sequence files and add them to the old file list
             foreach (string filePath in Directory.GetFiles(directory, "*.zseq"))
             {
                 OLD_MUSIC_FILES.Add(Path.GetFileName(filePath));
@@ -608,7 +643,8 @@ namespace MMR.Randomizer.Utils
 
                         foreach (var entry in zip.Entries)
                         {
-                            if (entry.FullName.Contains('/')) continue;
+                            if (entry.FullName.Contains('/'))
+                                continue;
 
                             // If the file is using the old format, it will have a categories file
                             if (entry.Name.Equals("categories.txt"))
@@ -638,11 +674,14 @@ namespace MMR.Randomizer.Utils
 
                         bool hasBankFile = mmrs.BankFile != null;
                         bool hasBankmetaFile = mmrs.BankmetaFile != null;
+
                         if (hasBankFile != hasBankmetaFile)
                             continue;
 
-                        var currentSong = new SequenceInfo();
-                        currentSong.Name = Path.GetFileNameWithoutExtension(filePath);
+                        SequenceInfo currentSong = new()
+                        {
+                            Name = Path.GetFileNameWithoutExtension(filePath)
+                        };
 
                         var metadata = ReadMMRSMetaYaml(currentSong.Name, mmrs.MetaFile);
 
@@ -695,18 +734,23 @@ namespace MMR.Randomizer.Utils
 
         public static void PointerizeSequenceSlots()
         {
-            // if music availablilty is low, pointerize some slots
-            // why? because in Z64 fairy fountain and fileselect are the same song,
-            //  with one being a pointer at the other, so we have 78 slots and 77 songs, not enough
-            //  also some categories can get exhausted leaving slots unfillable with remaining music,
-            // several slots that players will never/rarely hear are nullified (pointed at another song)
-            // this "fills" those slots, now we have fewer slots to fill with remaining music (77 fills 73)
-            //  so pointerized slots play the same music, and don't waste a song
-            //  but if the player does find this music in-game, it still plays sufficiently random music
-            ConvertSequenceSlotToPointer(0x29, 0x0B); // point zelda(SOTime get cs) at healed
+            // If music availability is low, then some slots are converted to pointers
+            // In vanilla, the Great Fairy's Fountain uses the same song as File Select,
+            // with the former being a pointer to the latter. Because of that, there are
+            // 78 slots and only 77 songs, which is not enough.
+            //
+            // Some music groups may also be exhausted, leaving slots unfilled with
+            // the remaining music.
+            //
+            // So, slots the player may rarely hear or will never hear become pointers.
+            // This will fill the remaining slots, that way if the player does encounter
+            // the scene using the slot, it will still play music.
+            //
+            ConvertSequenceSlotToPointer(ZELDAS_THEME, SONG_OF_HEALING_THEME); // Point "Zelda's Theme" to "Song of Healing Theme"
 
-            // with shortened cutscenes, we pointerize more slots that the player would not hear
-            // if using a patch, _randomized is not set, lookup a shortened cutscene byte instead
+            // With shortened cutscenes, slots that go unheard are converted to pointers.
+            // If using a patch, "_randomized" is not set, so lookup a shortened cutscene byte instead
+            //
             // =========================================================
             // File: 0x02CBF000, Address: 0x02CBFD48, Offset: 0x00000D48
             // Name: Z2_KONPEKI_ENT::Great Bay(Cutscene) -Scene File
@@ -715,65 +759,68 @@ namespace MMR.Randomizer.Utils
             //   .dw 0x00010294  94
             // .orga 0x02CBFD48     ->
             //   .dw 0x00010000        00
-            // checking if not 94 instead if 00 because 94 is vanilla and 00 is replacement
-            //  thinking ahead, it's possible the adjusted value will change one day, but vanilla is static
-            // if the file's data is null, nothing in that file was changed and therefore it is vanilla.
+            //
+            // This checks "if not 94", because 94 is vanilla and 00 is the replacement.
+            // It's possible this value could change one day, but vanilla is static.
+            // If the file's data is null, nothing was changed in the file and it is vanilla.
+            //
             bool shortenedCutscenes = RomData.MMFileList[1472].Data[0xD48 + 3] != 0x94;
 
             if (shortenedCutscenes)
             {
-                // these cutscene songs are never heard if shorten cutscenes is enabled, just pointerize it
-                ConvertSequenceSlotToPointer(0x72, 0x45); // point wagonride at kaeopora 
-                ConvertSequenceSlotToPointer(0x2D, 0x3A); // point giants world (oath get cutscene) at observatory
-                ConvertSequenceSlotToPointer(0x70, 0x0B); // point call the giants( cutscene confronting skullkid) at healed
-                ConvertSequenceSlotToPointer(0x7B, 0x0D); // point maskreveal, the song that plays when the mask shows its alive during moon cutscene, at aliens
-                ConvertSequenceSlotToPointer(0x7D, 0x05); // point reunion at clocktower
+                // These cutscenes are never encountered with "Shorten cutscenes" enabled, so convert them to pointers
+                ConvertSequenceSlotToPointer(CREMIAS_THEME, OWLS_THEME);            // Point "Cremia's Theme" to "Kaepora Gaebora's Theme"
+                ConvertSequenceSlotToPointer(GIANTS_THEME, ASTRAL_OBSERVATORY);     // Point "The Giants' Theme" to "Astral Observatory"
+                ConvertSequenceSlotToPointer(GIANTS_APPEAR, SONG_OF_HEALING_THEME); // Point "The Giants Appear" to "Song of Healing Theme"
+                ConvertSequenceSlotToPointer(MOON_ENRAGED, ALIENS_THEME);           // Point "The Moon Enraged" to "Aliens' Theme"
+                ConvertSequenceSlotToPointer(REUNION_THEME, CLOCK_TOWER_INTERIOR);  // Point "Reunion Theme" to "Clock Tower Interior"
             }
 
-            // if ocarina is NOT randomized, pointerize skullkid's seq since it gets used nowhere
-            // ocarina rando applies patch:fix_ocarina_checks, use a change applied by this fix to detect
+            // If the Ocarina is not randomized, then convert "Majora's Theme" to a pointer, it goes unused.
+            // Randomized Ocarina applies the patch: "fix_ocarina_checks", use a change applied by the fix to detect.
+            //
             // ============================================================================
             // File: 0x00B3C000, Address: 0x00BC66A0, Offset: 0x0008A6A0, Patch: 0x000000A8
             // Name: code
             // ============================================================================
             // Replaces:
-            //   .dh    0x14F9  F9
-            // .org 0x80130160    ->
-            //   .dh    0x1000       00
+            //  .dh 0x000014F9  F9
+            // .org 0x80130160     ->
+            //  .dh 0x00001000        00
+            //
             bool ocarinaNotRandomized = RomData.MMFileList[31].Data[0x8A6A0 + 1] == 0xF9;
 
             if (ocarinaNotRandomized)
             {
-                ConvertSequenceSlotToPointer(0x04, 0x1A); // point skullkid's theme, during skullkid's backstory cutscene, at combat
+                ConvertSequenceSlotToPointer(MAJORAS_THEME, SMALL_ENEMY_BATTLE); // Point "Majora's Theme" to "Small Enemy Battle"
             }
 
-            // if our replacement pool is small (MM only and low variety) pointerize a few more
+            // If the replacement pool is small (MM only or low variety), convert more sequences to pointers.
             if (RomData.TargetSequences.Count + 30 > RomData.SequenceList.Count)
             {
-                ConvertSequenceSlotToPointer(0x76, 0x15); // point titlescreen at clocktownday1
-                ConvertSequenceSlotToPointer(0x08, 0x09); // point chasefail(skullkid chase) at fail
-                ConvertSequenceSlotToPointer(0x19, 0x78); // point clearshort(epona get cs) at dungeonclearshort
+                ConvertSequenceSlotToPointer(TITLE_DEMO, CLOCK_TOWN_1);          // Point "Title Demo" to "Clock Town (Day 1)"
+                ConvertSequenceSlotToPointer(EVENT_FAIL_1, EVENT_FAIL_2);        // Point "Event Failure 1" to "Event Failure 2"
+                ConvertSequenceSlotToPointer(EVENT_SUCCESS, TEMPLE_CLEAR_SHORT); // Point "Event Success" to "Temple Clear (Short)"
             }
 
             // create some pointerized slots that are otherwise ignored, beacuse this pool gets re-used later for new song slots
-            RomData.PointerizedSequences.Add(new SequenceInfo() { Name = "mm-introcutscene1", SeqId = 0x1E, PreviousSlot = 0x1E, Replaces = 0x76 });
+            RomData.PointerizedSequences.Add(new SequenceInfo() { Name = "mm-introcutscene1", SeqId = INTRO_CUTSCENE_1, PreviousSlot = INTRO_CUTSCENE_1, Replaces = TITLE_DEMO });
         }
 
         public static void ConvertSequenceSlotToPointer(int seqSlotIndex, int substituteSlotIndex)
         {
-            // turns the sequence slot into a pointer, which points at another song, at SubstituteSlotIndex
-            // the slot at SeqSlotIndex is marked such that, instead of a new sequence being put there
-            //  a pointer to another song, at SubstituteSlotIndex, is used instead.
-            // this frees up a song slot but its not completely empty if someone finds it
-            //  this is the same concept DB used to nulify the intro song
+            // Converts the sequence slot to a pointer, then marks the slot so a new sequence isn't
+            // placed into the pointer's slot. This will free a song slot, but it won't be completely
+            // empty if a player encounters it.
+
             var targetSeq = RomData.TargetSequences.Find(u => u.Replaces == seqSlotIndex);
             var substituteSeq = RomData.TargetSequences.Find(u => u.Replaces == substituteSlotIndex);
             if (targetSeq != null && substituteSeq != null)
             {
-                targetSeq.PreviousSlot = targetSeq.Replaces; // we'll need at audioseq build
-                targetSeq.Replaces = substituteSeq.Replaces; // point the target at the substitute
-                RomData.PointerizedSequences.Add(targetSeq); // save the sequence for audioseq
-                RomData.TargetSequences.Remove(targetSeq);   // close the slot
+                targetSeq.PreviousSlot = targetSeq.Replaces; // Needed during AudioSeq rebuild
+                targetSeq.Replaces = substituteSeq.Replaces; // Point target to substitute
+                RomData.PointerizedSequences.Add(targetSeq); // Save the sequence for AudioSeq rebuild
+                RomData.TargetSequences.Remove(targetSeq);   // Ensure another sequence isn't placed in the slot
             }
             else
             {
@@ -783,24 +830,24 @@ namespace MMR.Randomizer.Utils
         }
 
 
-        // gets passed RomData.SequenceList in Builder.cs::WriteAudioSeq
+        // Passed to RomData.SequenceList in Builder.cs::WriteAudioSeq
         public static void RebuildAudioSeq(List<SequenceInfo> sequenceList, int? sequenceMaskFileIndex, int? sequenceNamesFileIndex)
         {
-            // spoiler log output DEBUG
+            // Spoiler log output DEBUG
             StringBuilder log = new StringBuilder();
             void WriteOutput(string str)
             {
-                Debug.WriteLine(str); // we still want debug output though
+                Debug.WriteLine(str); // Keep DEBUG output
                 log.AppendLine(str);
             }
 
-            List<MMSequence> oldSeq = new List<MMSequence>();
+            var oldSeq = new List<MMSequence>();
             int f = RomUtils.GetFileIndexForWriting(Addresses.SeqTable);
             int basea = RomData.MMFileList[f].Addr;
 
             for (int i = 0; i < 128; i++)
             {
-                MMSequence entry = new MMSequence();
+                var entry = new MMSequence();
 
                 int entryaddr = Addresses.SeqTable + (i * 16);
                 entry.Addr = (int)ReadWriteUtils.Arr_ReadU32(RomData.MMFileList[f].Data, entryaddr - basea);
@@ -817,13 +864,13 @@ namespace MMR.Randomizer.Utils
                     {
                         if ((entry.Addr > 0) && (entry.Addr < 128))
                         {
-                            if (sequenceList[j].Replaces != 0x28) // 28 (fairy fountain)
+                            if (sequenceList[j].Replaces != POINTER_0x18) // 0x28: Great Fairy's Fountain
                             {
                                 sequenceList[j].Replaces = entry.Addr;
                             }
                             else
                             {
-                                entry.Data = oldSeq[0x18].Data;
+                                entry.Data = oldSeq[FILE_SELECT].Data;
                             }
                         }
                     }
@@ -831,12 +878,12 @@ namespace MMR.Randomizer.Utils
                 oldSeq.Add(entry);
             }
 
-            List<MMSequence> newSeq = new List<MMSequence>();
+            var newSeq = new List<MMSequence>();
             int addr = 0;
             byte[] newAudioSeq = new byte[0];
             for (int i = 0; i < 128; i++)
             {
-                MMSequence newentry = new MMSequence();
+                var newentry = new MMSequence();
                 if (oldSeq[i].Size == 0)
                 {
                     newentry.Addr = oldSeq[i].Addr;
@@ -855,12 +902,12 @@ namespace MMR.Randomizer.Utils
                 int j = sequenceList.FindIndex(u => u.Replaces == i);
                 if (p != -1)
                 {
-                    // found song we want to pointerize
+                    // Found song to convert to a pointer
                     newentry.Addr = RomData.PointerizedSequences[p].Replaces;
                 }
                 else if (j != -1)
                 {
-                    // new song to replace old slot found
+                    // Replace old song with new song
                     if (sequenceList[j].SeqId != -1)
                     {
                         newentry.Data = oldSeq[sequenceList[j].SeqId].Data;
@@ -877,7 +924,7 @@ namespace MMR.Randomizer.Utils
                         WriteOutput("Slot " + i.ToString("X2") + " := " + sequenceList[j].Name + " *");
 
                     }
-                    else // non mm, load file and add
+                    else // Not an MM sequence, load and add file
                     {
                         byte[] data;
                         if (File.Exists(sequenceList[j].Filename))
@@ -897,8 +944,8 @@ namespace MMR.Randomizer.Utils
                             throw new Exception("Music not found as file or built-in resource." + sequenceList[j].Filename);
                         }
 
-                        // I think this checks if the sequence type is correct for MM
-                        //  because DB ripped sequences from SF64/SM64/MK64 without modifying them
+                        // This might check if the sequence type is correct for MM
+                        // DB ripped sequences from SF64/SM64/MK64 without modifying them
                         if (data[1] != 0x20)
                         {
                             data[1] = 0x20;
@@ -914,8 +961,8 @@ namespace MMR.Randomizer.Utils
                     newentry.Data = oldSeq[i].Data;
                 }
 
-                // if the sequence is not padded to 16 bytes, the DMA fails
-                //  music can stop from playing and on hardware it will just straight crash
+                // DMA fails if the sequence isn't 16 byte aligned
+                // Music will fails to play and will crash on actual hardware
                 var padding = 0x10 - newentry.Size % 0x10;
                 if (padding != 0x10)
                 {
@@ -946,7 +993,7 @@ namespace MMR.Randomizer.Utils
             RomData.MMFileList[4].Cmp_Addr = -1;
             RomData.MMFileList[4].Cmp_End = -1;
 
-            //update sequence index pointer table
+            // Update the sequence index pointer table
             f = RomUtils.GetFileIndexForWriting(Addresses.SeqTable);
             for (int i = 0; i < 128; i++)
             {
@@ -954,9 +1001,9 @@ namespace MMR.Randomizer.Utils
                 ReadWriteUtils.Arr_WriteU32(RomData.MMFileList[f].Data, 4 + (Addresses.SeqTable + (i * 16)) - basea, (uint)newSeq[i].Size);
             }
 
-            //update inst sets used by each new seq
-            // this is NOT the audiobank, its the complementary instrument set value for each sequence
-            //   IE, sequence 7 uses instrument set "10", we replaced it with sequnece ae which needs bank "23"
+            // Update the instrument sets for each sequence file
+            // This is not the instrument bank file, it's a complementary value for each sequence
+            // e.g. Sequence 0x02 uses instrument set 0x03, but it is replaced with sequence 0xAE which needs instrument set 0x3E
             f = RomUtils.GetFileIndexForWriting(Addresses.InstSetMap);
             basea = RomData.MMFileList[f].Addr;
             for (int i = 0; i < 128; i++)
@@ -965,7 +1012,7 @@ namespace MMR.Randomizer.Utils
                 int paddr = (Addresses.InstSetMap - basea) + (i * 2) + 2;
 
                 int j = -1;
-                if (newSeq[i].Size == 0) // pointer, we need to copy the instrumnet set from the destination
+                if (newSeq[i].Size == 0) // Pointer, the instrument set needs to be copied to the destination
                 {
                     j = sequenceList.FindIndex(u => u.Replaces == newSeq[i].Addr);
                 }
@@ -994,10 +1041,8 @@ namespace MMR.Randomizer.Utils
 
                 if (sequenceMaskFileIndex.HasValue)
                 {
-                    if (formMask == null)
-                    {
-                        formMask = Enumerable.Repeat<byte>(0xFF, 0x20).ToArray();
-                    }
+                    formMask ??= Enumerable.Repeat<byte>(0xFF, 0x20).ToArray();
+
                     Array.Resize(ref formMask, MusicConfig.SEQUENCE_DATA_SIZE);
                     ReadWriteUtils.Arr_Insert(formMask, 0, MusicConfig.SEQUENCE_DATA_SIZE, RomData.MMFileList[sequenceMaskFileIndex.Value].Data, i * MusicConfig.SEQUENCE_DATA_SIZE);
                 }
@@ -1055,7 +1100,7 @@ namespace MMR.Randomizer.Utils
 
         public static void MoveAudioBankTable()
         {
-            // grab original audiobanktable out of code, plus extra for modifying
+            // Grab original AudioBankTable out of code, plus extra for modifying
             var table = ReadWriteUtils.ReadBytes(0xB3C000 + 0x13B6C0, 0x820);
             // Move to unused fbdemo.c (0x80163DC0)
             ReadWriteUtils.WriteToROM(0xB3C000 + 0xBE300, table);
@@ -1065,21 +1110,22 @@ namespace MMR.Randomizer.Utils
             ReadWriteUtils.WriteCodeUInt32(0x80190E28, 0x254A3DC0);
             NewInstrumentSetAddress = 0xB3C000 + 0xBE300 + 0x10;
 
-            // clear old audiobank
+            // Clear the old instrument bank
             var zero = new byte[0x2A0];
             ReadWriteUtils.WriteToROM(0xB3C000 + 0x13B6C0, zero);
 
-            // instrumentset_patch: modifies audiobank metadata read and writes, instrument/drum/sfx pointer read and writes,
-            // nops a metadata copy function, and sets a fixed size for the audiobank pointer index
+            // instrumentset_patch: Modifies instrument bank metadata read and writes, instrument/drum/sfx pointer read and writes,
+            //                      nops a metadata copy function, and sets a fixed size for the audiobank pointer index
             ResourceUtils.ApplyHack(Resources.mods.instrumentset_patch);
 
-            // moveaudiostatebytes: sets where read and writes for sequence and instrumentset states go
-            // in this hack, they're moved from 0x80205008 to end of old instrumentset table in code and given more space
-            // if these don't get moved, new banks at 0x30 and up will overflow into sequence states and can knock out sound
+            // moveaudiostatebytes: Sets where read and writes for sequence and instrumentset states go.
+            //                      In this hack, they're moved from 0x80205008 to end of old instrumentset table in code and
+            //                      given more space. if these don't get moved, new banks at 0x30 and up will overflow into
+            //                      sequence states and can knock out sound.
             ResourceUtils.ApplyHack(Resources.mods.moveaudiostatebytes);
 
 
-            // insert dummy metadata (kamaro's dance bank duplicates)
+            // Insert dummy metadata (Kamaro's Theme instrument bank duplicates)
             int dummybankindexOffset = NewInstrumentSetAddress + 0x280;
             int totaldummybanks = 0x58;
             ulong dummybankmetadata0 = 0x00021880000000D0;
@@ -1099,104 +1145,61 @@ namespace MMR.Randomizer.Utils
             CurrentFreeBank = 0x29;
         }
 
-
-        public static bool TestIfAvailableBanks(SequenceInfo testSeq, SequenceInfo targetSlot, StringBuilder log, Random rng, List<SequenceInfo> unassignedSequences)
+        public static bool TestIfAvailableBanks(SequenceInfo testSeq, Random rng)
         {
-            /// test if the testSeq can be used with available instrument set slots
+            // Test is the testSeq can be used with available instrument set slots
 
-            // check if custom instrument sets exist for this sequence
+            // Check if the instrument set already exists for this sequence
             if (testSeq.SequenceBinaryList != null && testSeq.SequenceBinaryList.Count > 0 && testSeq.SequenceBinaryList.Any(u => u.InstrumentSet != null))
             {
-                // randomize instrument sets last second, so the early banks don't get ravaged based on order
+                // Randomize the instrument sets last second, this way early banks don't get ravaged based on order
                 if (testSeq.SequenceBinaryList.Count > 1)
                 {
                     testSeq.SequenceBinaryList = testSeq.SequenceBinaryList.OrderBy(x => rng.Next()).ToList();
                 }
 
-                //testSeq.ClearUnavailableBanks(); // clear the sequence list of {bank/sequence} we cannot use
-                //if (testSeq.SequenceBinaryList.Count == 0) // all removed, song is dead.
-                //{
-                //    log.AppendLine($"{ testSeq.Name,-50}  cannot be used because it requires custom audiobank(s) already claimed ");
-                //    unassignedSequences.Remove(testSeq);
-                //    return false;
-                //}
-
                 var testBanks = testSeq.CheckAvailableBanks();
                 if (testBanks == true)
                 {
-                    testSeq.ClearUnavailableBanks(); // remove any already claimed bank sequences
+                    testSeq.ClearUnavailableBanks(); // Remove any already claimed bank sequences
                 }
-                else // all custom banks have been claimed
+                else // All custom banks have been claimed
                 {
                     if (CurrentFreeBank > 0x0080)
                     {
-                        return false; // can't overwrite any more entries
+                        return false; // Can't overwrite any more entries
                     }
 
                     testSeq.SequenceBinaryList[0].InstrumentSet.BankSlot = CurrentFreeBank;
                 }
-
-                // some slots are rarely heard in-game, dont waste a custom instrument set on them, check if this slot is one of them
-                //if (IsBlockedByLowUse(testSeq, targetSlot, log))
-                //{
-                //    return false;
-                //}
             }
-            return true; // sequences with banks, or without needing banks, available
-        }
-
-        public static bool IsBlockedByLowUse(SequenceInfo testSeq, SequenceInfo targetSlot, StringBuilder log)
-        {
-            /// if the slot we are checking is a rarely used slot, and this song requires a custom instrument
-            ///  skip so we don't waste precious instrument set slots on rarely heard music
-            /// exception: if the song uses the unique song category, not general purpose; author wanted it to be in this slot, bypass
-            var uniqueCategory = targetSlot.Replaces + 0x100;
-            if (lowUseMusicSlots.Contains(targetSlot.Replaces) && !testSeq.Categories.Contains(uniqueCategory)
-                && !testSeq.SequenceBinaryList.Any(u => u.InstrumentSet == null))
-            {
-                var previouslyUsedBanks = testSeq.SequenceBinaryList.FindAll(u => (u.InstrumentSet.Hash != 0 && u.InstrumentSet.Hash == RomData.InstrumentSetList[u.InstrumentSet.BankSlot].Hash));
-                if (previouslyUsedBanks.Count >= 1)
-                {
-                    // exception: if another song already chosen has claimed a bank this song can use
-                    log.AppendLine($"{ testSeq.Name,-50}  was accepted despite low use because a usable bank was already selected from another song");
-                    return false;
-                }
-
-                if (targetSlot.Categories[0] < 8) // to reduce spam, limit logging this only to the regular categories
-                {
-                    log.AppendLine($"{testSeq.Name,-50}  skipped for slot {targetSlot.Replaces.ToString("X2")} because it's a low use slot and requires a custom bank");
-                }
-
-                return true;
-            }
-
-            return false;
+            return true; // Sequences with instrument banks, or without needing instrument banks, available
         }
 
         public static void TryBackupSongPlacement(SequenceInfo targetSlot, StringBuilder log, List<SequenceInfo> unassignedSequences, OutputSettings settings)
         {
-            /// sometimes, the remaining song slots can't find a compatible song, here we loosen restrictions until we can build a seed
+            // Loosen the restrictions on song placement if there are no compatible songs left
 
-            // first attempt: just merge BGM and fanfare into super categories and attempt to find replacement
-            // the first category of the type is the MAIN type, the rest are secondary
+            // First attempt: Merge BGM and Fanfares into a single category then attempt to find a replacement.
+            //                The first category of the type is the main type, the rest are secondary.
             SequenceInfo replacementSong = null;
-            if (targetSlot.Categories[0] <= 7 || targetSlot.Categories[0] == 0x16)  // bgm or cutscene
+            if (MusicGroups.IsBgmCategory(targetSlot.Categories[0])) // Check if the category is BGM or Cutscene
             {
-                replacementSong = unassignedSequences.Find(u => u.Categories[0] <= 7 || u.Categories[0] == 0x16);
+                replacementSong = unassignedSequences.Find(u => u.Categories[0] <= (int)MusicGroups.Category.Fights || u.Categories[0] == (int)MusicGroups.Category.Cutscenes);
             }
-            else //if (targetSlot.Type[0] <= 8) // fanfares
+            else //if (targetSlot.Type[0] <= 8) // The category is a Fanfare
             {
-                replacementSong = unassignedSequences.Find(u => u.Categories[0] >= 8 && u.Categories[0] < 0x10);
+                replacementSong = unassignedSequences.Find(u => u.Categories[0] >= (int)MusicGroups.Category.ItemFanfares && u.Categories[0] < (int)MusicGroups.Category.ClearFanfares);
             }
 
             if (replacementSong != null)
             {
-                log.AppendLine(" * generalized replacement with " + replacementSong.Name + " song, with categories: " + String.Join(", ", replacementSong.Categories.Select(x => "0x" + x.ToString("X2"))));
+                log.AppendLine(" * generalized replacement with " + replacementSong.Name + " song, with categories: " + string.Join(", ", replacementSong.Categories.Select(x => "0x" + x.ToString("X2"))));
                 AssignSequenceSlot(targetSlot, replacementSong, unassignedSequences, "APROX", log);
                 return;
             }
 
-            // second attempt, copy a song already used
+            // Second attempt: Copy an already used song.
             replacementSong = RomData.SequenceList.Find(u => u.Categories.Intersect(targetSlot.Categories).Any());
             if (replacementSong != null)
             {
@@ -1215,7 +1218,7 @@ namespace MMR.Randomizer.Utils
                     }
                 );
 
-                log.AppendLine(" * double dipping with song " + replacementSong.Name + ", with categories: " + String.Join(", ", replacementSong.Categories.Select(x => "0x" + x.ToString("X2"))));
+                log.AppendLine(" * double dipping with song " + replacementSong.Name + ", with categories: " + string.Join(", ", replacementSong.Categories.Select(x => "0x" + x.ToString("X2"))));
                 log.AppendLine($"{targetSlot.Name,-40} {"COPY",+10} -> " + replacementSong.Name);
                 return;
             }
@@ -1224,7 +1227,7 @@ namespace MMR.Randomizer.Utils
             log.AppendLine(" out of remaining songs:");
             foreach (SequenceInfo RemainingSong in unassignedSequences)
             {
-                log.AppendLine(" * [" + RemainingSong.Name + "] with categories [" + String.Join(",", RemainingSong.Categories) + "]");
+                log.AppendLine(" * [" + RemainingSong.Name + "] with categories [" + string.Join(",", RemainingSong.Categories) + "]");
             }
             WriteSongLog(log, settings);
             throw new Exception($"Cannot randomize music on this seed with available music: \nSlot Name:[{targetSlot.Name}] PreviousSlot: [{targetSlot.Replaces.ToString("X")}]");
@@ -1232,11 +1235,11 @@ namespace MMR.Randomizer.Utils
 
         public static void WriteSongLog(StringBuilder log, OutputSettings settings)
         {
-            String dir = Path.GetDirectoryName(settings.OutputROMFilename);
-            String path = $"{Path.GetFileNameWithoutExtension(settings.OutputROMFilename)}";
+            string dir = Path.GetDirectoryName(settings.OutputROMFilename);
+            string path = $"{Path.GetFileNameWithoutExtension(settings.OutputROMFilename)}";
 
-            // spoiler log should already be written by the time we reach this far
-            // if no text log, create separate song log (mostly for mmr users)
+            // The spoiler log should already be written at this point
+            // If there's no text log, create a separate song log
             if (File.Exists(Path.Combine(dir, path + "_SpoilerLog.txt")))
             {
                 path += "_SpoilerLog.txt";
@@ -1246,16 +1249,16 @@ namespace MMR.Randomizer.Utils
                 path += "_SongLog.txt";
             }
 
-            using (StreamWriter sw = new StreamWriter(Path.Combine(dir, path), append: true))
+            using (var writer = new StreamWriter(Path.Combine(dir, path), append: true))
             {
-                sw.WriteLine(""); // spacer between spoiler log and song log
-                sw.Write(log);
+                writer.WriteLine(""); // spacer between spoiler log and song log
+                writer.Write(log);
             }
         }
 
         private static (int sequenceBankIndex, int bankListIndex) FindMatchingInstrumentSetDuplicate(SequenceInfo replacementSequence)
         {
-            for (int b = 0; b < replacementSequence.SequenceBinaryList.Count(); b++)
+            for (int b = 0; b < replacementSequence.SequenceBinaryList.Count; b++)
             {
                 var bank = replacementSequence.SequenceBinaryList[b].SequenceBinary;
                 if (bank != null)
@@ -1273,7 +1276,7 @@ namespace MMR.Randomizer.Utils
 
         public static void AssignSequenceSlot(SequenceInfo slotSequence, SequenceInfo replacementSequence, List<SequenceInfo> remainingSequences, string debugString, StringBuilder log)
         {
-            // if the song has a custom instrument set: lock the sequence, update inst set value, debug output
+            // If the song has a custom instrument set: lock the sequence, update the instrument set value, and write debug output
             if (replacementSequence.SequenceBinaryList != null && replacementSequence.SequenceBinaryList[0] != null && replacementSequence.SequenceBinaryList[0].InstrumentSet != null)
             {
                 (int sequenceBankIndex, int bankListIndex) duplicateBankSearch = FindMatchingInstrumentSetDuplicate(replacementSequence);
@@ -1286,27 +1289,27 @@ namespace MMR.Randomizer.Utils
                         replacementSequence.SequenceBinaryList[duplicateBankSearch.sequenceBankIndex]
                     };
                 }
-                else // no duplicate bank found, add new one
+                else // No duplicate instrument bank found, add a new one
                 {
-                    replacementSequence.Instrument = CurrentFreeBank++; // update to the one we want to use
+                    replacementSequence.Instrument = CurrentFreeBank++; // Update the instrument bank that will be used
                     replacementSequence.SequenceBinaryList[0].InstrumentSet.BankSlot = replacementSequence.Instrument;
                     RomData.InstrumentSetList[replacementSequence.Instrument] = replacementSequence.SequenceBinaryList[0].InstrumentSet;
                     RomData.InstrumentSetList[replacementSequence.Instrument].InstrumentSamples = replacementSequence.InstrumentSamples;
                     log.AppendLine(" -- v -- Instrument set number " + replacementSequence.Instrument.ToString("X2") + " has been claimed -- v --");
-                    replacementSequence.SequenceBinaryList = new List<SequenceBinaryData> { replacementSequence.SequenceBinaryList[0] }; // reduce to one for later
+                    replacementSequence.SequenceBinaryList = new List<SequenceBinaryData> { replacementSequence.SequenceBinaryList[0] }; // Reduce to one for later
                 }
             }
 
-            replacementSequence.Replaces = slotSequence.Replaces; // tells the rando later what song to put into slot_seq
-            //the -40 and +10 pad out the text to allign on the same middle section for visual clarity
+            replacementSequence.Replaces = slotSequence.Replaces; // Determines what song will be placed in slot_seq later
+            // -40 and +10 pad the text to align in the same middle area for visual clarity
             log.AppendLine($"{slotSequence.Name,-40} {debugString,+10} -> " + replacementSequence.Name);
             remainingSequences.Remove(replacementSequence);
         }
 
         public static void CheckSongTest(List<SequenceInfo> sequences, StringBuilder log)
         {
-            /// For song makers: songtest is a debug token found in the song filename
-            ///  specifies to flood the seed with the music for testing
+            // For creators: Songtest is a debug token in the song filename. It specifies
+            // to the rando that the music pool should be flooded with the song for testing.
 
             SequenceInfo songtestSequence = RomData.SequenceList.Find(u => u.Name.Contains("songtest") == true);
             if (songtestSequence == null)
@@ -1314,91 +1317,91 @@ namespace MMR.Randomizer.Utils
                 return;
             }
 
-            // we always put songtest music on fileselect, titlescreen, ctd1, and combat music
-            SequenceInfo fileselectSlot = RomData.TargetSequences.Find(u => u.Replaces == 0x18); // Don't rely on the name in the SEQS.txt, rely on the sequence ID instead
-            AssignSequenceSlot(fileselectSlot, songtestSequence, sequences, "SONGTEST", log); // file select
+            // Songtest always replaces the following: "File Select", "Title Demo", "Clock Town (Day 1)", and "Small Enemy Battle"
+            SequenceInfo fileselectSlot = RomData.TargetSequences.Find(u => u.Replaces == FILE_SELECT); // Don't rely on the name in the SEQS.txt, rely on the sequence ID instead
+            AssignSequenceSlot(fileselectSlot, songtestSequence, sequences, "SONGTEST", log); // File Select
 
-            // since we know songtest is the focus, we can adjust the budget first at the start
+            // Because song testing is the focus, adjust the budget now
             var songtestSize = GetSequenceSize(songtestSequence);
-            if (songtestSequence.Categories.Contains(5) || songtestSequence.Categories.Contains(0x1A))
+            if (songtestSequence.Categories.Contains((int)MusicGroups.Category.ActionThemes) || songtestSequence.Categories.Contains((int)MusicGroups.Category.SmallEnemy))
             {
                 MAX_COMBAT_BUDGET = songtestSize;
                 MAX_BGM_BUDGET = MAX_TYPE2_MUSIC_BUDGET - MAX_COMBAT_BUDGET;
             }
-            // else if not fanfare
-            else if (!(songtestSequence.Categories.Contains(8) || songtestSequence.Categories.Contains(9)
-                        || songtestSequence.Categories.Contains(0x10) || songtestSequence.Categories.Contains(0x16)))
+            // else if Not Fanfare or Cutscene
+            else if (!(songtestSequence.Categories.Contains((int)MusicGroups.Category.ItemFanfares) || songtestSequence.Categories.Contains((int)MusicGroups.Category.EventFanfares)
+                        || songtestSequence.Categories.Contains((int)MusicGroups.Category.ClearFanfares) || songtestSequence.Categories.Contains((int)MusicGroups.Category.Cutscenes)))
             {
                 MAX_BGM_BUDGET = songtestSize;
                 MAX_COMBAT_BUDGET = MAX_TYPE2_MUSIC_BUDGET - MAX_BGM_BUDGET;
             }
 
-            ConvertSequenceSlotToPointer(0x76, 0x18);  // titlescreen
-            ConvertSequenceSlotToPointer(0x15, 0x18);  // clocktown 1
+            ConvertSequenceSlotToPointer(TITLE_DEMO, FILE_SELECT);   // Point "Title Demo" to "File Select"
+            ConvertSequenceSlotToPointer(CLOCK_TOWN_1, FILE_SELECT); // Point "Clock Town (Day 1)" to "File Select"
 
-            // in addition, we take all song slots that share a category with the song and add those too
+            // Additionally, every song that shares a category with the song should be added
             var allMatchingSlots = RomData.TargetSequences.FindAll(u => u.Categories.Intersect(songtestSequence.Categories).Any());
-            allMatchingSlots.Remove(fileselectSlot); // dont re-pointerize it
+            allMatchingSlots.Remove(fileselectSlot); // Don't re-pointerize it
             foreach (SequenceInfo songslot in allMatchingSlots)
             {
-                ConvertSequenceSlotToPointer(songslot.Replaces, 0x18);
+                ConvertSequenceSlotToPointer(songslot.Replaces, FILE_SELECT); // Point replacement to "File Select"
             }
             RomData.TargetSequences.Remove(fileselectSlot);
 
-            // in addition, because songs that use custom banks replace the original bank
-            //  by design, the replacement bank should be a super set of the original, and old songs should still work
-            //  however, sometimes, the old instruments in the new bank are broken, we need to test this
-            // we will test this by turning the lottery into a new song slot with a vanilla song using the songtest bank
+            // Additionally, because songs that use custom banks replace the original bank by design,
+            // the replacement bank should be a super set of the original and old songs should still work.
+            // However, sometimes the old instruments in the new bank are broken and need to be tested.
+            // To do so, the lottery will become a new song slot with a vanilla song using the songtest
+            // sequence's instrument bank.
 
             if (songtestSequence.SequenceBinaryList == null)
             {
-                return; // not a song with a custom bank, we can leave early
+                return; // The song doesn't have a custom instrument bank, no need to continue
             }
 
             void ConvertRoomForSongTest(int sceneFID, int roomFID, int actorIDOffset, int musicOffset, List<SequenceInfo> replacementSequences)
             {
                 if (replacementSequences.Count > 0)
                 {
-                    // pull a sequence from randomized list
-                    var validSequence = replacementSequences[0];
-                    // we have a list of slots we pointerize, we're recycling those
-                    var newSlot = RomData.PointerizedSequences[0].PreviousSlot;
+                    var validSequence = replacementSequences[0];                // Pull a sequence from the randomized list
+                    var newSlot = RomData.PointerizedSequences[0].PreviousSlot; // Recycle the list of slots converted to pointers
                     RomData.PointerizedSequences.RemoveAt(0);
-                    // update sequence to use the slot
-                    validSequence.Replaces = newSlot;
+                    validSequence.Replaces = newSlot;                           // Update the sequence to use the chosen slot
                     replacementSequences.Remove(validSequence);
                     sequences.Remove(validSequence);
-                    log.AppendLine($" -- ^ -- Instrument set number {validSequence.Instrument.ToString("X2")} also used by {validSequence.Name}");
+                    log.AppendLine($" -- ^ -- Instrument set number {validSequence.Instrument:X2} also used by {validSequence.Name}");
 
-                    // set the scene to use this new song slot for background music
+                    // Set the scene to use this new song as the background music
                     RomUtils.CheckCompressed(sceneFID);
                     var scene = RomData.MMFileList[sceneFID].Data;
                     scene[musicOffset] = (byte)newSlot;
                 }
-                // mute the previous music by killing the sfx actor which plays the filtered shop music
-                RomUtils.CheckCompressed(roomFID);
+
+                RomUtils.CheckCompressed(roomFID); // Mute the previous music by killing the SFX actor that plays the filtered shop music
                 var room = RomData.MMFileList[roomFID].Data;
-                room[actorIDOffset] = 0xFF; // kill the sfx actor by setting its room slot ID to -1
+                room[actorIDOffset] = 0xFF; // Kill the SFX actor by setting its room slot ID to -1
                 room[actorIDOffset + 1] = 0xFF;
             }
 
-            // generate a list of sequences that use the vanilla version of the bank our songtest replaces
+            // Generate a list of sequence that use the vanilla version of the bank the songtest sequence replaces
             var sharedBankSequences = RomData.SequenceList.FindAll(u => u.Instrument == songtestSequence.Instrument);
             sharedBankSequences.Remove(songtestSequence);
-            sharedBankSequences.Remove(fileselectSlot);   // file select was already set, so the values are broken
+            sharedBankSequences.Remove(fileselectSlot);   // File Select is already set, so the values are broken
             sharedBankSequences.RemoveAll(u => u.SequenceBinaryList != null);
-            Random newRandom = new Random();
-            sharedBankSequences = sharedBankSequences.OrderBy(x => newRandom.Next()).ToList(); // random shuffle
 
-            ConvertRoomForSongTest(sceneFID: 1334, 1335, actorIDOffset: 0x98, 0x7, sharedBankSequences); // lottery
-            ConvertRoomForSongTest(sceneFID: 1158, 1159, actorIDOffset: 0x88, 0x7, sharedBankSequences); // honey and darling
-            ConvertRoomForSongTest(sceneFID: 1188, 1189, actorIDOffset: 0x88, 0x7, sharedBankSequences); // treasure shop
-            ConvertRoomForSongTest(sceneFID: 1502, 1503, actorIDOffset: 0xC4, 0x7, sharedBankSequences); // bomb shop
+            var newRandom = new Random();
+            sharedBankSequences = sharedBankSequences.OrderBy(x => newRandom.Next()).ToList(); // Random shuffle
+
+            ConvertRoomForSongTest(sceneFID: 1334, 1335, actorIDOffset: 0x98, 0x7, sharedBankSequences); // Lottery
+            ConvertRoomForSongTest(sceneFID: 1158, 1159, actorIDOffset: 0x88, 0x7, sharedBankSequences); // Honey & Darling
+            ConvertRoomForSongTest(sceneFID: 1188, 1189, actorIDOffset: 0x88, 0x7, sharedBankSequences); // Treasure Chest Game Shop
+            ConvertRoomForSongTest(sceneFID: 1502, 1503, actorIDOffset: 0xC4, 0x7, sharedBankSequences); // Bomb Shop
         }
 
         public static void CheckSongForce(List<SequenceInfo> sequences, StringBuilder log, Random rng)
         {
-            /// songs with 'songforce' are higher priorty and get shuffled to the top of the previously randomized list of sequences
+            // Songforce is priority token in the song filename. It places it at the top of the previously randomized sequence list
+            
             List<SequenceInfo> forcedSequences = RomData.SequenceList.FindAll(u => u.Name.Contains("songforce") == true).OrderBy(x => rng.Next()).ToList();
             if (forcedSequences != null && forcedSequences.Count > 0)
             {
@@ -1413,62 +1416,66 @@ namespace MMR.Randomizer.Utils
 
         public static bool SearchForValidSongReplacement(CosmeticSettings cosmeticSettings, List<SequenceInfo> unassignedSequences, SequenceInfo targetSlot, Random rng, StringBuilder log)
         {
-            // we could replace this with a findall(compatible types) but then we lose the small chance of random category music
+            // This could be replaced with a findall(compatible types), but then the random category gacha is lost
             foreach (var testSeq in unassignedSequences.ToList())
             {
-                // increases chance of getting non-mm music, but only if we have lots of music remaining
-                // disable until we can modify this in UI, as there is now enough music it feels unnecessary
+                // Increases the change of getting non-MM music, but only if there's lost of music remaining
+                // Disabled until this can be modified in the UI, there's enough music now so it feels unnecessary
                 //if (unassigned.Count > 77 && testSeq.Name.StartsWith("mm") && testSeq.Type[0] < 0x100 && (random.Next(100) < 40))
                 //    continue;
 
-                // check if this song still has available banks or sequences, if not remove song and continue
-                var songNotStarved = TestIfAvailableBanks(testSeq, targetSlot, log, rng, unassignedSequences);
+                // Check if the current song still has available instrument banks or sequences, if not remove the song and continue
+                var songNotStarved = TestIfAvailableBanks(testSeq, rng);
                 if (songNotStarved == false)
                 {
-                    continue; // song unacceptable, continue
+                    continue; // The song is unacceptable
                 }
 
-                var maxSize = targetSlot.Replaces == 0x1A ? MAX_COMBAT_BUDGET : MAX_BGM_BUDGET;
+                var maxSize = targetSlot.Replaces == SMALL_ENEMY_BATTLE ? MAX_COMBAT_BUDGET : MAX_BGM_BUDGET;
                 var seqSize = GetSequenceSize(testSeq);
                 if (seqSize > maxSize)
                 {
-                    continue; // too big
+                    continue; // The song is too big
                 }
 
-                // do the target slot and the possible match seq share a category?
+                // Check if the target and the possible match share a category
                 if (testSeq.Categories.Intersect(targetSlot.Categories).Any())
                 {
                     AssignSequenceSlot(targetSlot, testSeq, unassignedSequences, "", log);
                     return true;
                 }
 
-                // Deathbasket wanted there to be a small chance of getting out of category music
-                //  but not put fanfares into bgm, or visa versa
-                // also restrict this nature to when there is plenty of music to work with
+                // Deathbasket wanted there to be a small chance of getting out of category music, but
+                // did not want to mix BGM and fanfares — or vice versa.
+                //
                 // (testSeq.Categories.Count > targetSlot.Categories.Count) DBs code, maybe thought to be safer?
                 else if (unassignedSequences.Count > 30
                     && testSeq.Categories.Count > targetSlot.Categories.Count
                     && cosmeticSettings.MusicLuckRollChance > 0 && (decimal)(rng.NextDouble() * 100.0) < cosmeticSettings.MusicLuckRollChance
-                    && targetSlot.Categories[0] <= 0x16
-                    && testSeq.Categories[0] <= 0x16
-                    && (testSeq.Categories[0] & 8) == (targetSlot.Categories[0] & 8)
-                    && testSeq.Categories.Contains(0x10) == targetSlot.Categories.Contains(0x10)
-                    && !testSeq.Categories.Contains(0x16))
+                    && targetSlot.Categories[0] <= (int)MusicGroups.Category.Cutscenes
+                    && testSeq.Categories[0] <= (int)MusicGroups.Category.Cutscenes
+                    && (testSeq.Categories[0] & (int)MusicGroups.Category.ItemFanfares) == (targetSlot.Categories[0] & (int)MusicGroups.Category.ItemFanfares)
+                    && testSeq.Categories.Contains((int)MusicGroups.Category.ClearFanfares) == targetSlot.Categories.Contains((int)MusicGroups.Category.ClearFanfares)
+                    && !testSeq.Categories.Contains((int)MusicGroups.Category.Cutscenes))
                 {
                     AssignSequenceSlot(targetSlot, testSeq, unassignedSequences, "LUCK", log);
                     return true;
                 }
             }
-            return false; // ran out of songs to try
+
+            return false; // Exhausted available songs
         }
 
         public static void CheckBGMCombatMusicBudget(CosmeticSettings cosmeticSettings, List<SequenceInfo> unassignedSequences, Random rng, StringBuilder log)
         {
-            /// in any scene, BGM and Combat music share the same buffer, loading to the other side,
-            /// if their sum is greater than the size of the buffer they clip into each other when one loads, this kills one, usually bgm
+            // For any given scene, BGM and Small Enemy Battle music share the same buffer, loading to the other side. If their sum
+            // is greater than the size of the buffer, they clip into one another when one loads — this kills one of them, usually BGM.
 
-            var combatSequences = RomData.SequenceList.FindAll(u => u.Categories.Contains(5));
-            var BGMSlots = RomData.TargetSequences.FindAll(u => u.Categories.Contains(0) || u.Categories.Contains(2) || u.SeqId == 0x12); // 0x12 is deku palace, which has an enemy
+            var combatSequences = RomData.SequenceList.FindAll(u => u.Categories.Contains((int)MusicGroups.Category.ActionThemes));
+            var BGMSlots = RomData.TargetSequences.FindAll(u => u.Categories.Contains((int)MusicGroups.Category.Fields)
+                                                             || u.Categories.Contains((int)MusicGroups.Category.Dungeons)
+                                                             || u.SeqId == DEKU_PALACE); // 0x12: Deku Palace (has enemies)
+
             var usedBGMSequences = new List<SequenceInfo>();
             foreach (var slot in BGMSlots)
             {
@@ -1479,14 +1486,14 @@ namespace MMR.Randomizer.Utils
                 }
             }
 
-            // we pick combat or BGM as the limiting factor, the other have to be smaller than what we chose
+            // BGM or combat is the limiting factor, the other has to be smaller than the chosen limiter
             bool combatVsBGMCoinToss = rng.Next(2) == 1;
 
-            var usedCombatSequence = RomData.SequenceList.Find(u => u.Replaces == 0x1A && u.Name != "mm-combat");
-            if (usedCombatSequence == null) // songtest removes the sequence, points it at fileselect for testing
+            var usedCombatSequence = RomData.SequenceList.Find(u => u.Replaces == SMALL_ENEMY_BATTLE && u.Name != "mm-combat");
+            if (usedCombatSequence == null) // Songtest removes the sequence and points it at "File Select" for testing
             {
                 combatVsBGMCoinToss = true; // "COMBAT" manually selected because of combat songtest
-                usedCombatSequence = RomData.SequenceList.Find(u => u.Replaces == 0x18 && u.Name != "mm-fileselect");
+                usedCombatSequence = RomData.SequenceList.Find(u => u.Replaces == FILE_SELECT && u.Name != "mm-fileselect");
             }
             else if (RomData.SequenceList.Find(u => u.Name.Contains("songtest")) != null)
             {
@@ -1495,7 +1502,7 @@ namespace MMR.Randomizer.Utils
 
             if (cosmeticSettings.DisableCombatMusic)
             {
-                combatVsBGMCoinToss = false; // "BGM" manually selected because combat music is disabled.
+                combatVsBGMCoinToss = false; // "BGM" manually selected because combat music is disabled
             }
 
             var combatSize = GetSequenceSize(usedCombatSequence);
@@ -1509,11 +1516,11 @@ namespace MMR.Randomizer.Utils
                 {
                     return;
                 }
-                // get new BGM budget from combat file
+                // Get new BGM budget from combat sequence
                 var newBGMBudget = MAX_BGM_BUDGET = MAX_TYPE2_MUSIC_BUDGET - combatSize;
-                log.AppendLine($" new BGM budget: {MAX_BGM_BUDGET.ToString("X")}, from combat size: {combatSize.ToString("X")}");
+                log.AppendLine($" new BGM budget: {MAX_BGM_BUDGET:X}, from combat size: {combatSize:X}");
 
-                // per BGM sequence
+                // Per BGM sequence
                 foreach (var seq in usedBGMSequences)
                 {
                     var bgmSeqSize = GetSequenceSize(seq);
@@ -1522,7 +1529,7 @@ namespace MMR.Randomizer.Utils
                         var seqName = seq.Name;
                         log.AppendLine($"BGM sequence {seqName} was too big to match your combat music, replacing ... ");
                         var bgmSlot = RomData.TargetSequences.Find(u => u.Replaces == seq.Replaces);
-                        seq.Replaces = -1; // cancel using this song
+                        seq.Replaces = -1; // Cancel using this song
                         bool status = SearchForValidSongReplacement(cosmeticSettings, unassignedSequences, bgmSlot, rng, log);
                         if (status == false)
                         {
@@ -1535,18 +1542,18 @@ namespace MMR.Randomizer.Utils
             }
             else // BGM chosen
             {
-                // get new combat budget by comparing to largest BGM
+                // Get new combat budget by comparing to the largest BGM sequence
                 var largestBGMSize = usedBGMSequences.Max(s => (int?)GetSequenceSize(s)) ?? 0;
-                log.AppendLine($" new Combat budget: {MAX_COMBAT_BUDGET.ToString("X")} from bgm size: {largestBGMSize.ToString("X")}");
+                log.AppendLine($" new Combat budget: {MAX_COMBAT_BUDGET:X} from bgm size: {largestBGMSize:X}");
 
-                // per BGM sequence
+                // Per BGM sequence
                 var newCombatBudget = MAX_COMBAT_BUDGET = MAX_TYPE2_MUSIC_BUDGET - largestBGMSize;
                 if (combatSize > newCombatBudget)
                 {
                     var seqName = usedCombatSequence.Name;
                     log.AppendLine($"Combat sequence {seqName} was too big to match your BGM music, replacing ... ");
                     var combatSlot = RomData.TargetSequences.Find(u => u.Name == "mm-combat");
-                    usedCombatSequence.Replaces = -1; // cancel using this song
+                    usedCombatSequence.Replaces = -1; // Cancel using this song
                     bool status = SearchForValidSongReplacement(cosmeticSettings, unassignedSequences, combatSlot, rng, log);
                     if (status == false)
                     {
@@ -1558,16 +1565,17 @@ namespace MMR.Randomizer.Utils
             }
         }
 
-
         public static void ReadInstrumentSetList()
         {
-            /// traverse the whole audiobank index and grab details about every bank
-            ///  use those details to generate a list from the vanilla game that we can modify as needed
+            // Go through the audiobank index and get details about every bank, then use those details
+            // to generate a list from the vanilla game that can be modified as needed.
+            
             RomData.InstrumentSetList = new List<InstrumentSetInfo>();
-            // audiobankindex can go up to 0x80 with current extended bank table file
+
+            // The index list can go up to 0x80 with current extended instrument bank table file
             for (int audiobankIndex = 0; audiobankIndex <= 0x80; ++audiobankIndex)
             {
-                // each bank has one 16 byte sentence of data, first word is address, second is length, last 2 words metadata
+                // Each instrument bank has one 16 byte sentence of data, first word is address, second is length, last 2 words metadata
                 int audiobankIndexAddr = NewInstrumentSetAddress + (audiobankIndex * 0x10);
                 int audiobankBankOffset = (ReadWriteUtils.ReadU16(audiobankIndexAddr) << 16) + ReadWriteUtils.ReadU16(audiobankIndexAddr + 2);
                 int bankLength = (ReadWriteUtils.ReadU16(audiobankIndexAddr + 4) << 16) + ReadWriteUtils.ReadU16(audiobankIndexAddr + 6);
@@ -1597,33 +1605,33 @@ namespace MMR.Randomizer.Utils
 
         public static void UpdateBankInstrumentPointers(byte[] ROM)
         {
-            /// the audiobank and new samples are already written to rom, now we need to go back and update all the pointers
-            ///   since we cannot know where those samples are on the rom until A) the soundbank is written, and B) the sample file is written
-            ///   because the pointer is an offset of the soundbank rom location, and both can shift in BuildRom()
+            // The audiobank and new samples are already written to the ROM file, now all the pointers need to be updated
+            // since it's currently not possible to know where the audio samples are written until the soundbank and samples are written.
+            // This is because the pointer is an offse to the soundbank ROM location, and both can shift in BuildROM()
 
             if (RomData.InstrumentSetList == null)
             {
                 return;
             }
 
-            int soundbankAddr = RomData.MMFileList[5].Cmp_Addr; // in vanilla it's 0x97f70 but MMR can shift it up because AudioSeq gets re-located
-            int audiobankInstSetAddr = RomData.MMFileList[3].Cmp_Addr; // pointer to specific instrument set, starting with 0, updating per loop
+            int soundbankAddr = RomData.MMFileList[5].Cmp_Addr; // In vanilla it's 0x97F70, but it can be shifted because MMR changes AudioSeq's location
+            int audiobankInstSetAddr = RomData.MMFileList[3].Cmp_Addr; // Point to a specific instrument set, starting with 0 and updating per loop
             foreach (var instrumentset in RomData.InstrumentSetList)
             {
                 if (instrumentset.InstrumentSamples != null && instrumentset.InstrumentSamples.Count > 0)
                 {
                     foreach (var sample in instrumentset.InstrumentSamples)
                     {
-                        // for each sample if the bank uses sample, lookup new rom for the sample
-                        //   get soundbank offset for said address: address of collection + offset of specific sample in collection, minus soundbank
+                        // For each audio sample, if the bank uses the sample, lookup new ROM for the sample
+                        // and get the soundbank offset for said address: address of collection + offset of specific sample in collection - soundbank
                         int soundbankSampleOffset = RomData.MMFileList[RomData.SamplesFileID].Cmp_Addr
                                                       + (int)RomData.ListOfSamples.Find(u => u.Hash == sample.Hash).Addr
                                                       - soundbankAddr;
                         byte[] sampleOffsetBytes = BitConverter.GetBytes(soundbankSampleOffset);
                         byte[] markerBytes = BitConverter.GetBytes(sample.Marker);
 
-                        // find the location in the bank where the Sample Marker is
-                        //   per byte, replace with the bytes from SampleOffsetBytes
+                        // Find the location in the bank where the temp address is per byte,
+                        // then replace with the bytes from SampleOffsetBytes
                         for (int i = 0; i < (instrumentset.BankBinary.Length - 4); i += 1)
                         {
                             if (ROM[audiobankInstSetAddr + i + 0] == markerBytes[3]
@@ -1639,6 +1647,7 @@ namespace MMR.Randomizer.Utils
                         }
                     }
                 }
+
                 audiobankInstSetAddr += instrumentset.BankBinary.Length;
             }
         }
@@ -1646,41 +1655,41 @@ namespace MMR.Randomizer.Utils
 
         public static void WriteNewSoundSamples(List<InstrumentSetInfo> InstrumentSetList)
         {
-            /// Writing all of our new samples in a single file at the end
-            //  in the event we run out of MMFile DMA indexes: These files dont need to be a hard file in the filesystem
-            //  they can be placed anywhere after the soundbank starting address on rom, instrument sample lookup doesnt use file system
-            //  adding to the file system is just useful for shifting in BuildROM()
+            // Write all the custom audio samples in a single file at the end.
+            // In the event there are no more MMFile DMA indices, these files don't need to be a hard file in the filesystem,
+            // they can be placed anywhere after the soundbank starting address on ROM. The instrument sample lookup doesn't use
+            // the file system, but adding to the file system is useful for shifting in BuildROM().
 
-            // issue: we don't know right now where the samples will be written to, because BuildRom will shift the files
-            //  for now we write samples, after audiobank/soundbank/samples are written, we'll update audiobank pointers
-            // save extra soundsamples fid, and the samples with their data, for later (UpdateBankInstrumentPointers())
+            // Issue: it's unknown where the samples will be written to at this point, because BuildROM() will shift the files.
+            // For now, write the audio samples after the audiobank/soundbank/samples are written, then update the audiobank
+            // pointers.
+            // Save extra soundsamples FID, and the samples with their data, for later (UpdateBankInstrumentPointers())
+
             int fid = RomData.SamplesFileID = RomUtils.AppendFile(new byte[0x0]);
             RomData.ListOfSamples = new List<SequenceSoundSampleBinaryData>();
 
-            // for each custom instrument set that needs a custom sample
+            // For each custom instrument set that needs a custom audio sample
             foreach (InstrumentSetInfo instrumentSet in InstrumentSetList)
             {
                 if (instrumentSet.InstrumentSamples != null && instrumentSet.InstrumentSamples.Count > 0)
                 {
                     foreach (SequenceSoundSampleBinaryData sample in instrumentSet.InstrumentSamples)
                     {
-                        // test if sample was already added by another song (OOT instruments for instance)
+                        // Test if sample was already added by another song
                         var previouslyWrittenSample = RomData.ListOfSamples.Find(u => sample.Hash == u.Hash);
-                        if (previouslyWrittenSample == null) // if sample not already written once before
+                        if (previouslyWrittenSample == null) // If sample not already written
                         {
-                            // get the rom addr of our new file, our file will start at the end of the last file
-                            sample.Addr = (uint)RomData.MMFileList[fid].Data.Length;
-                            // concat our sample to sample collection file
-                            RomData.MMFileList[fid].Data = RomData.MMFileList[fid].Data.Concat(sample.BinaryData).ToArray();
-                            // I don't know if samples need to be padded to 0x10 like sequences but might as well
-                            int paddingRemainder = RomData.MMFileList[fid].Data.Length % 0x10;
+                            sample.Addr = (uint)RomData.MMFileList[fid].Data.Length; // Get the ROM addr of the new file, the file will start at the end of the last file
+                            RomData.MMFileList[fid].Data = RomData.MMFileList[fid].Data.Concat(sample.BinaryData).ToArray(); // Concat the sample to sample collection file
+
+                            int paddingRemainder = RomData.MMFileList[fid].Data.Length % 0x10; // Samples may not need to be 16 byte aligned, but just in case
                             if (paddingRemainder > 0)
                             {
                                 RomData.MMFileList[fid].Data = RomData.MMFileList[fid].Data.Concat(new byte[paddingRemainder]).ToArray();
                             }
                             RomData.ListOfSamples.Add(sample);
                         }
-                        else // get address of previously used sample
+                        else // Get the address of the previously used audio sample
                         {
                             sample.Addr = previouslyWrittenSample.Addr;
                         }
@@ -1692,51 +1701,53 @@ namespace MMR.Randomizer.Utils
 
         public static void RebuildAudioBank(List<InstrumentSetInfo> InstrumentSetList)
         {
-            // get index for the old audiobank, we're putting it back in the same spot but letting it expand into audioseq's spot, which was moved to the end
+            // Get the index for the old instrument bank, it will be put in the same spot while
+            // letting it expand into the AudioSeq's spot that has been moved to the end
             int fid = RomUtils.GetFileIndexForWriting(NewInstrumentSetAddress);
-            // the DMA table doesn't point directly to the indextable on the rom, its part of a larger yaz0 file, we have to use an offset to get the address in the file
+
+            // The DMA table doesn't point directly to the indextable on the ROM, its part of a larger yaz0 file, an offset is required to get the address in the file
             int audiobankIndexOffset = NewInstrumentSetAddress - RomData.MMFileList[RomUtils.GetFileIndexForWriting(NewInstrumentSetAddress)].Addr;
 
             int audiobankBankOffset = 0;
-            var audiobankData = new byte[0];
+            byte[] audiobankData = new byte[0];
 
-            // for each bank, concat onto the new bank byte object, update the table to match the new instrument sets
-            // CurrentFreeBank is used so not all unused dummy audiobanks get written to rom
+            // For each instrument bank, concat onto the new object, then update the table to match the new instrument sets.
+            // CurrentFreeBank is used so not all unused dummy instrument banks get written to ROM.
             for (int audiobankIndex = 0; audiobankIndex <= CurrentFreeBank; ++audiobankIndex)
             {
                 var currentBank = InstrumentSetList[audiobankIndex];
                 audiobankData = audiobankData.Concat(currentBank.BankBinary).ToArray();
 
-                // update address of the bank in the index table
+                // Update address of the instrument bank in the index table
                 RomData.MMFileList[fid].Data[audiobankIndexOffset + (audiobankIndex * 16) + 0] = (byte)((audiobankBankOffset & 0xFF000000) >> 24);
                 RomData.MMFileList[fid].Data[audiobankIndexOffset + (audiobankIndex * 16) + 1] = (byte)((audiobankBankOffset & 0xFF0000) >> 16);
                 RomData.MMFileList[fid].Data[audiobankIndexOffset + (audiobankIndex * 16) + 2] = (byte)((audiobankBankOffset & 0xFF00) >> 8);
                 RomData.MMFileList[fid].Data[audiobankIndexOffset + (audiobankIndex * 16) + 3] = (byte)(audiobankBankOffset & 0xFF);
 
-                // update length of the bank in the table
+                // Update length of the instrument bank in the table
                 int currentBankLength = currentBank.BankBinary.Length;
                 RomData.MMFileList[fid].Data[audiobankIndexOffset + (audiobankIndex * 16) + 4] = (byte)((currentBankLength & 0xFF000000) >> 24);
                 RomData.MMFileList[fid].Data[audiobankIndexOffset + (audiobankIndex * 16) + 5] = (byte)((currentBankLength & 0xFF0000) >> 16);
                 RomData.MMFileList[fid].Data[audiobankIndexOffset + (audiobankIndex * 16) + 6] = (byte)((currentBankLength & 0xFF00) >> 8);
                 RomData.MMFileList[fid].Data[audiobankIndexOffset + (audiobankIndex * 16) + 7] = (byte)(currentBankLength & 0xFF);
 
-                // update metadata of the bank in the table
+                // Update the metadata of the instrument bank in the table
                 for (int metadataIter = 0; metadataIter < 8; ++metadataIter)
                 {
                     RomData.MMFileList[fid].Data[audiobankIndexOffset + (audiobankIndex * 16) + 8 + metadataIter] = currentBank.BankMetaData[metadataIter];
                 }
 
-                // adjust the address for the next bank to use
+                // Adjust the address for the next instrument bank to use
                 audiobankBankOffset += currentBankLength;
                 int paddingRemainder = currentBankLength % 0x10;
-                if (paddingRemainder > 0) // in the event the user made an audiobank instrument set that isn't padded
+                if (paddingRemainder > 0) // In the event the user made an instrument bank that isn't 16 byte aligned
                 {
-                    audiobankData = audiobankData.Concat(new byte[paddingRemainder + 0x10]).ToArray(); // padding with a spare 16 byte line sounds cheap enough to try
+                    audiobankData = audiobankData.Concat(new byte[paddingRemainder + 0x10]).ToArray(); // Padding with an extra line is cheap enough to try
                     audiobankBankOffset += paddingRemainder;
                 }
             }
 
-            // write new audiobank back to file
+            // Write the new instrument bank back to file
             var audiobankFile = RomData.MMFileList[RomUtils.GetFileIndexForWriting(Addresses.Audiobank)];
             audiobankFile.Data = audiobankData;
             audiobankFile.End = audiobankFile.Addr + audiobankFile.Data.Length;
@@ -1744,7 +1755,7 @@ namespace MMR.Randomizer.Utils
 
         private class MMRSArchiveContents
         {
-            /// Intermediary class to store files contained in the music file archive
+            // Intermediary class to store files contained in the music file archive
             public ZipArchiveEntry MetaFile { get; set; }
             public ZipArchiveEntry SequenceFile { get; set; }
             public ZipArchiveEntry BankFile { get; set; }
@@ -1756,7 +1767,7 @@ namespace MMR.Randomizer.Utils
 
         private class MMRSMetadata
         {
-            /// Intermediary class to store metadata information from the META file
+            // Intermediary class to store metadata information from the META file
             public string CosmeticName { get; set; }
             public string InstrumentSet { get; set; }
             public string SongType { get; set; }
@@ -1766,7 +1777,7 @@ namespace MMR.Randomizer.Utils
 
         public class SEQSYaml
         {
-            /// Store SEQS data as YAML instead of plaintext
+            // Store SEQS data as YAML instead of plaintext
 
             [YamlMember(Alias = "display name")]
             public string DisplayName { get; set; }
