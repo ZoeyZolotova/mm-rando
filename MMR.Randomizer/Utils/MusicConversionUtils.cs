@@ -427,10 +427,8 @@ namespace MMR.Randomizer.Utils
 
                     int value = Convert.ToInt32(cleaned, 16);
 
-                    if (Enum.IsDefined(typeof(MusicGroups.Individual), value))
-                        cleanedCategories.Add(Enum.GetName(typeof(MusicGroups.Individual), value));
-                    else if (Enum.IsDefined(typeof(MusicGroups.Group), value))
-                        cleanedCategories.Add(Enum.GetName(typeof(MusicGroups.Group), value));
+                    if (Enum.IsDefined(typeof(MusicGroups.Category), value))
+                        cleanedCategories.Add(Enum.GetName(typeof(MusicGroups.Category), value));
                 }
 
                 categories = cleanedCategories.OfType<string>().ToArray();
@@ -518,10 +516,8 @@ namespace MMR.Randomizer.Utils
                         // Convert to a string value
                         var value = Convert.ToInt32(cleanedCategory, 16);
 
-                        if (Enum.IsDefined(typeof(MusicGroups.Individual), value))
-                            categories.Add(Enum.GetName(typeof(MusicGroups.Individual), value));
-                        else if (Enum.IsDefined(typeof(MusicGroups.Group), value))
-                            categories.Add(Enum.GetName(typeof(MusicGroups.Group), value));
+                        if (Enum.IsDefined(typeof(MusicGroups.Category), value))
+                            categories.Add(Enum.GetName(typeof(MusicGroups.Category), value));
                     }
 
                     bool[] ffOrBgm = new bool[categories.Count];
