@@ -417,7 +417,7 @@ namespace MMR.Randomizer.Utils
 
                 metaBank = standaloneSeq.InstrumentSet;
                 var rawCategories = standaloneSeq.Categories;
-                List<object> cleanedCategories = new ();
+                List<object> cleanedCategories = new();
                 foreach (var category in rawCategories)
                 {
                     string cleaned = category.Trim();
@@ -479,8 +479,8 @@ namespace MMR.Randomizer.Utils
             string cosmeticName = "";
             string metaBank = "";
             string songType = "";
-            List<object> categories = new ();
-            Dictionary<string, uint> zsounds = new ();
+            List<object> categories = new();
+            Dictionary<string, uint> zsounds = new();
 
             string filename = Path.GetFileNameWithoutExtension(destinationFile);
             string filepath = Path.GetFullPath(destinationFile);
