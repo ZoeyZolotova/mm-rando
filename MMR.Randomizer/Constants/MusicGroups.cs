@@ -7,30 +7,33 @@ namespace MMR.Randomizer.Constants
     {
         // There's a few cases of alternative names being allowed, and quite a bit of special handling for spaces and proper punctuation
         // They could be removed to have a more standardized list... After all, why not? Why shouldn't I keep it?
-        public enum Group : int
+        public enum Type
         {
-            // BGM Categories
-            Fields       = 0x00,
-            Towns        = 0x01,
-            Dungeons     = 0x02,
-            Indoors      = 0x03,
-            Minigames    = 0x04,
-            ActionThemes = 0x05,
-            CalmThemes   = 0x06,
-            Fights       = 0x07,
-
-            // Fanfare Categories
-            ItemFanfares  = 0x08,
-            EventFanfares = 0x09,
-            ClearFanfares = 0x10,
-
-            // Special
-            Cutscenes = 0x16,
+            Bgm,
+            Fanfare
         }
 
-        // There are a few cases where alternate names are allowed, some people may make mistakes — especially end users
-        public enum Individual : int
+        public enum Category : int
         {
+            // Group BGM Categories
+            Fields               = 0x00,
+            Towns                = 0x01,
+            Dungeons             = 0x02,
+            Indoors              = 0x03,
+            Minigames            = 0x04,
+            ActionThemes         = 0x05,
+            CalmThemes           = 0x06,
+            Fights               = 0x07,
+
+            // Group Fanfare Categories
+            ItemFanfares         = 0x08,
+            EventFanfares        = 0x09,
+            ClearFanfares        = 0x10,
+
+            // Group Cutscene Categories
+            Cutscenes            = 0x16,
+
+            // Individual Categories
             // BGM
             TerminaField         = 0x102,
             PursuitTheme         = 0x103,
@@ -103,209 +106,318 @@ namespace MMR.Randomizer.Constants
             ReunionTheme         = 0x17D,
 
             // Fanfares
-            EventFail1        = 0x108,
-            EventFail2        = 0x109,
-            EventSuccess      = 0x119,
-            GameOver          = 0x120,
-            BossDefeated      = 0x121,
-            ItemGet           = 0x122,
-            HeartContainerGet = 0x124,
-            OpenChest         = 0x12B,
-            MaskGet           = 0x137,
-            HeartPieceGet     = 0x139,
-            TruthRevealed     = 0x13D,
-            GoronRaceWin      = 0x13F,
-            HorseRaceWin      = 0x141,
-            SongGet           = 0x152,
-            SoaringTheme      = 0x155,
-            TempleAppears     = 0x177,
-            TempleClearShort  = 0x178,
-            TempleClearLong   = 0x179,
-            GiantsLeave       = 0x17C,
-            MoonDestroyed     = 0x17E,
+            EventFail1           = 0x108,
+            EventFail2           = 0x109,
+            EventSuccess         = 0x119,
+            GameOver             = 0x120,
+            BossDefeated         = 0x121,
+            ItemGet              = 0x122,
+            HeartContainerGet    = 0x124,
+            OpenChest            = 0x12B,
+            MaskGet              = 0x137,
+            HeartPieceGet        = 0x139,
+            TruthRevealed        = 0x13D,
+            GoronRaceWin         = 0x13F,
+            HorseRaceWin         = 0x141,
+            SongGet              = 0x152,
+            SoaringTheme         = 0x155,
+            TempleAppears        = 0x177,
+            TempleClearShort     = 0x178,
+            TempleClearLong      = 0x179,
+            GiantsLeave          = 0x17C,
+            MoonDestroyed        = 0x17E,
 
             // Cutscenes
-            GiantsAppear      = 0x170,
-            TitleDemo         = 0x176,
+            GiantsAppear         = 0x170,
+            TitleDemo            = 0x176,
         }
 
+        // Stores the type for each category
+        public static readonly Dictionary<Category, Type> CategoryTypes = new()
+        {
+            // Group BGM Category
+            { Category.Fields,               Type.Bgm },
+            { Category.Towns,                Type.Bgm },
+            { Category.Dungeons,             Type.Bgm },
+            { Category.Indoors,              Type.Bgm },
+            { Category.Minigames,            Type.Bgm },
+            { Category.ActionThemes,         Type.Bgm },
+            { Category.CalmThemes,           Type.Bgm },
+            { Category.Fights,               Type.Bgm },
+
+            // Group Fanfares Category
+            { Category.ItemFanfares,         Type.Fanfare },
+            { Category.EventFanfares,        Type.Fanfare },
+            { Category.ClearFanfares,        Type.Fanfare },
+
+            // Group Cutscenes Category
+            { Category.Cutscenes,            Type.Bgm },
+
+            // Individual BGM Categories
+            { Category.TerminaField,         Type.Bgm },
+            { Category.PursuitTheme,         Type.Bgm },
+            { Category.MajorasTheme,         Type.Bgm },
+            { Category.ClockTower,           Type.Bgm },
+            { Category.StoneTower,           Type.Bgm },
+            { Category.InvertedStoneTower,   Type.Bgm },
+            { Category.HealingTheme,         Type.Bgm },
+            { Category.SouthernSwamp,        Type.Bgm },
+            { Category.AliensTheme,          Type.Bgm },
+            { Category.BoatCruise,           Type.Bgm },
+            { Category.SharpsCurse,          Type.Bgm },
+            { Category.GreatBay,             Type.Bgm },
+            { Category.IkanaCanyon,          Type.Bgm },
+            { Category.DekuPalace,           Type.Bgm },
+            { Category.Snowhead,             Type.Bgm },
+            { Category.PiratesFortress,      Type.Bgm },
+            { Category.ClockTown1,           Type.Bgm },
+            { Category.ClockTown2,           Type.Bgm },
+            { Category.ClockTown3,           Type.Bgm },
+            { Category.FileSelect,           Type.Bgm },
+            { Category.SmallEnemy,           Type.Bgm },
+            { Category.BossEnemy,            Type.Bgm },
+            { Category.WoodfallTemple,       Type.Bgm },
+            { Category.House,                Type.Bgm },
+            { Category.MinigameTheme,        Type.Bgm },
+            { Category.GoronRace,            Type.Bgm },
+            { Category.MusicBoxHouse,        Type.Bgm },
+            { Category.GreatFairysFountain,  Type.Bgm },
+            { Category.FairysFountain,       Type.Bgm },
+            { Category.ZeldasTheme,          Type.Bgm },
+            { Category.RosaSistersTheme,     Type.Bgm },
+            { Category.CuriosityShop,        Type.Bgm },
+            { Category.MarineResearchLab,    Type.Bgm },
+            { Category.GiantsTheme,          Type.Bgm },
+            { Category.GuruGurusTheme,       Type.Bgm },
+            { Category.RomaniRanch,          Type.Bgm },
+            { Category.GoronShrine,          Type.Bgm },
+            { Category.MayorsOffice,         Type.Bgm },
+            { Category.ZoraHall,             Type.Bgm },
+            { Category.BigEnemy,             Type.Bgm },
+            { Category.AstralObservatory,    Type.Bgm },
+            { Category.SecretGrotto,         Type.Bgm },
+            { Category.MilkBar,              Type.Bgm },
+            { Category.WoodsOfMystery,       Type.Bgm },
+            { Category.MysteryWoods,         Type.Bgm },
+            { Category.HorseRace,            Type.Bgm },
+            { Category.GormanBrosTheme,      Type.Bgm },
+            { Category.WitchesTheme,         Type.Bgm },
+            { Category.KoumeAndKotakesTheme, Type.Bgm },
+            { Category.ItemShop,             Type.Bgm },
+            { Category.OwlsTheme,            Type.Bgm },
+            { Category.KaeporaGaeborasTheme, Type.Bgm },
+            { Category.MinigameShop,         Type.Bgm },
+            { Category.SwordSchool,          Type.Bgm },
+            { Category.FinalHours,           Type.Bgm },
+            { Category.SnowheadTemple,       Type.Bgm },
+            { Category.GreatBayTemple,       Type.Bgm },
+            { Category.MajorasWrath,         Type.Bgm },
+            { Category.MajorasIncarnation,   Type.Bgm },
+            { Category.MajorasMask,          Type.Bgm },
+            { Category.JapasRoom,            Type.Bgm },
+            { Category.TijosRoom,            Type.Bgm },
+            { Category.EvansRoom,            Type.Bgm },
+            { Category.IkanaCastle,          Type.Bgm },
+            { Category.KamarosTheme,         Type.Bgm },
+            { Category.CremiasTheme,         Type.Bgm },
+            { Category.KeatonsTheme,         Type.Bgm },
+            { Category.MoonEnraged,          Type.Bgm },
+            { Category.ReunionTheme,         Type.Bgm },
+
+            // Individual Fanfare Categories
+            { Category.EventFail1,           Type.Fanfare },
+            { Category.EventFail2,           Type.Fanfare },
+            { Category.EventSuccess,         Type.Fanfare },
+            { Category.GameOver,             Type.Fanfare },
+            { Category.BossDefeated,         Type.Fanfare },
+            { Category.ItemGet,              Type.Fanfare },
+            { Category.HeartContainerGet,    Type.Fanfare },
+            { Category.OpenChest,            Type.Fanfare },
+            { Category.MaskGet,              Type.Fanfare },
+            { Category.HeartPieceGet,        Type.Fanfare },
+            { Category.TruthRevealed,        Type.Fanfare },
+            { Category.GoronRaceWin,         Type.Fanfare },
+            { Category.HorseRaceWin,         Type.Fanfare },
+            { Category.SongGet,              Type.Fanfare },
+            { Category.SoaringTheme,         Type.Fanfare },
+            { Category.TempleAppears,        Type.Fanfare },
+            { Category.TempleClearShort,     Type.Fanfare },
+            { Category.TempleClearLong,      Type.Fanfare },
+            { Category.GiantsLeave,          Type.Fanfare },
+            { Category.MoonDestroyed,        Type.Fanfare },
+
+            // Individual Cutscene Categories
+            { Category.GiantsAppear,         Type.Bgm },
+            { Category.TitleDemo,            Type.Bgm },
+        };
+
+
         // Allow people to utilize display names
-        public static readonly Dictionary<string, Group> GroupDisplayNames = new(StringComparer.OrdinalIgnoreCase)
+        public static readonly Dictionary<string, Category> CategoryDisplayNames = new(StringComparer.OrdinalIgnoreCase)
         {
-            { "Action Themes", Group.ActionThemes },
-            { "Calm Themes", Group.CalmThemes },
-            { "Item Fanfares", Group.ItemFanfares },
-            { "Event Fanfares", Group.EventFanfares },
-            { "Clear Fanfares", Group.ClearFanfares},
+            // Group Categories
+            { "Action Themes",            Category.ActionThemes },
+            { "Calm Themes",              Category.CalmThemes },
+            { "Item Fanfares",            Category.ItemFanfares },
+            { "Event Fanfares",           Category.EventFanfares },
+            { "Clear Fanfares",           Category.ClearFanfares},
+
+            // Individual BGM Categories
+            { "Termina Field",            Category.TerminaField },
+            { "Pursuit Theme",            Category.PursuitTheme },
+            { "Majora's Theme",           Category.MajorasTheme },
+            { "Majoras Theme",            Category.MajorasTheme },
+            { "Clock Tower",              Category.ClockTower },
+            { "Stone Tower",              Category.StoneTower },
+            { "Inverted Stone Tower",     Category.InvertedStoneTower },
+            { "Healing Theme",            Category.HealingTheme },
+            { "Southern Swamp",           Category.SouthernSwamp },
+            { "Aliens' Theme",            Category.AliensTheme },
+            { "Aliens Theme",             Category.AliensTheme },
+            { "Boat Cruise",              Category.BoatCruise },
+            { "Sharp's Curse",            Category.SharpsCurse },
+            { "Sharps Curse",             Category.SharpsCurse },
+            { "Great Bay",                Category.GreatBay },
+            { "Ikana Canyon",             Category.IkanaCanyon },
+            { "Deku Palace",              Category.DekuPalace },
+            { "Snowhead",                 Category.Snowhead },
+            { "Pirates' Fortress",        Category.PiratesFortress },
+            { "Pirates Fortress",         Category.PiratesFortress },
+            { "Clock Town 1",             Category.ClockTown1 },
+            { "Clock Town 2",             Category.ClockTown2 },
+            { "Clock Town 3",             Category.ClockTown3 },
+            { "File Select",              Category.FileSelect },
+            { "Small Enemy",              Category.SmallEnemy },
+            { "Boss Enemy",               Category.BossEnemy },
+            { "Woodfall Temple",          Category.WoodfallTemple },
+            { "House",                    Category.House },
+            { "Minigame",                 Category.MinigameTheme },
+            { "Goron Race",               Category.GoronRace },
+            { "Music Box House",          Category.MusicBoxHouse },
+            { "Great Fairy's Fountain",   Category.GreatFairysFountain },
+            { "Great Fairys Fountain",    Category.GreatFairysFountain },
+            { "Great Fairy Fountain",     Category.GreatFairysFountain },
+            { "Fairy's Fountain",         Category.FairysFountain },
+            { "Fairys Fountain",          Category.FairysFountain },
+            { "Fairy Fountain",           Category.FairysFountain },
+            { "Zelda's Theme",            Category.ZeldasTheme },
+            { "Zeldas Theme",             Category.ZeldasTheme },
+            { "Rosa Sisters' Theme",      Category.RosaSistersTheme },
+            { "Rosa Sisters Theme",       Category.RosaSistersTheme },
+            { "Curiosity Shop",           Category.CuriosityShop },
+            { "Marine Research Lab",      Category.MarineResearchLab },
+            { "Giants' Theme",            Category.GiantsTheme },
+            { "Giants Theme",             Category.GiantsTheme },
+            { "Guru-Guru's Theme",        Category.GuruGurusTheme },
+            { "Guru Guru's Theme",        Category.GuruGurusTheme },
+            { "Guru-Gurus Theme",         Category.GuruGurusTheme },
+            { "Guru Gurus Theme",         Category.GuruGurusTheme },
+            { "Romani Ranch",             Category.RomaniRanch },
+            { "Goron Shrine",             Category.GoronShrine },
+            { "Mayor's Office",           Category.MayorsOffice },
+            { "Mayors Office",            Category.MayorsOffice },
+            { "Zora Hall",                Category.ZoraHall },
+            { "Big Enemy",                Category.BigEnemy },
+            { "Astral Observatory",       Category.AstralObservatory },
+            { "Secret Grotto",            Category.SecretGrotto },
+            { "Milk Bar",                 Category.MilkBar },
+            { "Woods of Mystery",         Category.WoodsOfMystery },
+            { "Mystery Woods",            Category.MysteryWoods },
+            { "Horse Race",               Category.HorseRace },
+            { "Gorman Bros.' Theme",      Category.GormanBrosTheme },
+            { "Gorman Bros. Theme",       Category.GormanBrosTheme },
+            { "Gorman Bros' Theme",       Category.GormanBrosTheme },
+            { "Gorman Bros Theme",        Category.GormanBrosTheme },
+            { "Witches' Theme",           Category.WitchesTheme },
+            { "Witches Theme",            Category.WitchesTheme },
+            { "Koume & Kotake's Theme",   Category.KoumeAndKotakesTheme },
+            { "Koume and Kotake's Theme", Category.KoumeAndKotakesTheme },
+            { "Koumee & Kotakes Theme",   Category.KoumeAndKotakesTheme },
+            { "Koume and Kotakes Theme",  Category.KoumeAndKotakesTheme },
+            { "Item Shop",                Category.ItemShop },
+            { "Owl's Theme",              Category.OwlsTheme },
+            { "Owls Theme",               Category.OwlsTheme },
+            { "Kaepora Gaebora's Theme",  Category.KaeporaGaeborasTheme },
+            { "Kaepora Gaeboras Theme",   Category.KaeporaGaeborasTheme },
+            { "Minigame Shop",            Category.MinigameShop },
+            { "Sword School",             Category.SwordSchool },
+            { "Final Hours",              Category.FinalHours },
+            { "Snowhead Temple",          Category.SnowheadTemple },
+            { "Great Bay Temple",         Category.GreatBayTemple },
+            { "Majora's Wrath",           Category.MajorasWrath },
+            { "Majoras Wrath",            Category.MajorasWrath },
+            { "Majora's Incarnation",     Category.MajorasIncarnation },
+            { "Majoras Incarnation",      Category.MajorasIncarnation },
+            { "Majora's Mask",            Category.MajorasMask },
+            { "Majoras Mask",             Category.MajorasMask },
+            { "Japas' Room",              Category.JapasRoom },
+            { "Japas Room",               Category.JapasRoom },
+            { "Tijo's Room",              Category.TijosRoom },
+            { "Tijos Room",               Category.TijosRoom },
+            { "Evan's Room",              Category.EvansRoom },
+            { "Evans Room",               Category.EvansRoom },
+            { "Ikana Castle",             Category.IkanaCastle },
+            { "Kamaro's Theme",           Category.KamarosTheme },
+            { "Kamaros Theme",            Category.KamarosTheme },
+            { "Cremia's Theme",           Category.CremiasTheme },
+            { "Cremias Theme",            Category.CremiasTheme },
+            { "Keaton's Theme",           Category.KeatonsTheme },
+            { "Keatons Theme",            Category.KeatonsTheme },
+            { "Moon Enraged",             Category.MoonEnraged },
+            { "Reunion Theme",            Category.ReunionTheme },
+
+            // Individual Fanfare Categories
+            { "Event Fail 1",             Category.EventFail1 },
+            { "Event Fail 2",             Category.EventFail2 },
+            { "Event Success",            Category.EventSuccess },
+            { "Game Over",                Category.GameOver },
+            { "Boss Defeated",            Category.BossDefeated },
+            { "Item Get",                 Category.ItemGet },
+            { "Heart Container Get",      Category.HeartContainerGet },
+            { "Open Chest",               Category.OpenChest },
+            { "Mask Get",                 Category.MaskGet },
+            { "Heart Piece Get",          Category.HeartPieceGet },
+            { "Truth Revealed",           Category.TruthRevealed },
+            { "Goron Race Win",           Category.GoronRaceWin },
+            { "Horse Race Win",           Category.HorseRaceWin },
+            { "Song Get",                 Category.SongGet },
+            { "Soaring Theme",            Category.SoaringTheme },
+            { "Temple Appears",           Category.TempleAppears },
+            { "Temple Clear Short",       Category.TempleClearShort },
+            { "Temple Clear Long",        Category.TempleClearLong },
+            { "Giants Leave",             Category.GiantsLeave },
+            { "Moon Destroyed",           Category.MoonDestroyed },
+
+            // Individual Cutscene Categories
+            { "Giants Appear",            Category.GiantsAppear },
+            { "Title Demo",               Category.TitleDemo },
         };
 
-        // There is a lot of special handling for the individual categories... it might not be efficient, but I wanted to
-        public static readonly Dictionary<string, Individual> IndividualDisplayNames = new(StringComparer.OrdinalIgnoreCase)
+        public static Type GetCategoryType(int categoryValue)
         {
-            // BGM
-            { "Termina Field", Individual.TerminaField },
-            { "Pursuit Theme", Individual.PursuitTheme },
+            if (Enum.IsDefined(typeof(Category), categoryValue))
+            {
+                var category = (Category)categoryValue;
 
-            { "Majora's Theme", Individual.MajorasTheme },
-            { "Majoras Theme", Individual.MajorasTheme },
+                if (CategoryTypes.TryGetValue(category, out var type))
+                {
+                    return type;
+                }
+            }
 
-            { "Clock Tower", Individual.ClockTower },
-            { "Stone Tower", Individual.StoneTower },
-            { "Inverted Stone Tower", Individual.InvertedStoneTower },
-            { "Healing Theme", Individual.HealingTheme },
-            { "Southern Swamp", Individual.SouthernSwamp },
+            // Default to Bgm if undefined
+            return Type.Bgm;
+        }
 
-            { "Aliens' Theme", Individual.AliensTheme },
-            { "Aliens Theme", Individual.AliensTheme },
+        public static bool IsBgmCategory(int categoryValue)
+        {
+            return GetCategoryType(categoryValue) == Type.Bgm;
+        }
 
-            { "Boat Cruise", Individual.BoatCruise },
+        public static bool IsFanfareCategory(int categoryValue)
+        {
+            return GetCategoryType(categoryValue) == Type.Fanfare;
+        }
 
-            { "Sharp's Curse", Individual.SharpsCurse },
-            { "Sharps Curse", Individual.SharpsCurse },
-
-            { "Great Bay", Individual.GreatBay },
-            { "Ikana Canyon", Individual.IkanaCanyon },
-            { "Deku Palace", Individual.DekuPalace },
-            { "Snowhead", Individual.Snowhead },
-
-            { "Pirates' Fortress", Individual.PiratesFortress },
-            { "Pirates Fortress", Individual.PiratesFortress },
-
-            { "Clock Town 1", Individual.ClockTown1 },
-            { "Clock Town 2", Individual.ClockTown2 },
-            { "Clock Town 3", Individual.ClockTown3 },
-            { "File Select", Individual.FileSelect },
-            { "Small Enemy", Individual.SmallEnemy },
-            { "Boss Enemy", Individual.BossEnemy },
-            { "Woodfall Temple", Individual.WoodfallTemple },
-            { "House", Individual.House },
-            { "Minigame", Individual.MinigameTheme },
-            { "Goron Race", Individual.GoronRace },
-            { "Music Box House", Individual.MusicBoxHouse },
-
-            { "Great Fairy's Fountain", Individual.GreatFairysFountain },
-            { "Great Fairys Fountain", Individual.GreatFairysFountain },
-            { "Great Fairy Fountain", Individual.GreatFairysFountain },
-
-            { "Fairy's Fountain", Individual.FairysFountain },
-            { "Fairys Fountain", Individual.FairysFountain },
-            { "Fairy Fountain", Individual.FairysFountain },
-
-            { "Zelda's Theme", Individual.ZeldasTheme },
-            { "Zeldas Theme", Individual.ZeldasTheme },
-
-            { "Rosa Sisters' Theme", Individual.RosaSistersTheme },
-            { "Rosa Sisters Theme", Individual.RosaSistersTheme },
-
-            { "Curiosity Shop", Individual.CuriosityShop },
-            { "Marine Research Lab", Individual.MarineResearchLab },
-
-            { "Giants' Theme", Individual.GiantsTheme },
-            { "Giants Theme", Individual.GiantsTheme },
-
-            { "Guru-Guru's Theme", Individual.GuruGurusTheme },
-            { "Guru Guru's Theme", Individual.GuruGurusTheme },
-            { "Guru-Gurus Theme", Individual.GuruGurusTheme },
-            { "Guru Gurus Theme", Individual.GuruGurusTheme },
-
-            { "Romani Ranch", Individual.RomaniRanch },
-            { "Goron Shrine", Individual.GoronShrine },
-
-            { "Mayor's Office", Individual.MayorsOffice },
-            { "Mayors Office", Individual.MayorsOffice },
-
-            { "Zora Hall", Individual.ZoraHall },
-            { "Big Enemy", Individual.BigEnemy },
-            { "Astral Observatory", Individual.AstralObservatory },
-            { "Secret Grotto", Individual.SecretGrotto },
-            { "Milk Bar", Individual.MilkBar },
-            { "Woods of Mystery", Individual.WoodsOfMystery },
-            { "Mystery Woods", Individual.MysteryWoods },
-            { "Horse Race", Individual.HorseRace },
-
-            { "Gorman Bros.' Theme", Individual.GormanBrosTheme },
-            { "Gorman Bros. Theme", Individual.GormanBrosTheme },
-            { "Gorman Bros' Theme", Individual.GormanBrosTheme },
-            { "Gorman Bros Theme", Individual.GormanBrosTheme },
-
-            { "Witches' Theme", Individual.WitchesTheme },
-            { "Witches Theme", Individual.WitchesTheme },
-
-            { "Koume & Kotake's Theme", Individual.KotakeAndKoumesTheme },
-            { "Koume and Kotake's Theme", Individual.KotakeAndKoumesTheme },
-            { "Koume & Kotakes Theme", Individual.KotakeAndKoumesTheme },
-            { "Koume and Kotakes Theme", Individual.KotakeAndKoumesTheme },
-
-            { "Item Shop", Individual.ItemShop },
-
-            { "Owl's Theme", Individual.OwlsTheme },
-            { "Owls Theme", Individual.OwlsTheme },
-            { "Kaepora Gaebora's Theme", Individual.KaeporaGaeborasTheme },
-            { "Kaepora Gaeboras Theme", Individual.KaeporaGaeborasTheme },
-
-            { "Minigame Shop", Individual.MinigameShop },
-            { "Sword School", Individual.SwordSchool },
-            { "Final Hours", Individual.FinalHours },
-            { "Snowhead Temple", Individual.SnowheadTemple },
-            { "Great Bay Temple", Individual.GreatBayTemple },
-
-            { "Majora's Wrath", Individual.MajorasWrath },
-            { "Majoras Wrath", Individual.MajorasWrath },
-
-            { "Majora's Incarnation", Individual.MajorasIncarnation },
-            { "Majoras Incarnation", Individual.MajorasIncarnation },
-
-            { "Majora's Mask", Individual.MajorasMask },
-            { "Majoras Mask", Individual.MajorasMask },
-
-            { "Japas' Room", Individual.JapasRoom },
-            { "Japas Room", Individual.JapasRoom },
-
-            { "Tijo's Room", Individual.TijosRoom },
-            { "Tijos Room", Individual.TijosRoom },
-
-            { "Evan's Room", Individual.EvansRoom },
-            { "Evans Room", Individual.EvansRoom },
-
-            { "Ikana Castle", Individual.IkanaCastle },
-
-            { "Kamaro's Theme", Individual.KamarosTheme },
-            { "Kamaros Theme", Individual.KamarosTheme },
-
-            { "Cremia's Theme", Individual.CremiasTheme },
-            { "Cremias Theme", Individual.CremiasTheme },
-
-            { "Keaton's Theme", Individual.KeatonsTheme },
-            { "Keatons Theme", Individual.KeatonsTheme },
-
-            { "Moon Enraged", Individual.MoonEnraged },
-            { "Reunion Theme", Individual.ReunionTheme },
-
-            // Fanfares
-            { "Event Fail 1", Individual.EventFail1 },
-            { "Event Fail 2", Individual.EventFail2 },
-            { "Event Success", Individual.EventSuccess },
-            { "Game Over", Individual.GameOver },
-            { "Boss Defeated", Individual.BossDefeated },
-            { "Item Get", Individual.ItemGet },
-            { "Heart Container Get", Individual.HeartContainerGet },
-            { "Open Chest", Individual.OpenChest },
-            { "Mask Get", Individual.MaskGet },
-            { "Heart Piece Get", Individual.HeartPieceGet },
-            { "Truth Revealed", Individual.TruthRevealed },
-            { "Goron Race Win", Individual.GoronRaceWin },
-            { "Horse Race Win", Individual.HorseRaceWin },
-            { "Song Get", Individual.SongGet },
-            { "Soaring Theme", Individual.SoaringTheme },
-            { "Temple Appears", Individual.TempleAppears },
-            { "Temple Clear Short", Individual.TempleClearShort },
-            { "Temple Clear Long", Individual.TempleClearLong },
-            { "Giants Leave", Individual.GiantsLeave },
-            { "Moon Destroyed", Individual.MoonDestroyed },
-
-            // Cutscenes
-            { "Giants Appear", Individual.GiantsAppear },
-            { "Title Demo", Individual.TitleDemo },
-        };
     }
 }
