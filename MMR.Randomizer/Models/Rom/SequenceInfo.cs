@@ -13,7 +13,7 @@ namespace MMR.Randomizer.Models.Rom
         public string Directory { get; set; } = Values.MusicDirectory;
         public string Filename => Path.Combine(Directory, Name);
         public int Replaces { get; set; } = -1;
-        public int MM_seq { get; set; } = -1;
+        public int SeqId { get; set; } = -1; // MM_seq -> SeqId
         public List<int> Categories { get; set; } = new List<int>();
         public int Instrument { get; set; }
         public List<SequenceBinaryData> SequenceBinaryList { get; set; }
