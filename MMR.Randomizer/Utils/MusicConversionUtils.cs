@@ -14,7 +14,7 @@ using YamlDotNet.Serialization.EventEmitters;
 
 namespace MMR.Randomizer.Utils
 {
-    class MusicConversionUtils
+    public class MusicConversionUtils
     {
         public static List<string> OLD_MUSIC_FILES = new();
 
