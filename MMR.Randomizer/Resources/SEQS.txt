@@ -1,4 +1,29 @@
 # Majora's Mask Randomizer SEQS YML File
+#   This YAML file determines which sequences from the in-game areas can be randomized when randomizing music is enabled.
+#   If a sequence is not in this file, it will not be randomized. Each entry used by the file, and its corresponding fields
+#   is explained below.
+#
+# Sequence Name:
+#   The main key value for an entry (e.g. "mm-terminafield") is the name of the sequence. Do not change this field, the randomizer
+#   has some hard-coded reliance on this field. If you wish to change the name of the sequence in-game, please use the display name
+#   field — this field (sequence name) is not what is displayed in-game.
+#
+# Display Name:
+#   The display name is the name to be displayed in-game.
+#
+# Music Groups:
+#   The music groups is what areas the sequence can randomize into, for the full list of groups look at MusicGroups.cs
+#   Both strings and ints are allowed as long as the values are valid in MusicGroups.cs
+#
+# Instrument Set:
+#   The ID (index) of the instrument bank in the AudioBank index. This determines which instrument bank is used by the vanilla sequence.
+#
+# Sequence ID:
+#   The ID (index) of the sequence in the AudioSeq index. This determines which sequences can be replaced by music.
+#
+# No Recycle:
+#   A boolean that determines if vanila sequences will be used during music randomization.
+#   False means vanilla sequences will be used during randomization, and True means they will not be used.
 
 mm-terminafield:
   display name: "Termina Field"
