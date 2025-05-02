@@ -121,8 +121,6 @@ namespace MMR.Randomizer
                 return;
             }
 
-            MusicConversionUtils.ConvertMusicFiles(); // backs up music folder, copies music folder, converts any old files... might take a *long time* on the first pass if the user has a large folder
-
             RomData.PointerizedSequences = new List<SequenceInfo>();
             SequenceUtils.ReadSequenceInfo();
             SequenceUtils.ReadInstrumentSetList();
@@ -6515,6 +6513,29 @@ namespace MMR.Randomizer
             progressReporter.ReportProgress(73, "Writing sound effects...");
             WriteSoundEffects(new Random(BitConverter.ToInt32(hash, 0)));
             WriteLowHealthSound(new Random(BitConverter.ToInt32(hash, 0)));
+
+            // Music conversion process
+            if (Directory.Exists(Values.MusicDirectory))
+            {
+                // Back up the music folder before checking and converting
+                progressReporter.ReportProgress(74, "Backing up music folder to 'music.old'...");
+                MusicConversionUtils.BackupMusicFolder(Values.MusicDirectory);
+
+                // Check for old music files
+                progressReporter.ReportProgress(74, "Checking for old music files...");
+                MusicConversionUtils.CheckForOldFiles(Values.MusicDirectory);
+
+                // Convert if any old music files were found
+                if (MusicConversionUtils.OLD_MUSIC_FILES.Any())
+                {
+                    progressReporter.ReportProgress(74, "Converting old music files...");
+                    MusicConversionUtils.ConvertMusicFiles();
+
+                    // Clear the list for secondary checks during WriteAudioSeq()
+                    // where the music files get searched again and injected
+                    MusicConversionUtils.OLD_MUSIC_FILES.Clear();
+                }
+            }
 
             progressReporter.ReportProgress(74, "Writing music...");
             SequenceUtils.MoveAudioBankTable();
