@@ -53,8 +53,6 @@ namespace MMR.Randomizer.Utils
 
         public static MD5 md5lib; // Used for zip
 
-        public static List<string> OLD_MUSIC_FILES = new(); // Holds the names of old music files, only written out if the old music warning displays
-
         public static void ResetBudget()
         {
             MAX_BGM_BUDGET = 0x6000;
@@ -119,8 +117,6 @@ namespace MMR.Randomizer.Utils
 
             RomData.SequenceList = new List<SequenceInfo>();
             RomData.TargetSequences = new List<SequenceInfo>();
-
-            OLD_MUSIC_FILES.Clear(); // Ensure the list of old files is empty before searching
 
             // If the user has a SEQS.yml file, use it instead of the one in resources
             string seqsContent;
@@ -243,11 +239,11 @@ namespace MMR.Randomizer.Utils
                 }
             }
 
-            // Write any skipped files to a log file
+            // Secondary check for old music files returned some, so write it out!
             // This is contained within its own file because it could be hundreds of lines long
-            if (OLD_MUSIC_FILES.Count > 0)
+            if (MusicConversionUtils.OLD_MUSIC_FILES.Any())
             {
-                File.WriteAllLines(Path.Combine(Values.MusicDirectory, "unsupported_music_files.txt"), OLD_MUSIC_FILES);
+                File.WriteAllLines(Path.Combine(Values.MusicDirectory, "unsupported_music_files.txt"), MusicConversionUtils.OLD_MUSIC_FILES);
             }
         }
 
@@ -587,7 +583,6 @@ namespace MMR.Randomizer.Utils
                 Categories = categories,
                 Commands = commands
             };
-
         }
 
         public static void ScanForMMRS(string directory)
@@ -607,7 +602,7 @@ namespace MMR.Randomizer.Utils
             // Check for old standalone sequence files and add them to the old file list
             foreach (string filePath in Directory.GetFiles(directory, "*.zseq"))
             {
-                OLD_MUSIC_FILES.Add(Path.GetFileName(filePath));
+                MusicConversionUtils.OLD_MUSIC_FILES.Add(Path.GetFileName(filePath));
             }
 
             foreach (string filePath in Directory.GetFiles(directory, "*.mmrs"))
@@ -666,7 +661,7 @@ namespace MMR.Randomizer.Utils
                             // If the file is an old file, it will have categories and no meta file
                             if (mmrs.CategoriesFile != null)
                             {
-                                OLD_MUSIC_FILES.Add(Path.GetFileName(filePath));
+                                MusicConversionUtils.OLD_MUSIC_FILES.Add(Path.GetFileName(filePath));
                             }
 
                             continue;
@@ -1230,7 +1225,7 @@ namespace MMR.Randomizer.Utils
                 log.AppendLine(" * [" + RemainingSong.Name + "] with categories [" + string.Join(",", RemainingSong.Categories) + "]");
             }
             WriteSongLog(log, settings);
-            throw new Exception($"Cannot randomize music on this seed with available music: \nSlot Name:[{targetSlot.Name}] PreviousSlot: [{targetSlot.Replaces.ToString("X")}]");
+            throw new Exception($"Cannot randomize music on this seed with available music: \nSlot Name:[{targetSlot.Name}] PreviousSlot: [{targetSlot.Replaces:X}]");
         }
 
         public static void WriteSongLog(StringBuilder log, OutputSettings settings)
@@ -1329,6 +1324,7 @@ namespace MMR.Randomizer.Utils
                 MAX_BGM_BUDGET = MAX_TYPE2_MUSIC_BUDGET - MAX_COMBAT_BUDGET;
             }
             // else if Not Fanfare or Cutscene
+            // This doesn't account for individual Fanfare categories
             else if (!(songtestSequence.Categories.Contains((int)MusicGroups.Category.ItemFanfares) || songtestSequence.Categories.Contains((int)MusicGroups.Category.EventFanfares)
                         || songtestSequence.Categories.Contains((int)MusicGroups.Category.ClearFanfares) || songtestSequence.Categories.Contains((int)MusicGroups.Category.Cutscenes)))
             {
