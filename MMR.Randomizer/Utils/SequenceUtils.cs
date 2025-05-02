@@ -1,5 +1,5 @@
 using MMR.Randomizer.Constants;
-using static MMR.Randomizer.Constants.AudioSequences;
+using static MMR.Randomizer.Constants.AudioSequenceIds;
 using MMR.Randomizer.Models.Rom;
 using System;
 using System.Collections.Generic;
