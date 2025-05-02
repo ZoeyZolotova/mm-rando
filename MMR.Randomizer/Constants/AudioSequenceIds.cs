@@ -1,6 +1,6 @@
 namespace MMR.Randomizer.Constants
 {
-    public static class AudioSequences
+    public static class AudioSequenceIds
     {
         // Store AudioSeq indices to a name
         public const int MASTER_SEQUENCE               = 0x00;
