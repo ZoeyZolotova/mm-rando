@@ -32,9 +32,8 @@ namespace MMR.Randomizer.Constants
 
             // Group Cutscene Categories
             Cutscenes            = 0x16,
-
-            // Individual Categories
-            // BGM
+            
+            // Individual BGM Categories
             TerminaField         = 0x102,
             PursuitTheme         = 0x103,
             MajorasTheme         = 0x104,
@@ -105,7 +104,7 @@ namespace MMR.Randomizer.Constants
             MoonEnraged          = 0x17B,
             ReunionTheme         = 0x17D,
 
-            // Fanfares
+            // Individual Fanfare Categories
             EventFail1           = 0x108,
             EventFail2           = 0x109,
             EventSuccess         = 0x119,
@@ -127,7 +126,7 @@ namespace MMR.Randomizer.Constants
             GiantsLeave          = 0x17C,
             MoonDestroyed        = 0x17E,
 
-            // Cutscenes
+            // Individual Cutscene Categories
             GiantsAppear         = 0x170,
             TitleDemo            = 0x176,
         }
