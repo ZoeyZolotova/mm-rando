@@ -2078,7 +2078,7 @@ namespace MMR.UI.Forms
 
             // let users know their old music files can't be used
             // maybe there's a better way to handle this...
-            if (SequenceUtils.OLD_MUSIC_FILES.Count > 0)
+            if (MusicConversionUtils.OLD_MUSIC_FILES.Any())
             {
                 string old_music_message = "Unsupported music files were found during seed generation and could not be used. " +
                                "A log of the skipped files has been saved to the music folder.\n\n" +
