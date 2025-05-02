@@ -63,11 +63,11 @@ namespace MMR.Randomizer.Constants
             GoronRace            = 0x126,
             MusicBoxHouse        = 0x127,
             GreatFairysFountain  = 0x128,
-            FairysFountain       = 0x128, // Just in case
+            FairysFountain       = GreatFairysFountain, // Just in case
             ZeldasTheme          = 0x129,
             RosaSistersTheme     = 0x12A,
             CuriosityShop        = 0x12C,
-            MarineResearchLab    = 0x12C, // Just in case
+            MarineResearchLab    = CuriosityShop, // Just in case
             GiantsTheme          = 0x12D,
             GuruGurusTheme       = 0x12E,
             RomaniRanch          = 0x12F,
@@ -79,14 +79,14 @@ namespace MMR.Randomizer.Constants
             SecretGrotto         = 0x13B,
             MilkBar              = 0x13C,
             WoodsOfMystery       = 0x13E,
-            MysteryWoods         = 0x13E, // Just in case
+            MysteryWoods         = WoodsOfMystery, // Just in case
             HorseRace            = 0x140,
             GormanBrosTheme      = 0x142,
             WitchesTheme         = 0x143,
-            KoumeAndKotakesTheme = 0x143, // Just in case
+            KoumeAndKotakesTheme = WitchesTheme, // Just in case
             ItemShop             = 0x144,
             OwlsTheme            = 0x145,
-            KaeporaGaeborasTheme = 0x145, // Just in case
+            KaeporaGaeborasTheme = OwlsTheme, // Just in case
             MinigameShop         = 0x146,
             SwordSchool          = 0x150,
             FinalHours           = 0x157,
@@ -182,11 +182,9 @@ namespace MMR.Randomizer.Constants
             { Category.GoronRace,            Type.Bgm },
             { Category.MusicBoxHouse,        Type.Bgm },
             { Category.GreatFairysFountain,  Type.Bgm },
-            { Category.FairysFountain,       Type.Bgm },
             { Category.ZeldasTheme,          Type.Bgm },
             { Category.RosaSistersTheme,     Type.Bgm },
             { Category.CuriosityShop,        Type.Bgm },
-            { Category.MarineResearchLab,    Type.Bgm },
             { Category.GiantsTheme,          Type.Bgm },
             { Category.GuruGurusTheme,       Type.Bgm },
             { Category.RomaniRanch,          Type.Bgm },
@@ -198,14 +196,11 @@ namespace MMR.Randomizer.Constants
             { Category.SecretGrotto,         Type.Bgm },
             { Category.MilkBar,              Type.Bgm },
             { Category.WoodsOfMystery,       Type.Bgm },
-            { Category.MysteryWoods,         Type.Bgm },
             { Category.HorseRace,            Type.Bgm },
             { Category.GormanBrosTheme,      Type.Bgm },
             { Category.WitchesTheme,         Type.Bgm },
-            { Category.KoumeAndKotakesTheme, Type.Bgm },
             { Category.ItemShop,             Type.Bgm },
             { Category.OwlsTheme,            Type.Bgm },
-            { Category.KaeporaGaeborasTheme, Type.Bgm },
             { Category.MinigameShop,         Type.Bgm },
             { Category.SwordSchool,          Type.Bgm },
             { Category.FinalHours,           Type.Bgm },
