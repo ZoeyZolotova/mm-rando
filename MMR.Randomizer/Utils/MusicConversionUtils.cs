@@ -395,7 +395,7 @@ namespace MMR.Randomizer.Utils
             };
 
             // Optional audio sample info from zsounds
-            if (zsounds != null && zsounds.Count > 0)
+            if (zsounds != null && zsounds.Any())
             {
                 yaml.Metadata.AudioSamples = new Dictionary<string, MMRSMetadataYAML.Sample>();
 
