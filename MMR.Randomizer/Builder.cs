@@ -6522,13 +6522,13 @@ namespace MMR.Randomizer
                 MusicConversionUtils.BackupMusicFolder(Values.MusicDirectory);
 
                 // Check for old music files
-                progressReporter.ReportProgress(74, "Checking for old music files...");
+                progressReporter.ReportProgress(75, "Checking for old music files...");
                 MusicConversionUtils.CheckForOldFiles(Values.MusicDirectory);
 
                 // Convert if any old music files were found
                 if (MusicConversionUtils.OLD_MUSIC_FILES.Any())
                 {
-                    progressReporter.ReportProgress(74, "Converting old music files...");
+                    progressReporter.ReportProgress(76, "Converting old music files...");
                     MusicConversionUtils.ConvertMusicFiles();
 
                     // Clear the list for secondary checks during WriteAudioSeq()
@@ -6537,7 +6537,7 @@ namespace MMR.Randomizer
                 }
             }
 
-            progressReporter.ReportProgress(74, "Writing music...");
+            progressReporter.ReportProgress(77, "Writing music...");
             SequenceUtils.MoveAudioBankTable();
             WriteMuteMusic();
             WriteEnemyCombatMusicMute();
@@ -6556,7 +6556,7 @@ namespace MMR.Randomizer
 
             if (outputSettings.GenerateROM || outputSettings.OutputVC)
             {
-                progressReporter.ReportProgress(75, "Building ROM...");
+                progressReporter.ReportProgress(80, "Building ROM...");
 
                 if (outputSettings.GenerateROM)
                 {
