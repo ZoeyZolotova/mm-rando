@@ -3,6 +3,8 @@ using System.Collections.Generic;
 
 namespace MMR.Randomizer.Constants
 {
+    // Alignment is intentional, please don't remove it, it's easier to read and the file is mostly enums and dictionaries ＜(´⌯ w ⌯`)＞
+
     public static class MusicGroups
     {
         // There's a few cases of alternative names being allowed, and quite a bit of special handling for spaces and proper punctuation
@@ -32,7 +34,7 @@ namespace MMR.Randomizer.Constants
 
             // Group Cutscene Categories
             Cutscenes            = 0x16,
-            
+
             // Individual BGM Categories
             TerminaField         = 0x102,
             PursuitTheme         = 0x103,
@@ -245,7 +247,6 @@ namespace MMR.Randomizer.Constants
             { Category.TitleDemo,            Type.Bgm },
         };
 
-
         // Allow people to utilize display names
         public static readonly Dictionary<string, Category> CategoryDisplayNames = new(StringComparer.OrdinalIgnoreCase)
         {
@@ -394,9 +395,7 @@ namespace MMR.Randomizer.Constants
                 var category = (Category)categoryValue;
 
                 if (CategoryTypes.TryGetValue(category, out var type))
-                {
                     return type;
-                }
             }
 
             // Default to Bgm if undefined
