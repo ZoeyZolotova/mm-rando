@@ -6517,17 +6517,16 @@ namespace MMR.Randomizer
             // Music conversion process
             if (Directory.Exists(Values.MusicDirectory))
             {
-                // Back up the music folder before checking and converting
-                progressReporter.ReportProgress(74, "Backing up music folder to 'music.old'...");
-                MusicConversionUtils.BackupMusicFolder(Values.MusicDirectory);
-
                 // Check for old music files
-                progressReporter.ReportProgress(75, "Checking for old music files...");
+                progressReporter.ReportProgress(74, "Checking for old music files...");
                 MusicConversionUtils.CheckForOldFiles(Values.MusicDirectory);
 
-                // Convert if any old music files were found
+                // Backup and convert if any old music files were found
                 if (MusicConversionUtils.OLD_MUSIC_FILES.Any())
                 {
+                    progressReporter.ReportProgress(75, "Backing up music folder to 'music.old'...");
+                    MusicConversionUtils.BackupMusicFolder(Values.MusicDirectory);
+                    
                     progressReporter.ReportProgress(76, "Converting old music files...");
                     MusicConversionUtils.ConvertMusicFiles();
 
