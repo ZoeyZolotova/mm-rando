@@ -67,45 +67,43 @@ namespace MMR.Randomizer.Utils
             value = 0;
 
             // Handle ints
-            if (input is int intValue)
+            switch (input)
             {
-                value = intValue;
-                return true;
-            }
+                case int intValue:
+                    value = intValue;
+                    return true;
 
-            // Handle strings
-            if (input is string trimmed)
-            {
-                trimmed = trimmed.Trim();
+                case string strValue:
+                    string trimmed = strValue.Trim();
 
-                if (trimmed.StartsWith("0x", StringComparison.OrdinalIgnoreCase))
-                {
-                    if (int.TryParse(trimmed.Substring(2), System.Globalization.NumberStyles.HexNumber, null, out int parsed))
+                    if (trimmed.StartsWith("0x", StringComparison.OrdinalIgnoreCase)
+                        && int.TryParse(trimmed[2..], System.Globalization.NumberStyles.HexNumber, null, out int hexCategory))
                     {
-                        value = parsed;
+                        value = hexCategory;
                         return true;
                     }
-                }
 
-                if (int.TryParse(trimmed, out int intVal))
-                {
-                    value = intVal;
-                    return true;
-                }
+                    if (int.TryParse(trimmed, out int category))
+                    {
+                        value = category;
+                        return true;
+                    }
 
-                // Try enum values
-                if (Enum.TryParse<MusicGroups.Category>(trimmed, true, out var category))
-                {
-                    value = (int)category;
-                    return true;
-                }
+                    // Try enum values
+                    if (Enum.TryParse<MusicGroups.Category>(trimmed, true, out var enumCategory))
+                    {
+                        value = (int)enumCategory;
+                        return true;
+                    }
 
-                // Try dictionary
-                if (MusicGroups.CategoryDisplayNames.TryGetValue(trimmed, out category))
-                {
-                    value = (int)category;
-                    return true;
-                }
+                    // Try dictionary
+                    if (MusicGroups.CategoryDisplayNames.TryGetValue(trimmed, out var mappedCategory))
+                    {
+                        value = (int)mappedCategory;
+                        return true;
+                    }
+
+                    break;
             }
 
             return false;
@@ -255,7 +253,7 @@ namespace MMR.Randomizer.Utils
         public static int GetSequenceSize(SequenceInfo seq)
         {
             // The sequence should be loaded into memory if it was in an MMRS file
-            if (seq.SequenceBinaryList != null && seq.SequenceBinaryList.Count > 0)
+            if (seq.SequenceBinaryList != null && seq.SequenceBinaryList.Any())
             {
                 return RoundTo16(seq.SequenceBinaryList[0].SequenceBinary.Length);
             }
@@ -275,11 +273,9 @@ namespace MMR.Randomizer.Utils
                 byte[] data;
                 if (File.Exists(seq.Filename))
                 {
-                    using (var reader = new BinaryReader(File.OpenRead(seq.Filename)))
-                    {
-                        data = new byte[(int)reader.BaseStream.Length];
-                        return RoundTo16(data.Length);
-                    }
+                    using var reader = new BinaryReader(File.OpenRead(seq.Filename));
+                    data = new byte[(int)reader.BaseStream.Length];
+                    return RoundTo16(data.Length);
                 }
             }
 
@@ -836,7 +832,7 @@ namespace MMR.Randomizer.Utils
         public static void RebuildAudioSeq(List<SequenceInfo> sequenceList, int? sequenceMaskFileIndex, int? sequenceNamesFileIndex)
         {
             // Spoiler log output DEBUG
-            StringBuilder log = new StringBuilder();
+            StringBuilder log = new();
             void WriteOutput(string str)
             {
                 Debug.WriteLine(str); // Keep DEBUG output
@@ -877,6 +873,7 @@ namespace MMR.Randomizer.Utils
                         }
                     }
                 }
+
                 oldSeq.Add(entry);
             }
 
@@ -914,14 +911,14 @@ namespace MMR.Randomizer.Utils
                     {
                         newentry.Data = oldSeq[sequenceList[j].SeqId].Data;
                         WriteOutput($"Slot {i:X2} := {sequenceList[j].Name}");
-
                     }
-                    else if (sequenceList[j].SequenceBinaryList != null && sequenceList[j].SequenceBinaryList.Count > 0)
+                    else if (sequenceList[j].SequenceBinaryList != null && sequenceList[j].SequenceBinaryList.Any())
                     {
                         if (sequenceList[j].SequenceBinaryList.Count > 1)
                         {
                             WriteOutput("Warning: writing song with multiple sequence/bank combos, selecting first available");
                         }
+
                         newentry.Data = sequenceList[j].SequenceBinaryList[0].SequenceBinary;
                         WriteOutput($"Slot {i:X2} := {sequenceList[j].Name} *");
 
@@ -955,7 +952,6 @@ namespace MMR.Randomizer.Utils
 
                         newentry.Data = data;
                         WriteOutput($"Slot {i:X2} := {sequenceList[j].Name}");
-
                     }
                 }
                 else // not found, song wasn't touched by rando, just transfer over
@@ -1056,6 +1052,7 @@ namespace MMR.Randomizer.Utils
                     {
                         name = name.Substring(0, MusicConfig.SEQUENCE_NAME_MAX_SIZE - 4) + "...";
                     }
+
                     name += "\0";
                     var nameBytes = Encoding.ASCII.GetBytes(name);
                     Array.Resize(ref nameBytes, MusicConfig.SEQUENCE_NAME_MAX_SIZE);
@@ -1139,7 +1136,6 @@ namespace MMR.Randomizer.Utils
                 ReadWriteUtils.WriteU64ToROM(dummybankindexOffset + 0x08, dummybankmetadata1);
                 dummybankindexOffset += 0x10;
             }
-
         }
 
         public static void ResetFreeBankIndex()
@@ -1175,6 +1171,7 @@ namespace MMR.Randomizer.Utils
                     testSeq.SequenceBinaryList[0].InstrumentSet.BankSlot = CurrentFreeBank;
                 }
             }
+
             return true; // Sequences with instrument banks, or without needing instrument banks, available
         }
 
@@ -1231,6 +1228,7 @@ namespace MMR.Randomizer.Utils
             {
                 log.AppendLine(" * [" + RemainingSong.Name + "] with categories [" + string.Join(",", RemainingSong.Categories) + "]");
             }
+
             WriteSongLog(log, settings);
             throw new Exception($"Cannot randomize music on this seed with available music: \nSlot Name:[{targetSlot.Name}] PreviousSlot: [{targetSlot.Replaces:X}]");
         }
@@ -1251,11 +1249,9 @@ namespace MMR.Randomizer.Utils
                 path += "_SongLog.txt";
             }
 
-            using (var writer = new StreamWriter(Path.Combine(dir, path), append: true))
-            {
-                writer.WriteLine(""); // spacer between spoiler log and song log
-                writer.Write(log);
-            }
+            using var writer = new StreamWriter(Path.Combine(dir, path), append: true);
+            writer.WriteLine(""); // spacer between spoiler log and song log
+            writer.Write(log);
         }
 
         private static (int sequenceBankIndex, int bankListIndex) FindMatchingInstrumentSetDuplicate(SequenceInfo replacementSequence)
@@ -1263,6 +1259,7 @@ namespace MMR.Randomizer.Utils
             for (int b = 0; b < replacementSequence.SequenceBinaryList.Count; b++)
             {
                 var bank = replacementSequence.SequenceBinaryList[b].SequenceBinary;
+
                 if (bank != null)
                 {
                     var searchResult = RomData.InstrumentSetList.FindIndex(match => match.BankBinary == bank);
@@ -1281,28 +1278,32 @@ namespace MMR.Randomizer.Utils
             // If the song has a custom instrument set: lock the sequence, update the instrument set value, and write debug output
             if (replacementSequence.SequenceBinaryList != null && replacementSequence.SequenceBinaryList[0] != null && replacementSequence.SequenceBinaryList[0].InstrumentSet != null)
             {
-                (int sequenceBankIndex, int bankListIndex) duplicateBankSearch = FindMatchingInstrumentSetDuplicate(replacementSequence);
-                if (duplicateBankSearch.sequenceBankIndex != -1)
+                (int sequenceBankIndex, int bankListIndex) = FindMatchingInstrumentSetDuplicate(replacementSequence);
+                if (sequenceBankIndex != -1)
                 {
-                    RomData.InstrumentSetList[duplicateBankSearch.bankListIndex].Modified += 1;
-                    replacementSequence.Instrument = duplicateBankSearch.bankListIndex;
-                    log.AppendLine(" -- v -- Instrument set number " + replacementSequence.Instrument.ToString("X2") + " is being reused -- v --");
-                    replacementSequence.SequenceBinaryList = new List<SequenceBinaryData> {
-                        replacementSequence.SequenceBinaryList[duplicateBankSearch.sequenceBankIndex]
-                    };
+                    RomData.InstrumentSetList[bankListIndex].Modified += 1;
+                    replacementSequence.Instrument = bankListIndex;
+
+                    log.AppendLine($" -- v -- Instrument set number {replacementSequence.Instrument:X2} is being reused -- v --");
+
+                    replacementSequence.SequenceBinaryList = new List<SequenceBinaryData> { replacementSequence.SequenceBinaryList[sequenceBankIndex] };
                 }
                 else // No duplicate instrument bank found, add a new one
                 {
                     replacementSequence.Instrument = CurrentFreeBank++; // Update the instrument bank that will be used
                     replacementSequence.SequenceBinaryList[0].InstrumentSet.BankSlot = replacementSequence.Instrument;
+
                     RomData.InstrumentSetList[replacementSequence.Instrument] = replacementSequence.SequenceBinaryList[0].InstrumentSet;
                     RomData.InstrumentSetList[replacementSequence.Instrument].InstrumentSamples = replacementSequence.InstrumentSamples;
-                    log.AppendLine(" -- v -- Instrument set number " + replacementSequence.Instrument.ToString("X2") + " has been claimed -- v --");
+
+                    log.AppendLine($" -- v -- Instrument set number {replacementSequence.Instrument:X2} has been claimed -- v --");
+
                     replacementSequence.SequenceBinaryList = new List<SequenceBinaryData> { replacementSequence.SequenceBinaryList[0] }; // Reduce to one for later
                 }
             }
 
             replacementSequence.Replaces = slotSequence.Replaces; // Determines what song will be placed in slot_seq later
+
             // -40 and +10 pad the text to align in the same middle area for visual clarity
             log.AppendLine($"{slotSequence.Name,-40} {debugString,+10} -> " + replacementSequence.Name);
             remainingSequences.Remove(replacementSequence);
@@ -1349,6 +1350,7 @@ namespace MMR.Randomizer.Utils
             {
                 ConvertSequenceSlotToPointer(songslot.Replaces, FILE_SELECT); // Point replacement to "File Select"
             }
+
             RomData.TargetSequences.Remove(fileselectSlot);
 
             // Additionally, because songs that use custom banks replace the original bank by design,
@@ -1372,6 +1374,7 @@ namespace MMR.Randomizer.Utils
                     validSequence.Replaces = newSlot;                           // Update the sequence to use the chosen slot
                     replacementSequences.Remove(validSequence);
                     sequences.Remove(validSequence);
+
                     log.AppendLine($" -- ^ -- Instrument set number {validSequence.Instrument:X2} also used by {validSequence.Name}");
 
                     // Set the scene to use this new song as the background music
@@ -1406,7 +1409,7 @@ namespace MMR.Randomizer.Utils
             // Songforce is priority token in the song filename. It places it at the top of the previously randomized sequence list
             
             List<SequenceInfo> forcedSequences = RomData.SequenceList.FindAll(u => u.Name.Contains("songforce") == true).OrderBy(x => rng.Next()).ToList();
-            if (forcedSequences != null && forcedSequences.Count > 0)
+            if (forcedSequences != null && forcedSequences.Any())
             {
                 foreach (SequenceInfo seq in forcedSequences)
                 {
@@ -1645,7 +1648,8 @@ namespace MMR.Randomizer.Utils
                         // Parse the audiobank binary to find the sample address offsets
                         AudiobankUtils.Audiobank instrumentBank = new(instrumentset.BankMetaData, instrumentset.BankBinary);
 
-                        if (sample.Marker == 0)
+                        if (sample.InstrumentType != null && sample.ListIndex != -1 && sample.Marker == 0) // Key region can be null
+                        //if (sample.Marker == 0)
                         {
                             // Get the offset to the sample using the given type, index, and region
                             uint sampleBankAddress = 0;
@@ -1656,13 +1660,13 @@ namespace MMR.Randomizer.Utils
                                     "LOW"  => instrumentBank.Instruments[sample.ListIndex].LowSampleAddress,
                                     "PRIM" => instrumentBank.Instruments[sample.ListIndex].PrimSampleAddress,
                                     "HIGH" => instrumentBank.Instruments[sample.ListIndex].HighSampleAddress,
-                                    _      => throw new Exception(),// invalid key region
+                                    _      => throw new Exception(), // invalid key region
                                 },
 
                                 // Drums and SFX don't have key regions
                                 "DRUM" => instrumentBank.Drums[sample.ListIndex].SampleAddress,
                                 "SFX"  => instrumentBank.Effects[sample.ListIndex].SampleAddress,
-                                _      => throw new Exception(),// invalid type
+                                _      => throw new Exception(), // invalid type
                             };
 
                             // Replace the sample struct's address with the correct address
@@ -1734,7 +1738,6 @@ namespace MMR.Randomizer.Utils
             }
         }
 
-
         public static void WriteNewSoundSamples(List<InstrumentSetInfo> InstrumentSetList)
         {
             // Write all the custom audio samples in a single file at the end.
@@ -1769,6 +1772,7 @@ namespace MMR.Randomizer.Utils
                             {
                                 RomData.MMFileList[fid].Data = RomData.MMFileList[fid].Data.Concat(new byte[paddingRemainder]).ToArray();
                             }
+
                             RomData.ListOfSamples.Add(sample);
                         }
                         else // Get the address of the previously used audio sample
