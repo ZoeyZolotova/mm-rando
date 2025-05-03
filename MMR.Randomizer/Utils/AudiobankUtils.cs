@@ -22,9 +22,9 @@ namespace MMR.Randomizer.Utils
 
             public Audiobank(byte[] metadata, byte[] bankData)
             {
-                int numInsts = metadata[12];
-                int numDrums = metadata[13];
-                int numEffects = BinaryPrimitives.ReadUInt16BigEndian(metadata.AsSpan(14, 2));
+                int numInsts = metadata[4];
+                int numDrums = metadata[5];
+                int numEffects = BinaryPrimitives.ReadUInt16BigEndian(metadata.AsSpan(6, 2));
 
                 uint drumListAddr = BinaryPrimitives.ReadUInt32BigEndian(bankData.AsSpan(0, 4));
                 for (int i = 0; i < numDrums; i++)
