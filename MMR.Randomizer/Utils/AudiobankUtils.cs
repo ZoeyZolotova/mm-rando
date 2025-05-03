@@ -6,9 +6,14 @@ namespace MMR.Randomizer.Utils
 {
     public class AudiobankUtils
     {
+        public interface ISample
+        {
+            uint Address { get; set; }
+            uint BankOffset { get; set; }
+        }
+
         // Should only need the sample offsets, and int should be fine for bank addresses
         // because there shouldn't be a bank out there longer than 0x7FFFFFFF bytes
-
         public class Audiobank
         {
             public List<Instrument> Instruments = new();
@@ -46,9 +51,38 @@ namespace MMR.Randomizer.Utils
                     Instruments.Add(instrument);
                 }
             }
+
+            public List<ISample> GetBankSamples()
+            {
+                List<ISample> allSamples = new();
+
+                foreach (var instrument in Instruments)
+                {
+                    if (instrument.LowSample != null)
+                        allSamples.Add(instrument.LowSample);
+                    if (instrument.PrimSample != null)
+                        allSamples.Add(instrument.PrimSample);
+                    if (instrument.HighSample != null)
+                        allSamples.Add(instrument.HighSample);
+                }
+
+                foreach (var drum in Drums)
+                {
+                    if (drum.Sample != null)
+                        allSamples.Add(drum.Sample);
+                }
+
+                foreach (var sfx in Effects)
+                {
+                    if (sfx.Sample != null)
+                        allSamples.Add(sfx.Sample);
+                }
+
+                return allSamples;
+            }
         }
 
-        public class Sample<TParent>
+        public class Sample<TParent> : ISample
         {
             public TParent Parent;
             public uint BankOffset {  get; set; }
@@ -67,7 +101,7 @@ namespace MMR.Randomizer.Utils
 
         public class Instrument
         {
-            public int InstrumentID {  get; set; }
+            public int InstrumentId {  get; set; }
             public uint LowSampleAddress { get; set; }
             public uint PrimSampleAddress { get; set; }
             public uint HighSampleAddress { get; set; }
@@ -78,7 +112,7 @@ namespace MMR.Randomizer.Utils
 
             public Instrument(int instrumentId, byte[] bankData, int instrumentOffset)
             {
-                InstrumentID = instrumentId;
+                InstrumentId = instrumentId;
 
                 LowSampleAddress = BinaryPrimitives.ReadUInt32BigEndian(bankData.AsSpan(instrumentOffset + 8, 4));
                 PrimSampleAddress = BinaryPrimitives.ReadUInt32BigEndian(bankData.AsSpan(instrumentOffset + 16, 4));
