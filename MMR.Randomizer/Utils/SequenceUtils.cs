@@ -1626,7 +1626,16 @@ namespace MMR.Randomizer.Utils
                 {
                     foreach (var sample in instrumentset.InstrumentSamples)
                     {
+                        // Get the new sample address from the ROM
+                        int newSampleAddress = RomData.MMFileList[RomData.SamplesFileID].Cmp_Addr
+                                                   + (int)RomData.ListOfSamples.Find(u => u.Hash == sample.Hash).Addr
+                                                   - soundbankAddr;
 
+                        byte[] newAddressBytes = BitConverter.GetBytes(newSampleAddress);
+                        if (BitConverter.IsLittleEndian)
+                            Array.Reverse(newAddressBytes); // Ensure the byte[] is big endian so indices aren't reversed
+
+                        // Parse the audiobank binary to find the sample address offsets
                         AudiobankUtils.Audiobank instrumentBank = new(instrumentset.BankMetaData, instrumentset.BankBinary);
 
                         if (sample.Marker == 0)
@@ -1648,15 +1657,6 @@ namespace MMR.Randomizer.Utils
                                 "SFX"  => instrumentBank.Effects[sample.ListIndex].SampleAddress,
                                 _      => throw new Exception(),// invalid type
                             };
-
-                            // Get the new sample address from the ROM
-                            int newSampleAddress = RomData.MMFileList[RomData.SamplesFileID].Cmp_Addr
-                                                   + (int)RomData.ListOfSamples.Find(u => u.Hash == sample.Hash).Addr
-                                                   - soundbankAddr;
-
-                            byte[] newAddressBytes = BitConverter.GetBytes(newSampleAddress);
-                            if (BitConverter.IsLittleEndian)
-                                Array.Reverse(newAddressBytes);
 
                             // Replace the sample struct's address with the correct address
                             // The first 4 bytes are a bitfield, so add 4 to the index
@@ -1712,14 +1712,6 @@ namespace MMR.Randomizer.Utils
                                 if (sampleBankAddress != 0)
                                     break;
                             }
-
-                            int newSampleAddress = RomData.MMFileList[RomData.SamplesFileID].Cmp_Addr
-                                                   + (int)RomData.ListOfSamples.Find(u => u.Hash == sample.Hash).Addr
-                                                   - soundbankAddr;
-
-                            byte[] newAddressBytes = BitConverter.GetBytes(newSampleAddress);
-                            if (BitConverter.IsLittleEndian)
-                                Array.Reverse(newAddressBytes);
 
                             // Replace the sample struct's address with the correct address
                             // The first 4 bytes are a bitfield, so add 4 to the index
