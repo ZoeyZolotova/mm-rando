@@ -553,14 +553,13 @@ namespace MMR.Randomizer.Utils
                         }
                     }
 
-                    // type, index, and key region are all part of the new format used by OOTR:
-                    // ZSOUND:INST:0:NORM:file.zsound, ZSOUND:DRUM:0::file.zsound, ZSOUND:SFX:0::file.zsound
+                    // type, index, and key region are the new sample linking format used by OOTR and now MMR
+                    // The new format links samples by parsing the audiobank to get the corresponding sample struct offsets,
+                    // then it writes new address at the given sample struct offset (+ 4 bytes due to the bitfield).
                     //
-                    // The new format links samples by: parsing the bank, indexing the structures,
-                    // then modifying the sample addresses in said structures to where the custom
-                    // samples have been injected into the ROM
-                    //
-                    // MMR doesn't have that functionality, so it relies on the old method
+                    // Originally, OOTR and MMR both required temp addresses and searched the bank byte by byte
+                    // to find any matching sequences. There is fallback to a similar method, but now it only matches
+                    // via parsed samples, ensuring only matching sample addresses are modified and nothing else is.
                     //
                     var zsound = new Dictionary<string, object>
                     {
@@ -1609,10 +1608,18 @@ namespace MMR.Randomizer.Utils
 
         public static void UpdateBankInstrumentPointers(byte[] ROM)
         {
-            // The audiobank and new samples are already written to the ROM file, now all the pointers need to be updated
-            // since it's currently not possible to know where the audio samples are written until the soundbank and samples are written.
-            // This is because the pointer is an offse to the soundbank ROM location, and both can shift in BuildROM()
-
+            // The instrument bank and new samples are already written to the ROM file, now the pointers need to be updated.
+            // It's not currently possible to know where the audio samples are written until they're actually written to ROM.
+            // This is because the pointer is an offset to the soundbank ROM location, and both can shift in BuildROM()
+            //
+            // Previously, the samples were updated by going through the bank binary byte by byte, but now the bank is parsed and
+            // the sample offsets are obtained — this allows the samples to be linked by type, index, and key region (if INST).
+            // If the type, index, and key region are null and the temp address is present, then the system fallsback to searching
+            // for the sample. However, because the bank is parsed it can search only sample addresses. This gets rid of the risk
+            // of overwriting other data (it was common that ADPCM prediction coefficients would be overwritten if the address was small).
+            // If the temp address is matched to a sample address, the parent type is gotten and the offset to the sample is obtained
+            // using the stored index in the parent's struct.
+            //
             if (RomData.InstrumentSetList == null)
             {
                 return;
