@@ -1,5 +1,7 @@
 namespace MMR.Randomizer.Constants
 {
+    // Alignment is intentional, please don't remove it, it's easier to read and the file is just constants ＜(´⌯ w ⌯`)＞
+
     public static class AudioSequenceIds
     {
         // Store AudioSeq indices to a name
@@ -136,7 +138,7 @@ namespace MMR.Randomizer.Constants
 
 //namespace MMR.Randomizer.Constants
 //{
-//    public static class AudioSequences
+//    public static class AudioSequenceIds
 //    {
 //        // Store AudioSeq indices to a name
 //        public const int SEQ_MASTER_SEQUENCE               = 0x00;
