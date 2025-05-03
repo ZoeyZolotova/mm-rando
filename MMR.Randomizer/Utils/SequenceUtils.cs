@@ -485,22 +485,22 @@ namespace MMR.Randomizer.Utils
                 {
                     if (TryParseCategory(category, out int cat))
                     {
-                        if (!categories.Contains(cat))
-                            categories.Add(cat);
-
                         // BGM and Fanfare categories can't be mixed, so get the type
                         var currentType = MusicGroups.GetCategoryType(cat);
 
+                        // Ensure at least the first type matches the given song type, otherwise throw an error
+                        if (firstType == null && !string.Equals(songType, MusicGroups.TypeCheck[currentType], StringComparison.OrdinalIgnoreCase))
+                            throw new Exception($"Error: Category '{category}' does not match given song type '{songType}' for song: {songname}");
+
                         // After the first category, if any categories are mismatched then drop them entirely
                         // Might be good to throw an error or log the file... but this is fine for now
-                        if (firstType == null)
-                        {
-                            firstType = currentType;
-                        }
-                        else if (firstType != currentType)
-                        {
+                        if (firstType != null && firstType != currentType)
                             continue;
-                        }
+
+                        firstType ??= currentType;
+
+                        if (!categories.Contains(cat))
+                            categories.Add(cat);
                     }
                     else
                     {
