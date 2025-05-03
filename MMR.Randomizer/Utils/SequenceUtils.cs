@@ -83,9 +83,9 @@ namespace MMR.Randomizer.Utils
                         return true;
                     }
 
-                    if (int.TryParse(trimmed, out int category))
+                    if (int.TryParse(trimmed, out int intCategory))
                     {
-                        value = category;
+                        value = intCategory;
                         return true;
                     }
 
