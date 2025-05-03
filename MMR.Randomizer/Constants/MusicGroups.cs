@@ -15,6 +15,12 @@ namespace MMR.Randomizer.Constants
             Fanfare
         }
 
+        public static readonly Dictionary<Type, string> TypeCheck = new()
+        {
+            { Type.Bgm, "bgm" },
+            { Type.Fanfare, "fanfare" }
+        };
+
         public enum Category : int
         {
             // Group BGM Categories
