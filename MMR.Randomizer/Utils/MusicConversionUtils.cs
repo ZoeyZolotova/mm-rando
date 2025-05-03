@@ -405,11 +405,12 @@ namespace MMR.Randomizer.Utils
                     string filename = $"{kvp.Key}.zsound"; // don't know if the extension is needed, but just in case...
                     uint tempAddr = kvp.Value;
 
+                    // Since old data doesn't use the new format, the type, index, and keyregion can be left null
                     yaml.Metadata.AudioSamples[$"{filename}"] = new MMRSMetadataYAML.Sample
                     {
-                        Type = "~",
-                        Index = -1,
-                        KeyRegion = "~",
+                        // Type = "~",
+                        // Index = -1,
+                        // KeyRegion = "~",
                         TempAddress = tempAddr
                     };
 
