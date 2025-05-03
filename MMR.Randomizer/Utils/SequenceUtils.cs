@@ -528,7 +528,7 @@ namespace MMR.Randomizer.Utils
 
                     if (type == null && listIndex != null && sample.KeyRegion != null)
                     {
-                        throw new InvalidOperationException($"Error: Audio sample '{entry.Key}': If type is null, index and key_region must also be null.");
+                        throw new InvalidOperationException($"Error: Audio sample '{entry.Key}': If type is null, index and key region must also be null.");
                     }
                     else
                     {
@@ -539,21 +539,21 @@ namespace MMR.Randomizer.Utils
                             throw new InvalidOperationException($"Sample '{entry.Key}': Index must not be null when type is '{type}'.");
 
                         if (type != null && tempAddr != null)
-                            throw new InvalidOperationException($"Sample '{entry.Key}': temp_addr must be null in the new format.");
+                            throw new InvalidOperationException($"Sample '{entry.Key}': temp addr must be null in the new format.");
 
                         if (type == "INST")
                         {
                             if (string.IsNullOrEmpty(keyRegion) || !validKeyRegions.Contains(keyRegion))
-                                throw new InvalidOperationException($"Error: Audio sample '{entry.Key}': key_region must be one of LOW, NORM, HIGH for INST.");
+                                throw new InvalidOperationException($"Error: Audio sample '{entry.Key}': key region must be one of LOW, NORM, HIGH for INST.");
                         }
                         else // DRUM or SFX
                         {
                             if (!string.IsNullOrEmpty(keyRegion))
-                                throw new InvalidOperationException($"Error: Audio sample '{entry.Key}': key_region must be null or empty for {type}.");
+                                throw new InvalidOperationException($"Error: Audio sample '{entry.Key}': key region must be null or empty for {type}.");
                         }
                     }
 
-                    // type, index, and key_region are all part of the new format used by OOTR:
+                    // type, index, and key region are all part of the new format used by OOTR:
                     // ZSOUND:INST:0:NORM:file.zsound, ZSOUND:DRUM:0::file.zsound, ZSOUND:SFX:0::file.zsound
                     //
                     // The new format links samples by: parsing the bank, indexing the structures,
@@ -566,9 +566,9 @@ namespace MMR.Randomizer.Utils
                     {
                         { "type", sample.Type }, // Instrument type: INST, DRUM, SFX
                         { "index", listIndex }, // Index in the related structure list
-                        { "key_region", type == "INST" ? keyRegion : null }, // For INST: LOW, NORM, HIGH; for DRUM and SFX: leave empty
+                        { "key region", type == "INST" ? keyRegion : null }, // For INST: LOW, NORM, HIGH; for DRUM and SFX: leave empty
                         { "file", entry.Key },
-                        { "temp_addr", tempAddr }, // This is unused in the new format
+                        { "temp addr", tempAddr }, // This is unused in the new format
                     };
 
                     commands.Add(zsound);
@@ -687,23 +687,31 @@ namespace MMR.Randomizer.Utils
                         var samplesList = new List<SequenceSoundSampleBinaryData>();
                         foreach (var command in metadata.Commands)
                         {
-                            var sampleName = command.ContainsKey("file") ? command["file"].ToString() : null;
-                            var zsoundFile = mmrs.AudioSamples.FirstOrDefault(entry => entry.Name.Contains(sampleName));
+                            var zsoundName = command.TryGetValue("file", out var nameVal) ? nameVal as string : null;
+                            var zsoundFile = mmrs.AudioSamples.FirstOrDefault(entry => entry.Name.Contains(zsoundName));
 
                             if (zsoundFile != null)
                             {
                                 byte[] sampleData = new byte[zsoundFile.Length];
                                 zsoundFile.Open().Read(sampleData, 0, sampleData.Length);
 
-                                uint tempAddr = command.ContainsKey("temp_addr") ? Convert.ToUInt32(command["temp_addr"]) : 0;
+                                var zsoundType = command.TryGetValue("type", out var typeVal) ? typeVal as string : null;
+                                var zsoundIndex = command.TryGetValue("index", out var indexVal) ? indexVal as int? : null;
+                                var zsoundKeyRegion = command.TryGetValue("key region", out var regionVal) ? regionVal as string : null;
+                                var zsoundTempAddr = command.TryGetValue("temp addr", out var markerVal) ? markerVal as uint? : null;
 
                                 samplesList.Add(
                                     new SequenceSoundSampleBinaryData()
                                     {
                                         BinaryData = sampleData,
-                                        Addr = tempAddr,
-                                        Marker = tempAddr,
-                                        Hash = BitConverter.ToInt64(md5lib.ComputeHash(sampleData), 0)
+                                        Addr = zsoundTempAddr ?? 0,
+                                        Marker = zsoundTempAddr ?? 0,
+                                        Hash = BitConverter.ToInt64(md5lib.ComputeHash(sampleData), 0),
+
+                                        // Store the new type if available
+                                        InstrumentType = zsoundType,
+                                        ListIndex = zsoundIndex ?? -1,
+                                        KeyRegion = zsoundKeyRegion,
                                     }
                                 );
                             }
@@ -890,7 +898,7 @@ namespace MMR.Randomizer.Utils
 
                 if (sequenceList.FindAll(u => u.Replaces == i).Count > 1)
                 {
-                    WriteOutput("Error: Slot " + i.ToString("X") + " has multiple songs pointing at it!");
+                    WriteOutput($"Error: Slot {i:X} has multiple songs pointing at it!");
                 }
 
                 int p = RomData.PointerizedSequences.FindIndex(u => u.PreviousSlot == i);
@@ -906,7 +914,7 @@ namespace MMR.Randomizer.Utils
                     if (sequenceList[j].SeqId != -1)
                     {
                         newentry.Data = oldSeq[sequenceList[j].SeqId].Data;
-                        WriteOutput("Slot " + i.ToString("X2") + " -> " + sequenceList[j].Name);
+                        WriteOutput($"Slot {i:X2} := {sequenceList[j].Name}");
 
                     }
                     else if (sequenceList[j].SequenceBinaryList != null && sequenceList[j].SequenceBinaryList.Count > 0)
@@ -916,7 +924,7 @@ namespace MMR.Randomizer.Utils
                             WriteOutput("Warning: writing song with multiple sequence/bank combos, selecting first available");
                         }
                         newentry.Data = sequenceList[j].SequenceBinaryList[0].SequenceBinary;
-                        WriteOutput("Slot " + i.ToString("X2") + " := " + sequenceList[j].Name + " *");
+                        WriteOutput($"Slot {i:X2} := {sequenceList[j].Name} *");
 
                     }
                     else // Not an MM sequence, load and add file
@@ -936,7 +944,7 @@ namespace MMR.Randomizer.Utils
                         }
                         else
                         {
-                            throw new Exception("Music not found as file or built-in resource." + sequenceList[j].Filename);
+                            throw new Exception($"Music not found as file or built-in resource: '{sequenceList[j].Filename}'");
                         }
 
                         // This might check if the sequence type is correct for MM
@@ -947,7 +955,7 @@ namespace MMR.Randomizer.Utils
                         }
 
                         newentry.Data = data;
-                        WriteOutput("Slot " + i.ToString("X2") + " := " + sequenceList[j].Name);
+                        WriteOutput($"Slot {i:X2} := {sequenceList[j].Name}");
 
                     }
                 }
@@ -1614,32 +1622,111 @@ namespace MMR.Randomizer.Utils
             int audiobankInstSetAddr = RomData.MMFileList[3].Cmp_Addr; // Point to a specific instrument set, starting with 0 and updating per loop
             foreach (var instrumentset in RomData.InstrumentSetList)
             {
-                if (instrumentset.InstrumentSamples != null && instrumentset.InstrumentSamples.Count > 0)
+                if (instrumentset.InstrumentSamples != null && instrumentset.InstrumentSamples.Any())
                 {
                     foreach (var sample in instrumentset.InstrumentSamples)
                     {
-                        // For each audio sample, if the bank uses the sample, lookup new ROM for the sample
-                        // and get the soundbank offset for said address: address of collection + offset of specific sample in collection - soundbank
-                        int soundbankSampleOffset = RomData.MMFileList[RomData.SamplesFileID].Cmp_Addr
-                                                      + (int)RomData.ListOfSamples.Find(u => u.Hash == sample.Hash).Addr
-                                                      - soundbankAddr;
-                        byte[] sampleOffsetBytes = BitConverter.GetBytes(soundbankSampleOffset);
-                        byte[] markerBytes = BitConverter.GetBytes(sample.Marker);
 
-                        // Find the location in the bank where the temp address is per byte,
-                        // then replace with the bytes from SampleOffsetBytes
-                        for (int i = 0; i < (instrumentset.BankBinary.Length - 4); i += 1)
+                        AudiobankUtils.Audiobank instrumentBank = new(instrumentset.BankMetaData, instrumentset.BankBinary);
+
+                        if (sample.Marker == 0)
                         {
-                            if (ROM[audiobankInstSetAddr + i + 0] == markerBytes[3]
-                                && ROM[audiobankInstSetAddr + i + 1] == markerBytes[2]
-                                && ROM[audiobankInstSetAddr + i + 2] == markerBytes[1]
-                                && ROM[audiobankInstSetAddr + i + 3] == markerBytes[0])
+                            // Get the offset to the sample using the given type, index, and region
+                            uint sampleBankAddress = 0;
+                            sampleBankAddress = sample.InstrumentType switch
                             {
-                                ROM[audiobankInstSetAddr + i + 0] = sampleOffsetBytes[3];
-                                ROM[audiobankInstSetAddr + i + 1] = sampleOffsetBytes[2];
-                                ROM[audiobankInstSetAddr + i + 2] = sampleOffsetBytes[1];
-                                ROM[audiobankInstSetAddr + i + 3] = sampleOffsetBytes[0];
+                                "INST" => sample.KeyRegion switch
+                                {
+                                    "LOW"  => instrumentBank.Instruments[sample.ListIndex].LowSampleAddress,
+                                    "PRIM" => instrumentBank.Instruments[sample.ListIndex].PrimSampleAddress,
+                                    "HIGH" => instrumentBank.Instruments[sample.ListIndex].HighSampleAddress,
+                                    _      => throw new Exception(),// invalid key region
+                                },
+
+                                // Drums and SFX don't have key regions
+                                "DRUM" => instrumentBank.Drums[sample.ListIndex].SampleAddress,
+                                "SFX"  => instrumentBank.Effects[sample.ListIndex].SampleAddress,
+                                _      => throw new Exception(),// invalid type
+                            };
+
+                            // Get the new sample address from the ROM
+                            int newSampleAddress = RomData.MMFileList[RomData.SamplesFileID].Cmp_Addr
+                                                   + (int)RomData.ListOfSamples.Find(u => u.Hash == sample.Hash).Addr
+                                                   - soundbankAddr;
+
+                            byte[] newAddressBytes = BitConverter.GetBytes(newSampleAddress);
+                            if (BitConverter.IsLittleEndian)
+                                Array.Reverse(newAddressBytes);
+
+                            // Replace the sample struct's address with the correct address
+                            // The first 4 bytes are a bitfield, so add 4 to the index
+                            ROM[audiobankInstSetAddr + sampleBankAddress + 4] = newAddressBytes[0];
+                            ROM[audiobankInstSetAddr + sampleBankAddress + 5] = newAddressBytes[1];
+                            ROM[audiobankInstSetAddr + sampleBankAddress + 6] = newAddressBytes[2];
+                            ROM[audiobankInstSetAddr + sampleBankAddress + 7] = newAddressBytes[3];
+                        }
+                        else // Fallback to sample marker matching
+                        {
+                            uint sampleBankAddress = 0;
+
+                            // Instead of searching byte by byte, collect all the samples, match the address, then get the offset to the matched address
+                            // With this, there should be no accidental overwrites of data in the instrument bank 
+                            foreach (var s in instrumentBank.GetBankSamples())
+                            {
+                                switch (s)
+                                {
+                                    case AudiobankUtils.Sample<AudiobankUtils.Instrument> instrumentSample:
+                                        var instParent = instrumentSample.Parent;
+
+                                        if (instParent.LowSample != null && instParent.LowSample.Address == sample.Marker)
+                                            sampleBankAddress = instrumentBank.Instruments[instParent.InstrumentId].LowSampleAddress;
+
+                                        else if (instParent.PrimSample != null && instParent.PrimSample.Address == sample.Marker)
+                                            sampleBankAddress = instrumentBank.Instruments[instParent.InstrumentId].PrimSampleAddress;
+
+                                        else if (instParent.HighSample != null && instParent.HighSample.Address == sample.Marker)
+                                            sampleBankAddress = instrumentBank.Instruments[instParent.InstrumentId].HighSampleAddress;
+
+                                        break;
+
+                                    case AudiobankUtils.Sample<AudiobankUtils.Drum> drumSample:
+                                        var drumParent = drumSample.Parent;
+
+                                        if (drumParent.Sample != null && drumParent.Sample.Address == sample.Marker)
+                                            sampleBankAddress = instrumentBank.Drums[drumParent.DrumId].SampleAddress;
+
+                                        break;
+
+                                    case AudiobankUtils.Sample<AudiobankUtils.Effect> effectSample:
+                                        var effectParent = effectSample.Parent;
+
+                                        if (effectParent.Sample != null && effectParent.Sample.Address == sample.Marker)
+                                            sampleBankAddress = instrumentBank.Effects[effectParent.EffectId].SampleAddress;
+
+                                        break;
+
+                                    default:
+                                        break;
+                                }
+
+                                if (sampleBankAddress != 0)
+                                    break;
                             }
+
+                            int newSampleAddress = RomData.MMFileList[RomData.SamplesFileID].Cmp_Addr
+                                                   + (int)RomData.ListOfSamples.Find(u => u.Hash == sample.Hash).Addr
+                                                   - soundbankAddr;
+
+                            byte[] newAddressBytes = BitConverter.GetBytes(newSampleAddress);
+                            if (BitConverter.IsLittleEndian)
+                                Array.Reverse(newAddressBytes);
+
+                            // Replace the sample struct's address with the correct address
+                            // The first 4 bytes are a bitfield, so add 4 to the index
+                            ROM[audiobankInstSetAddr + sampleBankAddress + 4] = newAddressBytes[0];
+                            ROM[audiobankInstSetAddr + sampleBankAddress + 5] = newAddressBytes[1];
+                            ROM[audiobankInstSetAddr + sampleBankAddress + 6] = newAddressBytes[2];
+                            ROM[audiobankInstSetAddr + sampleBankAddress + 7] = newAddressBytes[3];
                         }
                     }
                 }
@@ -1667,7 +1754,7 @@ namespace MMR.Randomizer.Utils
             // For each custom instrument set that needs a custom audio sample
             foreach (InstrumentSetInfo instrumentSet in InstrumentSetList)
             {
-                if (instrumentSet.InstrumentSamples != null && instrumentSet.InstrumentSamples.Count > 0)
+                if (instrumentSet.InstrumentSamples != null && instrumentSet.InstrumentSamples.Any())
                 {
                     foreach (SequenceSoundSampleBinaryData sample in instrumentSet.InstrumentSamples)
                     {
