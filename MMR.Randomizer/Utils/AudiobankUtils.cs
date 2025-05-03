@@ -58,23 +58,26 @@ namespace MMR.Randomizer.Utils
 
                 foreach (var instrument in Instruments)
                 {
-                    if (instrument.LowSample != null)
-                        allSamples.Add(instrument.LowSample);
-                    if (instrument.PrimSample != null)
-                        allSamples.Add(instrument.PrimSample);
-                    if (instrument.HighSample != null)
-                        allSamples.Add(instrument.HighSample);
+                    if (instrument != null)
+                    {
+                        if (instrument.LowSample != null)
+                            allSamples.Add(instrument.LowSample);
+                        if (instrument.PrimSample != null)
+                            allSamples.Add(instrument.PrimSample);
+                        if (instrument.HighSample != null)
+                            allSamples.Add(instrument.HighSample);
+                    }
                 }
 
                 foreach (var drum in Drums)
                 {
-                    if (drum.Sample != null)
+                    if (drum != null && drum.Sample != null)
                         allSamples.Add(drum.Sample);
                 }
 
                 foreach (var sfx in Effects)
                 {
-                    if (sfx.Sample != null)
+                    if (sfx != null && sfx.Sample != null)
                         allSamples.Add(sfx.Sample);
                 }
 
@@ -106,9 +109,9 @@ namespace MMR.Randomizer.Utils
             public uint PrimSampleAddress { get; set; }
             public uint HighSampleAddress { get; set; }
 
-            public Sample<Instrument> LowSample { get; set; }
-            public Sample<Instrument> PrimSample { get; set; }
-            public Sample<Instrument> HighSample { get; set; }
+            public Sample<Instrument> LowSample { get; set; } = null;
+            public Sample<Instrument> PrimSample { get; set; } = null;
+            public Sample<Instrument> HighSample { get; set; } = null;
 
             public Instrument(int instrumentId, byte[] bankData, int instrumentOffset)
             {
@@ -128,7 +131,7 @@ namespace MMR.Randomizer.Utils
         {
             public int DrumId { get; set; }
             public uint SampleAddress { get; set; }
-            public Sample<Drum> Sample { get; set; }
+            public Sample<Drum> Sample { get; set; } = null;
 
             public Drum(int drumId, byte[] bankData, int drumOffset)
             {
@@ -145,7 +148,7 @@ namespace MMR.Randomizer.Utils
         {
             public int EffectId { get; set; }
             public uint SampleAddress { get; set; }
-            public Sample<Effect> Sample { get; set; }
+            public Sample<Effect> Sample { get; set; } = null;
 
             public Effect(int effectId, byte[] bankData, int sampleOffset)
             {
