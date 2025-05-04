@@ -1,35 +1,45 @@
-# Majora's Mask Randomizer SEQS YML File
+# Majora's Mask Randomizer SEQS YAML File
 #   This YAML file determines which sequences from the in-game areas can be randomized when randomizing music is enabled.
 #   If a sequence is not in this file, it will not be randomized. Each entry used by the file, and its corresponding fields
 #   is explained below.
 #
 # Sequence Name:
-#   The main key value for an entry (e.g. "mm-terminafield") is the name of the sequence. Do not change this field, the randomizer
-#   has some hard-coded reliance on this field. If you wish to change the name of the sequence in-game, please use the display name
-#   field — this field (sequence name) is not what is displayed in-game.
+#   The main key value for an entry (e.g. "mm-terminafield") is the name of the sequence. If you wish to change the name of
+#   the sequence in-game, please use the display name field — this field (sequence name) is not what is displayed in-game.
+#   Users should not change this — the randomizer has some hardcoded reliance on the entry's key.
 #
 # Display Name:
 #   The display name is the name to be displayed in-game.
+#   Users may change this.
 #
 # Music Groups:
 #   The music groups is what areas the sequence can randomize into, for the full list of groups look at MusicGroups.cs
 #   Both strings and ints are allowed as long as the values are valid in MusicGroups.cs
+#   Users may change this.
 #
 # Instrument Set:
 #   The ID (index) of the instrument bank in the AudioBank index. This determines which instrument bank is used by the vanilla sequence.
+#   Users should not change this.
 #
 # Sequence ID:
 #   The ID (index) of the sequence in the AudioSeq index. This determines which sequences can be replaced by music.
+#   Users should not change this.
+#
+# Song Type:
+#  The sequence's type. This is used to determine what default music group list will be used if the music groups field is empty.
+#  Users should not change this.
 #
 # No Recycle:
 #   A boolean that determines if vanila sequences will be used during music randomization.
 #   False means vanilla sequences will be used during randomization, and True means they will not be used.
+#   Users may change this.
 
 mm-terminafield:
   display name: "Termina Field"
   music groups: ["Fields", "TerminaField"]
   instrument set: 0x03
   sequence id: 0x02
+  song type: "bgm"
   no recycle: false
 
 mm-snowheadmountains:
@@ -37,6 +47,7 @@ mm-snowheadmountains:
   music groups: ["Fields", "Snowhead"]
   instrument set: 0x15
   sequence id: 0x13
+  song type: "bgm"
   no recycle: false
 
 mm-greatbaycoast:
@@ -44,6 +55,7 @@ mm-greatbaycoast:
   music groups: ["Fields", "Towns", "GreatBay"]
   instrument set: 0x1D
   sequence id: 0x10
+  song type: "bgm"
   no recycle: false
 
 mm-ikanacanyon:
@@ -51,6 +63,7 @@ mm-ikanacanyon:
   music groups: ["Fields", "Towns", "IkanaCanyon"]
   instrument set: 0x1E
   sequence id: 0x11
+  song type: "bgm"
   no recycle: false
 
 mm-southernswamp:
@@ -58,6 +71,7 @@ mm-southernswamp:
   music groups: ["Fields", "Towns", "SouthernSwamp"]
   instrument set: 0x1C
   sequence id: 0x0C
+  song type: "bgm"
   no recycle: false
 
 mm-clocktown1:
@@ -65,6 +79,7 @@ mm-clocktown1:
   music groups: ["Towns", "ClockTown1"]
   instrument set: 0x19
   sequence id: 0x15
+  song type: "bgm"
   no recycle: false
 
 mm-clocktown2:
@@ -79,6 +94,7 @@ mm-clocktown3:
   music groups: ["Towns", "ClockTown3"]
   instrument set: 0x19
   sequence id: 0x17
+  song type: "bgm"
   no recycle: false
 
 mm-goroncity:
@@ -86,6 +102,7 @@ mm-goroncity:
   music groups: ["Towns", "GoronShrine"]
   instrument set: 0x26
   sequence id: 0x30
+  song type: "bgm"
   no recycle: false
 
 mm-romaniranch:
@@ -93,6 +110,7 @@ mm-romaniranch:
   music groups: ["Fields", "Towns", "RomaniRanch"]
   instrument set: 0x07
   sequence id: 0x2F
+  song type: "bgm"
   no recycle: false
 
 mm-zorahall:
@@ -100,6 +118,7 @@ mm-zorahall:
   music groups: ["Towns", "Indoors", "ZoraHall"]
   instrument set: 0x0B
   sequence id: 0x36
+  song type: "bgm"
   no recycle: false
 
 mm-dekupalace:
@@ -107,6 +126,7 @@ mm-dekupalace:
   music groups: ["Fields", "Towns", "DekuPalace"]
   instrument set: 0x19
   sequence id: 0x12
+  song type: "bgm"
   no recycle: false
 
 mm-caves:
@@ -114,6 +134,7 @@ mm-caves:
   music groups: ["Dungeons", "SecretGrotto"]
   instrument set: 0x1A
   sequence id: 0x3B
+  song type: "bgm"
   no recycle: false
 
 mm-snowheadtemple:
@@ -121,6 +142,7 @@ mm-snowheadtemple:
   music groups: ["Dungeons", "SnowheadTemple"]
   instrument set: 0x15
   sequence id: 0x65
+  song type: "bgm"
   no recycle: false
 
 mm-greatbaytemple:
@@ -128,6 +150,7 @@ mm-greatbaytemple:
   music groups: ["Dungeons", "GreatBayTemple"]
   instrument set: 0x16
   sequence id: 0x66
+  song type: "bgm"
   no recycle: false
 
 mm-piratefortress:
@@ -135,6 +158,7 @@ mm-piratefortress:
   music groups: ["Dungeons", "PiratesFortress"]
   instrument set: 0x03
   sequence id: 0x14
+  song type: "bgm"
   no recycle: false
 
 mm-ikanacastle:
@@ -142,20 +166,23 @@ mm-ikanacastle:
   music groups: ["Dungeons", "IkanaCastle"]
   instrument set: 0x21
   sequence id: 0x6F
+  song type: "bgm"
   no recycle: false
 
 mm-stonetower:
-  display name: "Stone Tower"
+  display name: "Stone Tower Temple"
   music groups: ["Dungeons", "StoneTower"]
   instrument set: 0x19
   sequence id: 0x06
+  song type: "bgm"
   no recycle: false
 
 mm-invertedstonetower:
-  display name: "Inverted Stone Tower"
+  display name: "Inverted Stone Tower Temple"
   music groups: ["Dungeons", "InvertedStoneTower"]
   instrument set: 0x19
   sequence id: 0x07
+  song type: "bgm"
   no recycle: false
 
 mm-woodfalltemple:
@@ -163,6 +190,7 @@ mm-woodfalltemple:
   music groups: ["Dungeons", "WoodfallTemple"]
   instrument set: 0x14
   sequence id: 0x1C
+  song type: "bgm"
   no recycle: false
 
 mm-clocktower:
@@ -170,6 +198,7 @@ mm-clocktower:
   music groups: ["Indoors", "CalmThemes", "ClockTower"]
   instrument set: 0x17
   sequence id: 0x05
+  song type: "bgm"
   no recycle: false
 
 mm-guruguru:
@@ -177,6 +206,7 @@ mm-guruguru:
   music groups: ["Indoors", "CalmThemes", "GuruGurusTheme"]
   instrument set: 0x05
   sequence id: 0x2E
+  song type: "bgm"
   no recycle: false
 
 mm-milkbar:
@@ -184,6 +214,7 @@ mm-milkbar:
   music groups: ["Indoors", "Minigames", "MilkBar"]
   instrument set: 0x20
   sequence id: 0x3C
+  song type: "bgm"
   no recycle: false
 
 mm-house:
@@ -191,6 +222,7 @@ mm-house:
   music groups: ["Indoors", "House"]
   instrument set: 0x03
   sequence id: 0x1F
+  song type: "bgm"
   no recycle: false
 
 mm-shop:
@@ -198,6 +230,7 @@ mm-shop:
   music groups: ["Indoors", "ItemShop"]
   instrument set: 0x0C
   sequence id: 0x44
+  song type: "bgm"
   no recycle: false
 
 mm-shootinggallery:
@@ -205,13 +238,15 @@ mm-shootinggallery:
   music groups: ["Indoors", "Minigames", "MinigameShop"]
   instrument set: 0x0A
   sequence id: 0x46
+  song type: "bgm"
   no recycle: false
 
 mm-laboratory:
-  display name: "Curiosity Shop & Marine Research Lab"
+  display name: "Curiosity Shop"
   music groups: ["Indoors", "CalmThemes", "CuriosityShop"]
   instrument set: 0x0D
   sequence id: 0x2C
+  song type: "bgm"
   no recycle: false
 
 
@@ -220,6 +255,7 @@ mm-observatory:
   music groups: ["Indoors", "AstralObservatory"]
   instrument set: 0x17
   sequence id: 0x3A
+  song type: "bgm"
   no recycle: false
 
 mm-musicbox:
@@ -227,6 +263,7 @@ mm-musicbox:
   music groups: ["Indoors", "Minigames", "CalmThemes", "MusicBoxHouse"]
   instrument set: 0x05
   sequence id: 0x27
+  song type: "bgm"
   no recycle: false
 
 mm-goronrace:
@@ -234,6 +271,7 @@ mm-goronrace:
   music groups: ["Minigames", "GoronRace"]
   instrument set: 0x26
   sequence id: 0x26
+  song type: "bgm"
   no recycle: false
 
 mm-minigame:
@@ -241,6 +279,7 @@ mm-minigame:
   music groups: ["Minigames", "ActionThemes", "MinigameTheme"]
   instrument set: 0x03
   sequence id: 0x25
+  song type: "bgm"
   no recycle: false
 
 mm-wagonride:
@@ -248,6 +287,7 @@ mm-wagonride:
   music groups: ["Indoors", "Minigames", "CalmThemes", "CremiasTheme"]
   instrument set: 0x08
   sequence id: 0x72
+  song type: "bgm"
   no recycle: false
 
 mm-boatcruise:
@@ -255,6 +295,7 @@ mm-boatcruise:
   music groups: ["Indoors", "Minigames", "CalmThemes", "BoatCruise"]
   instrument set: 0x05
   sequence id: 0x0E
+  song type: "bgm"
   no recycle: false
 
 mm-horserace:
@@ -262,6 +303,7 @@ mm-horserace:
   music groups: ["Minigames", "HorseRace"]
   instrument set: 0x08
   sequence id: 0x40
+  song type: "bgm"
   no recycle: false
 
 mm-meeting:
@@ -269,6 +311,7 @@ mm-meeting:
   music groups: ["Indoors", "ActionThemes", "CalmThemes", "MayorsOffice"]
   instrument set: 0x03
   sequence id: 0x31
+  song type: "bgm"
   no recycle: false
 
 mm-aliens:
@@ -276,13 +319,15 @@ mm-aliens:
   music groups: ["ActionThemes", "CalmThemes", "AliensTheme"]
   instrument set: 0x16
   sequence id: 0x0D
+  song type: "bgm"
   no recycle: false
 
 mm-swordschool:
-  display name: "Swordsmans' School"
+  display name: "Swordsman's School"
   music groups: ["Indoors", "Minigames", "ActionThemes", "SwordSchool"]
   instrument set: 0x18
   sequence id: 0x50
+  song type: "bgm"
   no recycle: false
 
 mm-sharp:
@@ -290,6 +335,7 @@ mm-sharp:
   music groups: ["Indoors", "ActionThemes", "CalmThemes", "SharpsCurse"]
   instrument set: 0x03
   sequence id: 0x0F
+  song type: "bgm"
   no recycle: false
 
 mm-chase:
@@ -297,6 +343,7 @@ mm-chase:
   music groups: ["ActionThemes", "Fights", "PursuitTheme"]
   instrument set: 0x03
   sequence id: 0x03
+  song type: "bgm"
   no recycle: false
 
 mm-skullkid:
@@ -304,6 +351,7 @@ mm-skullkid:
   music groups: ["CalmThemes", "MajorasTheme"]
   instrument set: 0x11
   sequence id: 0x04
+  song type: "bgm"
   no recycle: false
 
 mm-maskreveal:
@@ -311,6 +359,7 @@ mm-maskreveal:
   music groups: ["ActionThemes", "MoonEnraged"]
   instrument set: 0x11
   sequence id: 0x7B
+  song type: "bgm"
   no recycle: false
 
 mm-fairyfountain:
@@ -318,6 +367,7 @@ mm-fairyfountain:
   music groups: ["Towns", "Indoors", "CalmThemes", "GreatFairysFountain"]
   instrument set: 0x06
   sequence id: 0x28
+  song type: "bgm"
   no recycle: false
 
 mm-fileselect:
@@ -325,6 +375,7 @@ mm-fileselect:
   music groups: ["Indoors", "CalmThemes", "FileSelect"]
   instrument set: 0x06
   sequence id: 0x18
+  song type: "bgm"
   no recycle: false
 
 mm-keaton:
@@ -332,6 +383,7 @@ mm-keaton:
   music groups: ["CalmThemes", "KeatonsTheme"]
   instrument set: 0x27
   sequence id: 0x73
+  song type: "bgm"
   no recycle: false
 
 mm-kaepora:
@@ -339,6 +391,7 @@ mm-kaepora:
   music groups: ["CalmThemes", "OwlsTheme"]
   instrument set: 0x27
   sequence id: 0x45
+  song type: "bgm"
   no recycle: false
 
 mm-witches:
@@ -346,6 +399,7 @@ mm-witches:
   music groups: ["Indoors", "CalmThemes", "WitchesTheme"]
   instrument set: 0x0E
   sequence id: 0x43
+  song type: "bgm"
   no recycle: false
 
 mm-gormanbros:
@@ -353,6 +407,7 @@ mm-gormanbros:
   music groups: ["Fields", "CalmThemes", "GormanBrosTheme"]
   instrument set: 0x08
   sequence id: 0x42
+  song type: "bgm"
   no recycle: false
 
 mm-mysterywoods:
@@ -360,6 +415,7 @@ mm-mysterywoods:
   music groups: ["Fields", "Towns", "Indoors", "Minigames", "CalmThemes", "WoodsOfMystery"]
   instrument set: 0x04
   sequence id: 0x3E
+  song type: "bgm"
   no recycle: false
 
 mm-zelda:
@@ -367,6 +423,7 @@ mm-zelda:
   music groups: ["Towns", "Indoors", "CalmThemes", "ZeldasTheme"]
   instrument set: 0x06
   sequence id: 0x29
+  song type: "bgm"
   no recycle: false
 
 mm-reunion:
@@ -374,6 +431,7 @@ mm-reunion:
   music groups: ["CalmThemes", "ReunionTheme"]
   instrument set: 0x21
   sequence id: 0x7D
+  song type: "bgm"
   no recycle: false
 
 mm-healed:
@@ -381,6 +439,7 @@ mm-healed:
   music groups: ["Indoors", "CalmThemes", "HealingTheme"]
   instrument set: 0x17
   sequence id: 0x0B
+  song type: "bgm"
   no recycle: false
 
 mm-giants:
@@ -388,6 +447,7 @@ mm-giants:
   music groups: ["Indoors", "CalmThemes", "GiantsTheme"]
   instrument set: 0x12
   sequence id: 0x2D
+  song type: "bgm"
   no recycle: false
 
 mm-miniboss:
@@ -395,6 +455,7 @@ mm-miniboss:
   music groups: ["Fights", "BigEnemy"]
   instrument set: 0x03
   sequence id: 0x38
+  song type: "bgm"
   no recycle: false
 
 mm-boss:
@@ -402,6 +463,7 @@ mm-boss:
   music groups: ["Fights", "BossEnemy"]
   instrument set: 0x03
   sequence id: 0x1B
+  song type: "bgm"
   no recycle: false
 
 mm-mask:
@@ -409,6 +471,7 @@ mm-mask:
   music groups: ["Fights", "MajorasMask"]
   instrument set: 0x11
   sequence id: 0x6B
+  song type: "bgm"
   no recycle: false
 
 mm-incarnation:
@@ -416,6 +479,7 @@ mm-incarnation:
   music groups: ["Minigames", "ActionThemes", "Fights", "MajorasIncarnation"]
   instrument set: 0x11
   sequence id: 0x6A
+  song type: "bgm"
   no recycle: false
 
 mm-wrath:
@@ -423,6 +487,7 @@ mm-wrath:
   music groups: ["Fights", "MajorasWrath"]
   instrument set: 0x11
   sequence id: 0x69
+  song type: "bgm"
   no recycle: false
 
 mm-f-chasefail:
@@ -430,6 +495,7 @@ mm-f-chasefail:
   music groups: ["EventFanfares", "EventFail1"]
   instrument set: 0x03
   sequence id: 0x08
+  song type: "fanfare"
   no recycle: false
 
 mm-f-fail:
@@ -437,6 +503,7 @@ mm-f-fail:
   music groups: ["EventFanfares", "EventFail2"]
   instrument set: 0x03
   sequence id: 0x09
+  song type: "fanfare"
   no recycle: false
 
 mm-f-clearshort:
@@ -444,6 +511,7 @@ mm-f-clearshort:
   music groups: ["ItemFanfares", "EventSuccess"]
   instrument set: 0x03
   sequence id: 0x19
+  song type: "fanfare"
   no recycle: false
 
 mm-f-gameover:
@@ -451,6 +519,7 @@ mm-f-gameover:
   music groups: ["EventFanfares", "GameOver"]
   instrument set: 0x0F
   sequence id: 0x20
+  song type: "fanfare"
   no recycle: false
 
 mm-f-bossdown:
@@ -458,6 +527,7 @@ mm-f-bossdown:
   music groups: ["EventFanfares", "ClearFanfares", "BossDefeated"]
   instrument set: 0x03
   sequence id: 0x21
+  song type: "fanfare"
   no recycle: false
 
 mm-f-gotitem:
@@ -465,6 +535,7 @@ mm-f-gotitem:
   music groups: ["ItemFanfares", "ItemGet"]
   instrument set: 0x0F
   sequence id: 0x22
+  song type: "fanfare"
   no recycle: false
 
 mm-f-heart:
@@ -472,6 +543,7 @@ mm-f-heart:
   music groups: ["ItemFanfares", "HeartContainerGet"]
   instrument set: 0x0F
   sequence id: 0x24
+  song type: "fanfare"
   no recycle: false
 
 mm-f-mask:
@@ -479,6 +551,7 @@ mm-f-mask:
   music groups: ["ItemFanfares", "MaskGet"]
   instrument set: 0x0F
   sequence id: 0x37
+  song type: "fanfare"
   no recycle: false
 
 mm-f-smallitem:
@@ -486,6 +559,7 @@ mm-f-smallitem:
   music groups: ["ItemFanfares", "HeartPieceGet"]
   instrument set: 0x0F
   sequence id: 0x39
+  song type: "fanfare"
   no recycle: false
 
 mm-f-meet:
@@ -493,6 +567,7 @@ mm-f-meet:
   music groups: ["ItemFanfares", "TruthRevealed"]
   instrument set: 0x03
   sequence id: 0x3D
+  song type: "fanfare"
   no recycle: false
 
 mm-f-goronwin:
@@ -500,6 +575,7 @@ mm-f-goronwin:
   music groups: ["ItemFanfares", "GoronRaceWin"]
   instrument set: 0x26
   sequence id: 0x3F
+  song type: "fanfare"
   no recycle: false
 
 mm-f-horsewin:
@@ -507,6 +583,7 @@ mm-f-horsewin:
   music groups: ["ItemFanfares", "HorseRaceWin"]
   instrument set: 0x08
   sequence id: 0x41
+  song type: "fanfare"
   no recycle: false
 
 mm-f-song:
@@ -514,6 +591,7 @@ mm-f-song:
   music groups: ["ItemFanfares", "SongGet"]
   instrument set: 0x06
   sequence id: 0x52
+  song type: "fanfare"
   no recycle: false
 
 mm-f-soar:
@@ -521,6 +599,7 @@ mm-f-soar:
   music groups: ["ItemFanfares", "EventFanfares", "SoaringTheme"]
   instrument set: 0x09
   sequence id: 0x55
+  song type: "fanfare"
   no recycle: false
 
 mm-f-dungeonopen:
@@ -528,6 +607,7 @@ mm-f-dungeonopen:
   music groups: ["ItemFanfares", "EventFanfares", "TempleAppears"]
   instrument set: 0x0F
   sequence id: 0x77
+  song type: "fanfare"
   no recycle: false
 
 mm-f-dungeonclearshort:
@@ -535,6 +615,7 @@ mm-f-dungeonclearshort:
   music groups: ["ClearFanfares", "TempleClearShort"]
   instrument set: 0x0F
   sequence id: 0x78
+  song type: "fanfare"
   no recycle: false
 
 mm-f-dungeonclearlong:
@@ -542,6 +623,7 @@ mm-f-dungeonclearlong:
   music groups: ["ClearFanfares", "TempleClearLong"]
   instrument set: 0x0F
   sequence id: 0x79
+  song type: "fanfare"
   no recycle: false
 
 mm-f-moonclear:
@@ -549,6 +631,7 @@ mm-f-moonclear:
   music groups: ["ClearFanfares", "MoonDestroyed"]
   instrument set: 0x21
   sequence id: 0x7E
+  song type: "fanfare"
   no recycle: false
 
 mm-f-giantsleave:
@@ -556,12 +639,14 @@ mm-f-giantsleave:
   music groups: ["ClearFanfares", "GiantsLeave"]
   instrument set: 0x21
   sequence id: 0x7C
+  song type: "fanfare"
   no recycle: false
 
 mm-kamaros-mask-item-dance:
   display name: "Kamaro's Theme"
   music groups: ["KamarosTheme"]
   instrument set: 0x0A
+  song type: "bgm"
   sequence id: 0x71
 
 mm-c-giantscs:
@@ -569,6 +654,7 @@ mm-c-giantscs:
   music groups: ["Cutscenes", "GiantsAppear"]
   instrument set: 0x21
   sequence id: 0x70
+  song type: "bgm"
   no recycle: false
 
 mm-c-titlescreen:
@@ -576,6 +662,7 @@ mm-c-titlescreen:
   music groups: ["Cutscenes", "TitleDemo"]
   instrument set: 0x23
   sequence id: 0x76
+  song type: "bgm"
   no recycle: false
 
 mm-combat:
@@ -583,6 +670,7 @@ mm-combat:
   music groups: ["Minigames", "ActionThemes", "Fights", "SmallEnemy"]
   instrument set: 0x03
   sequence id: 0x1A
+  song type: "bgm"
   no recycle: false
 
 mm-japas-basspractice:
@@ -590,6 +678,7 @@ mm-japas-basspractice:
   music groups: ["JapasRoom"]
   instrument set: 0x13
   sequence id: 0x6C
+  song type: "bgm"
   no recycle: false
 
 mm-tijo-drumpractice:
@@ -597,6 +686,7 @@ mm-tijo-drumpractice:
   music groups: ["TijosRoom"]
   instrument set: 0x13
   sequence id: 0x6D
+  song type: "bgm"
   no recycle: false
 
 mm-evan-pianopractice:
@@ -604,6 +694,7 @@ mm-evan-pianopractice:
   music groups: ["EvansRoom"]
   instrument set: 0x13
   sequence id: 0x6E
+  song type: "bgm"
   no recycle: false
 
 mm-finalhours:
@@ -611,6 +702,7 @@ mm-finalhours:
   music groups: ["CalmThemes", "FinalHours"]
   instrument set: 0x17
   sequence id: 0x57
+  song type: "bgm"
   no recycle: false
 
 mm-opening-a-chest:
@@ -618,6 +710,7 @@ mm-opening-a-chest:
   music groups: ["OpenChest"]
   instrument set: 0x03
   sequence id: 0x2B
+  song type: "fanfare"
   no recycle: false
 
 mm-kamaros-dance-rosa-sisters:
@@ -625,4 +718,5 @@ mm-kamaros-dance-rosa-sisters:
   music groups: ["CalmThemes", "RosaSistersTheme"]
   instrument set: 0x1F
   sequence id: 0x2A
+  song type: "bgm"
   no recycle: false
