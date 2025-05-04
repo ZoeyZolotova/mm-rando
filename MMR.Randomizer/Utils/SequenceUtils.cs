@@ -156,23 +156,40 @@ namespace MMR.Randomizer.Utils
                         string seqName = entry.Key;
                         var data = entry.Value;
 
-                        var seqCategories = new List<int>();
-                        foreach (var part in data.MusicGroups)
+                        var seqType = data.SongType.ToLower() ?? "bgm";
+
+                        var defaultMusicGroup = seqType switch
                         {
-                            if (TryParseCategory(part, out int c) && !seqCategories.Contains(c))
+                            "bgm" => MusicGroups.DEFAULT_BGM_CATEGORIES,
+                            "Fanfares" => MusicGroups.DEFAULT_FANFARE_CATEGORIES,
+                            _ => MusicGroups.DEFAULT_BGM_CATEGORIES,
+                        };
+
+                        var seqCategories = new List<int>();
+
+                        if (!data.MusicGroups.Any())
+                        {
+                            seqCategories.AddRange(defaultMusicGroup);
+                        }
+                        else
+                        {
+                            foreach (var part in data.MusicGroups)
                             {
-                                seqCategories.Add(c);
-                            }
-                            else
-                            {
+                                if (TryParseCategory(part, out int c) && !seqCategories.Contains(c))
+                                {
+                                    seqCategories.Add(c);
+                                }
+                                else
+                                {
 #if DEBUG
-                                throw new Exception($"Error: Invalid category in SEQS file for '{seqName}': '{part}'");
+                                    throw new Exception($"Error: Invalid category in SEQS file for '{seqName}': '{part}'");
 #else
                                 continue;
 #endif
+                                }
                             }
                         }
-
+                            
                         int seqInstrument = data.InstrumentSet;
                         int seqId = data.SequenceId;
 
@@ -468,17 +485,7 @@ namespace MMR.Randomizer.Utils
             string songType = validTypes.Contains(yamlData.Metadata.SongType?.ToLower()) ? yamlData.Metadata.SongType.ToLower() : "bgm";
 
             //Handle the categories
-            var categories = new List<int> // Default to all BGM
-            {
-                (int)MusicGroups.Category.Fields,
-                (int)MusicGroups.Category.Towns,
-                (int)MusicGroups.Category.Dungeons,
-                (int)MusicGroups.Category.Indoors,
-                (int)MusicGroups.Category.Minigames,
-                (int)MusicGroups.Category.ActionThemes,
-                (int)MusicGroups.Category.CalmThemes,
-                (int)MusicGroups.Category.Fights,
-            };
+            var categories = MusicGroups.DEFAULT_BGM_CATEGORIES;
             if (yamlData.Metadata.MusicGroups != null && yamlData.Metadata.MusicGroups.Any())
             {
                 categories.Clear(); // Clear the defaults
@@ -1845,6 +1852,9 @@ namespace MMR.Randomizer.Utils
 
             [YamlMember(Alias = "sequence id")]
             public int SequenceId { get; set; }
+
+            [YamlMember(Alias = "song type")]
+            public string SongType { get; set; } = null;
 
             [YamlMember(Alias = "no recycle")]
             public bool NoRecycle { get; set; } = false;
