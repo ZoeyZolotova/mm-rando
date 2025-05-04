@@ -166,7 +166,7 @@ namespace MMR.Randomizer.Utils
                             else
                             {
 #if DEBUG
-                                throw new Exception($"Invalid category in YAML for '{seqName}': '{part}'");
+                                throw new Exception($"Error: Invalid category in SEQS file for '{seqName}': '{part}'");
 #else
                                 continue;
 #endif
@@ -481,7 +481,7 @@ namespace MMR.Randomizer.Utils
             };
             if (yamlData.Metadata.MusicGroups != null && yamlData.Metadata.MusicGroups.Any())
             {
-                categories.Clear();
+                categories.Clear(); // Clear the defaults
                 MusicGroups.Type? firstType = null;
 
                 foreach (var category in yamlData.Metadata.MusicGroups)
@@ -1645,8 +1645,8 @@ namespace MMR.Randomizer.Utils
                     {
                         // Get the new sample address from the ROM
                         int newSampleAddress = RomData.MMFileList[RomData.SamplesFileID].Cmp_Addr
-                                                   + (int)RomData.ListOfSamples.Find(u => u.Hash == sample.Hash).Addr
-                                                   - soundbankAddr;
+                                             + (int)RomData.ListOfSamples.Find(u => u.Hash == sample.Hash).Addr
+                                             - soundbankAddr;
 
                         byte[] newAddressBytes = BitConverter.GetBytes(newSampleAddress);
                         if (BitConverter.IsLittleEndian)
@@ -1655,11 +1655,10 @@ namespace MMR.Randomizer.Utils
                         // Parse the audiobank binary to find the sample address offsets
                         AudiobankUtils.Audiobank instrumentBank = new(instrumentset.BankMetaData, instrumentset.BankBinary);
 
+                        uint sampleBankAddress = 0;
                         if (sample.InstrumentType != null && sample.ListIndex != -1 && sample.Marker == 0) // Key region can be null
-                        //if (sample.Marker == 0)
                         {
                             // Get the offset to the sample using the given type, index, and region
-                            uint sampleBankAddress = 0;
                             sampleBankAddress = sample.InstrumentType switch
                             {
                                 "INST" => sample.KeyRegion switch
@@ -1675,68 +1674,31 @@ namespace MMR.Randomizer.Utils
                                 "SFX"  => instrumentBank.Effects[sample.ListIndex].SampleAddress,
                                 _      => throw new Exception(), // invalid type
                             };
-
-                            // Replace the sample struct's address with the correct address
-                            // The first 4 bytes are a bitfield, so add 4 to the index
-                            ROM[audiobankInstSetAddr + sampleBankAddress + 4] = newAddressBytes[0];
-                            ROM[audiobankInstSetAddr + sampleBankAddress + 5] = newAddressBytes[1];
-                            ROM[audiobankInstSetAddr + sampleBankAddress + 6] = newAddressBytes[2];
-                            ROM[audiobankInstSetAddr + sampleBankAddress + 7] = newAddressBytes[3];
                         }
                         else // Fallback to sample marker matching
                         {
-                            uint sampleBankAddress = 0;
-
                             // Instead of searching byte by byte, collect all the samples, match the address, then get the offset to the matched address
                             // With this, there should be no accidental overwrites of data in the instrument bank 
                             foreach (var s in instrumentBank.GetBankSamples())
                             {
-                                switch (s)
-                                {
-                                    case AudiobankUtils.Sample<AudiobankUtils.Instrument> instrumentSample:
-                                        var instParent = instrumentSample.Parent;
-
-                                        if (instParent.LowSample != null && instParent.LowSample.Address == sample.Marker)
-                                            sampleBankAddress = instrumentBank.Instruments[instParent.InstrumentId].LowSampleAddress;
-
-                                        else if (instParent.PrimSample != null && instParent.PrimSample.Address == sample.Marker)
-                                            sampleBankAddress = instrumentBank.Instruments[instParent.InstrumentId].PrimSampleAddress;
-
-                                        else if (instParent.HighSample != null && instParent.HighSample.Address == sample.Marker)
-                                            sampleBankAddress = instrumentBank.Instruments[instParent.InstrumentId].HighSampleAddress;
-
-                                        break;
-
-                                    case AudiobankUtils.Sample<AudiobankUtils.Drum> drumSample:
-                                        var drumParent = drumSample.Parent;
-
-                                        if (drumParent.Sample != null && drumParent.Sample.Address == sample.Marker)
-                                            sampleBankAddress = instrumentBank.Drums[drumParent.DrumId].SampleAddress;
-
-                                        break;
-
-                                    case AudiobankUtils.Sample<AudiobankUtils.Effect> effectSample:
-                                        var effectParent = effectSample.Parent;
-
-                                        if (effectParent.Sample != null && effectParent.Sample.Address == sample.Marker)
-                                            sampleBankAddress = instrumentBank.Effects[effectParent.EffectId].SampleAddress;
-
-                                        break;
-
-                                    default:
-                                        break;
-                                }
+                                // The bank offset gets stored in the sample struct, there's no need to find the parent
+                                // structure and link it that way
+                                if (sample.Marker == s.Address)
+                                    sampleBankAddress = s.BankOffset;
 
                                 if (sampleBankAddress != 0)
                                     break;
                             }
+                        }
 
-                            // Replace the sample struct's address with the correct address
-                            // The first 4 bytes are a bitfield, so add 4 to the index
-                            ROM[audiobankInstSetAddr + sampleBankAddress + 4] = newAddressBytes[0];
-                            ROM[audiobankInstSetAddr + sampleBankAddress + 5] = newAddressBytes[1];
-                            ROM[audiobankInstSetAddr + sampleBankAddress + 6] = newAddressBytes[2];
-                            ROM[audiobankInstSetAddr + sampleBankAddress + 7] = newAddressBytes[3];
+                        // Replace the sample struct's address with the correct address
+                        // The first 4 bytes are a bitfield, so add 4 to the index
+                        if (sampleBankAddress == 0)
+                            continue; // Maybe throwing an error would be better?
+
+                        for (int i = 0; i < 4; i++)
+                        {
+                            ROM[audiobankInstSetAddr + sampleBankAddress + i + 4] = newAddressBytes[i];
                         }
                     }
                 }
