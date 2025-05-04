@@ -19,22 +19,37 @@ namespace MMR.Randomizer.Utils
 
         public class Audiobank
         {
+            public int NumInsts { get; set; }
+            public int NumDrums { get; set; }
+            public int NumEffects { get; set; }
+
             public List<Instrument> Instruments = new();
             public List<Drum> Drums = new();
             public List<Effect> Effects = new();
 
             public Audiobank(byte[] metadata, byte[] bankData)
             {
-                // The metadata stored in SequenceSoundSampleBinaryData is not the full 0x10 bytes
-                // it's the .bankmeta from the music file.
+                switch (metadata.Length)
+                {
+                    case 0x08: // 8 Bytes (.bankmeta): [Sample Medium, Sequence Player, Audiotable, ID, Num Inst, Num Drum, Num Effect MSB, Num Effect LSB]
+                        NumInsts = metadata[4];
+                        NumDrums = metadata[5];
+                        NumEffects = BinaryPrimitives.ReadUInt16BigEndian(metadata.AsSpan(6, 2));
+                        break;
 
-                int numInsts = metadata[4];
-                int numDrums = metadata[5];
-                int numEffects = BinaryPrimitives.ReadUInt16BigEndian(metadata.AsSpan(6, 2));
+                    case 0x10: // 16 Bytes: [Address, Length, Sample Medium, Sequence Player, Audiotable, ID, Num Inst, Num Drum, Num Effect MSB, Num Effect LSB]
+                        NumInsts = metadata[12];
+                        NumDrums = metadata[13];
+                        NumEffects = BinaryPrimitives.ReadUInt16BigEndian(metadata.AsSpan(14, 2));
+                        break;
+
+                    default: // When reading .bankmeta there's already a check for 8 bytes, but never hurts to be extra safe
+                        throw new Exception($"Error: Audiobank cannot be parsed due to invalid metadata length");
+                }
 
                 // Find all the drums and instantiate them
                 uint drumListAddr = BinaryPrimitives.ReadUInt32BigEndian(bankData.AsSpan(0, 4));
-                for (int i = 0; i < numDrums; i++)
+                for (int i = 0; i < NumDrums; i++)
                 {
                     uint offset = drumListAddr + (uint)(4 * i);
                     offset = BinaryPrimitives.ReadUInt32BigEndian(bankData.AsSpan((int)offset, 4));
@@ -44,7 +59,7 @@ namespace MMR.Randomizer.Utils
 
                 // Find all the effects and instantiate them
                 uint effectListAddr = BinaryPrimitives.ReadUInt32BigEndian(bankData.AsSpan(4, 4));
-                for (int i = 0; i < numEffects; i++)
+                for (int i = 0; i < NumEffects; i++)
                 {
                     uint offset = effectListAddr + (uint)(8 * i);
                     Effect effect = offset != 0 ? new Effect(i, bankData, (int)offset) : null;
@@ -52,7 +67,7 @@ namespace MMR.Randomizer.Utils
                 }
 
                 // Find all the instruments and instantiante them
-                for (int i = 0; i < numInsts; i++)
+                for (int i = 0; i < NumInsts; i++)
                 {
                     uint offset = 0x08 + (uint)(4 * i);
                     offset = BinaryPrimitives.ReadUInt32BigEndian(bankData.AsSpan((int)offset, 4));
