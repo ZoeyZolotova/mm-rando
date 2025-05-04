@@ -1,7 +1,6 @@
 using MMR.Randomizer.Constants;
 using MMR.Randomizer.Models.Rom;
 using System;
-using System.Diagnostics;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
@@ -62,97 +61,6 @@ namespace MMR.Randomizer.Utils
             "TempleClearLong",
             "GiantsLeave",
             "MoonDestroyed",
-        };
-
-        private static readonly Dictionary<int, (string Name, string DisplayName, string Type)> SEQUENCE_ID_MAP = new()
-        {
-            // Sequence ID for matching, then tuple of data
-            { 0x02, ("mm-terminafield", "Termina Field", "bgm") },
-            { 0x13, ("mm-snowheadmountains", "Snowhead", "bgm") },
-            { 0x10, ("mm-greatbaycoast", "Great Bay Coast", "bgm") },
-            { 0x11, ("mm-ikanacanyon", "Ikana Canyon", "bgm") },
-            { 0x0C, ("mm-southernswamp", "Southern Swamp", "bgm") },
-            { 0x15, ("mm-clocktown1", "Clock Town (Day 1)", "bgm") },
-            { 0x16, ("mm-clocktown2", "Clock Town (Day 2)", "bgm") },
-            { 0x17, ("mm-clocktown3", "Clock Town (Day 3)", "bgm") },
-            { 0x30, ("mm-goronshrine", "Goron Shrine", "bgm") },
-            { 0x2F, ("mm-romaniranch", "Romani Ranch", "bgm") },
-            { 0x36, ("mm-zorahall", "Zora Hall", "bgm") },
-            { 0x12, ("mm-dekupalace", "Deku Palace", "bgm") },
-            { 0x3B, ("mm-caves", "Secret Grotto", "bgm") },
-            { 0x65, ("mm-snowheadtemple", "Snowhead Temple", "bgm") },
-            { 0x66, ("mm-greatbaytemple", "Great Bay Temple", "bgm") },
-            { 0x14, ("mm-piratesfortress", "Pirates' Fortress", "bgm") },
-            { 0x6F, ("mm-ikanacastle", "Ancient Castle of Ikana", "bgm") },
-            { 0x06, ("mm-stonetower", "Stone Tower Temple", "bgm") },
-            { 0x07, ("mm-invertedstonetower", "Inverted Stone Tower Temple", "bgm") },
-            { 0x1C, ("mm-woodfalltemple", "Woodfall Temple", "bgm") },
-            { 0x05, ("mm-clocktower", "Clock Tower Interior", "bgm") },
-            { 0x2E, ("mm-guruguru", "Guru-Guru's Theme", "bgm") },
-            { 0x3C, ("mm-milkbar", "Milk Bar", "bgm") },
-            { 0x1F, ("mm-house", "House", "bgm") },
-            { 0x44, ("mm-shop", "Item Shop", "bgm") },
-            { 0x46, ("mm-shootinggallery", "Minigame Shop", "bgm") },
-            { 0x2C, ("mm-laboratory", "Curiosity Shop", "bgm") },
-            { 0x3A, ("mm-observatory", "Astral Observatory", "bgm") },
-            { 0x27, ("mm-musicbox", "Music-Box House", "bgm") },
-            { 0x26, ("mm-goronrace", "Goron Race", "bgm") },
-            { 0x25, ("mm-minigame", "Minigame", "bgm") },
-            { 0x72, ("mm-wagonride", "Cremia's Theme", "bgm") },
-            { 0x0E, ("mm-boatcruise", "Old Koume's Boat Cruise", "bgm") },
-            { 0x40, ("mm-horserace", "Horse Race", "bgm") },
-            { 0x31, ("mm-meeting", "Mayor Dotour's Office", "bgm") },
-            { 0x0D, ("mm-aliens", "Aliens' Theme", "bgm") },
-            { 0x50, ("mm-swordschool", "Swordsman's School", "bgm") },
-            { 0x0F, ("mm-sharpscurse", "Sharp's Curse", "bgm") },
-            { 0x03, ("mm-chase", "Pursuit Theme", "bgm") },
-            { 0x04, ("mm-skullkid", "Majora's Theme", "bgm") },
-            { 0x7B, ("mm-maskreveal", "The Moon Enraged", "bgm") },
-            { 0x28, ("mm-fairyfountain", "Great Fairy's Fountain", "bgm") },
-            { 0x18, ("mm-fileselect", "File Select", "bgm") },
-            { 0x73, ("mm-keaton", "Keaton's Theme", "bgm") },
-            { 0x45, ("mm-kaepora", "Kaepora Gaebora's Theme", "bgm") },
-            { 0x43, ("mm-witches", "Koume & Kotake's Theme", "bgm") },
-            { 0x42, ("mm-gormanbros", "Gorman Bros.' Theme", "bgm") },
-            { 0x3E, ("mm-mysterywoods", "Woods of Mystery", "bgm") },
-            { 0x29, ("mm-zelda", "Zelda's Theme", "bgm") },
-            { 0x7D, ("mm-reunion", "Reunion Theme", "bgm") },
-            { 0x0B, ("mm-healed", "Song of Healing Theme", "bgm") },
-            { 0x2D, ("mm-giants", "Giants' Theme", "bgm") },
-            { 0x38, ("mm-miniboss", "Miniboss Battle", "bgm") },
-            { 0x1B, ("mm-boss", "Boss Battle", "bgm") },
-            { 0x6B, ("mm-mask", "Majora's Mask", "bgm") },
-            { 0x6A, ("mm-incarnation", "Majora's Incarnation", "bgm") },
-            { 0x69, ("mm-wrath", "Majora's Wrath", "bgm") },
-            { 0x08, ("mm-f-chasefail", "Event Failure 1", "fanfare") },
-            { 0x09, ("mm-f-fail", "Event Failure 2", "fanfare") },
-            { 0x19, ("mm-f-clearshort", "Event Success", "fanfare") },
-            { 0x20, ("mm-f-gameover", "Game Over", "fanfare") },
-            { 0x21, ("mm-f-bossdown", "Boss Defeated", "fanfare") },
-            { 0x22, ("mm-f-gotitem", "Item Get", "fanfare") },
-            { 0x24, ("mm-f-heart", "Heart Container Get", "fanfare") },
-            { 0x37, ("mm-f-mask", "Mask Get", "fanfare") },
-            { 0x39, ("mm-f-smallitem", "Heart Piece Get", "fanfare") },
-            { 0x3D, ("mm-f-meet", "The Truth Revealed", "fanfare") },
-            { 0x3F, ("mm-f-goronwin", "Goron Race Win", "fanfare") },
-            { 0x41, ("mm-f-horsewin", "Horse Race Win", "fanfare") },
-            { 0x52, ("mm-f-song", "Song Get", "fanfare") },
-            { 0x55, ("mm-f-soar", "Song of Soaring", "fanfare") },
-            { 0x77, ("mm-f-dungeonopen", "Temple Appears", "fanfare") },
-            { 0x78, ("mm-f-dungeonclearshort", "Temple Clear (Short)", "fanfare") },
-            { 0x79, ("mm-f-dungeonclearlong", "Temple Clear (Long)", "fanfare") },
-            { 0x7E, ("mm-f-moonclear", "The Moon Destroyed", "fanfare") },
-            { 0x7C, ("mm-f-giantsleave", "The Giants Farewell", "fanfare") },
-            { 0x71, ("mm-kamaros-mask-item-dance", "Kamaro's Theme", "bgm") },
-            { 0x70, ("mm-c-giantscs", "The Giants Appear", "bgm") },
-            { 0x76, ("mm-c-titlescreen", "Title Screen", "bgm") },
-            { 0x1A, ("mm-combat", "Enemy Battle", "bgm") },
-            { 0x6C, ("mm-japas-basspractice", "Japas' Room", "bgm") },
-            { 0x6D, ("mm-tijo-drumpractice", "Tijo's Room", "bgm") },
-            { 0x6E, ("mm-evan-pianopractice", "Evan's Room", "bgm") },
-            { 0x57, ("mm-finalhours", "Final Hours", "bgm") },
-            { 0x2B, ("mm-opening-a-chest", "Opening Chest", "fanfare") },
-            { 0x2A, ("mm-kamaros-dance-rosa-sisters", "Rosa Sisters' Theme", "bgm") },
         };
 
         public static void BackupMusicFolder(string folder)
@@ -777,7 +685,7 @@ namespace MMR.Randomizer.Utils
 
                 int seqId = int.Parse(seqIdStr, NumberStyles.HexNumber);
 
-                if (!SEQUENCE_ID_MAP.TryGetValue(seqId, out var def))
+                if (!AudioSequenceIds.SEQUENCE_ID_MAP.TryGetValue(seqId, out var def))
                 {
                     continue;
                 }
