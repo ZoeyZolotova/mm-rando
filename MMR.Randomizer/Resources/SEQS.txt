@@ -87,6 +87,7 @@ mm-clocktown2:
   music groups: ["Towns", "ClockTown2"]
   instrument set: 0x19
   sequence id: 0x16
+  song type: "bgm"
   no recycle: false
 
 mm-clocktown3:
