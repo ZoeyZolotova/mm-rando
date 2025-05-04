@@ -118,11 +118,18 @@ namespace MMR.Randomizer.Utils
 
             // If the user has a SEQS.yml file, use it instead of the one in resources
             string seqsContent;
+            string seqsYamlPath = Directory.GetFiles(Values.MusicDirectory)
+                                 .FirstOrDefault(f =>
+                                 {
+                                     string seqsYaml = Path.GetFileName(f);
+                                     return string.Equals(seqsYaml, "SEQS.yml", StringComparison.OrdinalIgnoreCase) ||
+                                            string.Equals(seqsYaml, "SEQS.yaml", StringComparison.OrdinalIgnoreCase);
+                                 });
 
-            if (File.Exists(Path.Combine(Values.MusicDirectory, "SEQS.yml")))
+            if (seqsYamlPath != null)
             {
-                Debug.WriteLine("We found a user SEQS.yml file that we can use");
-                seqsContent = File.ReadAllText(Path.Combine(Values.MusicDirectory, "SEQS.yml"));
+                Debug.WriteLine("SEQS: Found a SEQS file in the music folder to use");
+                seqsContent = File.ReadAllText(seqsYamlPath);
             }
             else
             {
