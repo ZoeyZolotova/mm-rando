@@ -1,12 +1,13 @@
 using MMR.Randomizer.Constants;
 using MMR.Randomizer.Models.Rom;
 using System;
+using System.Diagnostics;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Text.RegularExpressions;
-using YamlDotNet.Serialization.NamingConventions;
+using System.Globalization;
 using YamlDotNet.Serialization;
 using YamlDotNet.Core.Events;
 using YamlDotNet.Core;
@@ -16,6 +17,11 @@ namespace MMR.Randomizer.Utils
 {
     public class MusicConversionUtils
     {
+        // Process outline:
+        // Step 1: Check for old music files
+        // Step 2: Create backup of music folder
+        // Step 3: Convert music files
+
         public static List<string> OLD_MUSIC_FILES = new();
 
         public class FlowStyleListEmitter : ChainedEventEmitter
@@ -58,6 +64,97 @@ namespace MMR.Randomizer.Utils
             "MoonDestroyed",
         };
 
+        private static readonly Dictionary<int, (string Name, string DisplayName, string Type)> SEQUENCE_ID_MAP = new()
+        {
+            // Sequence ID for matching, then tuple of data
+            { 0x02, ("mm-terminafield", "Termina Field", "bgm") },
+            { 0x13, ("mm-snowheadmountains", "Snowhead", "bgm") },
+            { 0x10, ("mm-greatbaycoast", "Great Bay Coast", "bgm") },
+            { 0x11, ("mm-ikanacanyon", "Ikana Canyon", "bgm") },
+            { 0x0C, ("mm-southernswamp", "Southern Swamp", "bgm") },
+            { 0x15, ("mm-clocktown1", "Clock Town (Day 1)", "bgm") },
+            { 0x16, ("mm-clocktown2", "Clock Town (Day 2)", "bgm") },
+            { 0x17, ("mm-clocktown3", "Clock Town (Day 3)", "bgm") },
+            { 0x30, ("mm-goronshrine", "Goron Shrine", "bgm") },
+            { 0x2F, ("mm-romaniranch", "Romani Ranch", "bgm") },
+            { 0x36, ("mm-zorahall", "Zora Hall", "bgm") },
+            { 0x12, ("mm-dekupalace", "Deku Palace", "bgm") },
+            { 0x3B, ("mm-caves", "Secret Grotto", "bgm") },
+            { 0x65, ("mm-snowheadtemple", "Snowhead Temple", "bgm") },
+            { 0x66, ("mm-greatbaytemple", "Great Bay Temple", "bgm") },
+            { 0x14, ("mm-piratesfortress", "Pirates' Fortress", "bgm") },
+            { 0x6F, ("mm-ikanacastle", "Ancient Castle of Ikana", "bgm") },
+            { 0x06, ("mm-stonetower", "Stone Tower Temple", "bgm") },
+            { 0x07, ("mm-invertedstonetower", "Inverted Stone Tower Temple", "bgm") },
+            { 0x1C, ("mm-woodfalltemple", "Woodfall Temple", "bgm") },
+            { 0x05, ("mm-clocktower", "Clock Tower Interior", "bgm") },
+            { 0x2E, ("mm-guruguru", "Guru-Guru's Theme", "bgm") },
+            { 0x3C, ("mm-milkbar", "Milk Bar", "bgm") },
+            { 0x1F, ("mm-house", "House", "bgm") },
+            { 0x44, ("mm-shop", "Item Shop", "bgm") },
+            { 0x46, ("mm-shootinggallery", "Minigame Shop", "bgm") },
+            { 0x2C, ("mm-laboratory", "Curiosity Shop", "bgm") },
+            { 0x3A, ("mm-observatory", "Astral Observatory", "bgm") },
+            { 0x27, ("mm-musicbox", "Music-Box House", "bgm") },
+            { 0x26, ("mm-goronrace", "Goron Race", "bgm") },
+            { 0x25, ("mm-minigame", "Minigame", "bgm") },
+            { 0x72, ("mm-wagonride", "Cremia's Theme", "bgm") },
+            { 0x0E, ("mm-boatcruise", "Old Koume's Boat Cruise", "bgm") },
+            { 0x40, ("mm-horserace", "Horse Race", "bgm") },
+            { 0x31, ("mm-meeting", "Mayor Dotour's Office", "bgm") },
+            { 0x0D, ("mm-aliens", "Aliens' Theme", "bgm") },
+            { 0x50, ("mm-swordschool", "Swordsman's School", "bgm") },
+            { 0x0F, ("mm-sharpscurse", "Sharp's Curse", "bgm") },
+            { 0x03, ("mm-chase", "Pursuit Theme", "bgm") },
+            { 0x04, ("mm-skullkid", "Majora's Theme", "bgm") },
+            { 0x7B, ("mm-maskreveal", "The Moon Enraged", "bgm") },
+            { 0x28, ("mm-fairyfountain", "Great Fairy's Fountain", "bgm") },
+            { 0x18, ("mm-fileselect", "File Select", "bgm") },
+            { 0x73, ("mm-keaton", "Keaton's Theme", "bgm") },
+            { 0x45, ("mm-kaepora", "Kaepora Gaebora's Theme", "bgm") },
+            { 0x43, ("mm-witches", "Koume & Kotake's Theme", "bgm") },
+            { 0x42, ("mm-gormanbros", "Gorman Bros.' Theme", "bgm") },
+            { 0x3E, ("mm-mysterywoods", "Woods of Mystery", "bgm") },
+            { 0x29, ("mm-zelda", "Zelda's Theme", "bgm") },
+            { 0x7D, ("mm-reunion", "Reunion Theme", "bgm") },
+            { 0x0B, ("mm-healed", "Song of Healing Theme", "bgm") },
+            { 0x2D, ("mm-giants", "Giants' Theme", "bgm") },
+            { 0x38, ("mm-miniboss", "Miniboss Battle", "bgm") },
+            { 0x1B, ("mm-boss", "Boss Battle", "bgm") },
+            { 0x6B, ("mm-mask", "Majora's Mask", "bgm") },
+            { 0x6A, ("mm-incarnation", "Majora's Incarnation", "bgm") },
+            { 0x69, ("mm-wrath", "Majora's Wrath", "bgm") },
+            { 0x08, ("mm-f-chasefail", "Event Failure 1", "fanfare") },
+            { 0x09, ("mm-f-fail", "Event Failure 2", "fanfare") },
+            { 0x19, ("mm-f-clearshort", "Event Success", "fanfare") },
+            { 0x20, ("mm-f-gameover", "Game Over", "fanfare") },
+            { 0x21, ("mm-f-bossdown", "Boss Defeated", "fanfare") },
+            { 0x22, ("mm-f-gotitem", "Item Get", "fanfare") },
+            { 0x24, ("mm-f-heart", "Heart Container Get", "fanfare") },
+            { 0x37, ("mm-f-mask", "Mask Get", "fanfare") },
+            { 0x39, ("mm-f-smallitem", "Heart Piece Get", "fanfare") },
+            { 0x3D, ("mm-f-meet", "The Truth Revealed", "fanfare") },
+            { 0x3F, ("mm-f-goronwin", "Goron Race Win", "fanfare") },
+            { 0x41, ("mm-f-horsewin", "Horse Race Win", "fanfare") },
+            { 0x52, ("mm-f-song", "Song Get", "fanfare") },
+            { 0x55, ("mm-f-soar", "Song of Soaring", "fanfare") },
+            { 0x77, ("mm-f-dungeonopen", "Temple Appears", "fanfare") },
+            { 0x78, ("mm-f-dungeonclearshort", "Temple Clear (Short)", "fanfare") },
+            { 0x79, ("mm-f-dungeonclearlong", "Temple Clear (Long)", "fanfare") },
+            { 0x7E, ("mm-f-moonclear", "The Moon Destroyed", "fanfare") },
+            { 0x7C, ("mm-f-giantsleave", "The Giants Farewell", "fanfare") },
+            { 0x71, ("mm-kamaros-mask-item-dance", "Kamaro's Theme", "bgm") },
+            { 0x70, ("mm-c-giantscs", "The Giants Appear", "bgm") },
+            { 0x76, ("mm-c-titlescreen", "Title Screen", "bgm") },
+            { 0x1A, ("mm-combat", "Enemy Battle", "bgm") },
+            { 0x6C, ("mm-japas-basspractice", "Japas' Room", "bgm") },
+            { 0x6D, ("mm-tijo-drumpractice", "Tijo's Room", "bgm") },
+            { 0x6E, ("mm-evan-pianopractice", "Evan's Room", "bgm") },
+            { 0x57, ("mm-finalhours", "Final Hours", "bgm") },
+            { 0x2B, ("mm-opening-a-chest", "Opening Chest", "fanfare") },
+            { 0x2A, ("mm-kamaros-dance-rosa-sisters", "Rosa Sisters' Theme", "bgm") },
+        };
+
         public static void BackupMusicFolder(string folder)
         {
             // backs up the music folder into a zip file with the .old extension
@@ -86,7 +183,6 @@ namespace MMR.Randomizer.Utils
             var convFolder = Path.Combine(Path.GetDirectoryName(Values.MusicDirectory), "converted");
             if (Directory.Exists(Values.MusicDirectory)) // This isn't needed, but keeping it just in case
             {
-                //BackupMusicFolder(Values.MusicDirectory);
                 try
                 {
                     ProcessFiles(Values.MusicDirectory, convFolder);
@@ -136,11 +232,11 @@ namespace MMR.Randomizer.Utils
             {
                 // copies the sequence into its temp directory
                 
-                if (File.Exists(Filename + ".zip"))
-                    File.Delete(Filename + ".zip");
+                //if (File.Exists(Filename + ".zip"))
+                //    File.Delete(Filename + ".zip");
 
-                if (File.Exists(Filename + ".mmrs"))
-                    File.Delete(Filename + ".mmrs");
+                //if (File.Exists(Filename + ".mmrs"))
+                //    File.Delete(Filename + ".mmrs");
 
                 string tempSeqFilePath = Path.Combine(TempFolder, Filename + ".seq");
 
@@ -200,11 +296,11 @@ namespace MMR.Randomizer.Utils
                 if (Directory.Exists(TempFolder))
                     Directory.Delete(TempFolder, recursive: true);
 
-                if (File.Exists(filename + ".zip"))
-                    File.Delete(filename + ".zip");
+                //if (File.Exists(filename + ".zip"))
+                //    File.Delete(filename + ".zip");
 
-                if (File.Exists(filename + ".mmrs"))
-                    File.Delete(filename + ".mmrs");
+                //if (File.Exists(filename + ".mmrs"))
+                //    File.Delete(filename + ".mmrs");
 
                 ZipFile.ExtractToDirectory(filePath, TempFolder);
 
@@ -306,16 +402,22 @@ namespace MMR.Randomizer.Utils
             Directory.CreateDirectory(convFolder);
 
             var allFiles = Directory.GetFiles(baseFolder, "*", SearchOption.AllDirectories);
+            var seqsTxtFile = allFiles.FirstOrDefault(f => Path.GetFileName(f).Equals("SEQS.txt", StringComparison.OrdinalIgnoreCase));
 
             foreach (var inputFile in allFiles)
             {
                 string extension = Path.GetExtension(inputFile).ToLower();
+                string filename = Path.GetFileName(inputFile);
                 string relativePath = Path.GetRelativePath(baseFolder, inputFile);
                 string destinationFile = Path.Combine(convFolder, relativePath);
                 string destinationDir = Path.GetDirectoryName(destinationFile);
 
                 if (!Directory.Exists(destinationDir))
                     Directory.CreateDirectory(destinationDir);
+
+                // Don't copy the SEQS file because it gets converted too
+                if (filename.Equals("SEQS.txt", StringComparison.OrdinalIgnoreCase))
+                    continue;
 
                 File.Copy(inputFile, destinationFile, overwrite: true);
 
@@ -333,6 +435,12 @@ namespace MMR.Randomizer.Utils
                         break;
                 }
             }
+
+            if (seqsTxtFile != null)
+            {
+                string seqsYamlFile = Path.Combine(convFolder, "SEQS.yml");
+                ConvertSEQSToYAML(seqsTxtFile, seqsYamlFile);
+            }
         }
 
         public static void CheckForOldFiles(string baseFolder)
@@ -341,6 +449,7 @@ namespace MMR.Randomizer.Utils
                 OLD_MUSIC_FILES.Clear(); // Clear out the list if it's populated
 
             var allFiles = Directory.GetFiles(baseFolder, "*", SearchOption.AllDirectories);
+            bool seqsTxtFound = false;
 
             foreach (var inputFile in allFiles)
             {
@@ -373,7 +482,12 @@ namespace MMR.Randomizer.Utils
 
                     default:
                         break;
+                }
 
+                if (!seqsTxtFound && Path.GetFileName(inputFile).Equals("SEQS.txt", StringComparison.OrdinalIgnoreCase))
+                {
+                    OLD_MUSIC_FILES.Add(inputFile);
+                    seqsTxtFound = true;
                 }
             }
         }
@@ -420,7 +534,6 @@ namespace MMR.Randomizer.Utils
 
             // Serialize to YAML
             var serializer = new SerializerBuilder()
-                .WithNamingConvention(CamelCaseNamingConvention.Instance)
                 .WithEventEmitter(next => new FlowStyleListEmitter(next))
                 .ConfigureDefaultValuesHandling(DefaultValuesHandling.OmitDefaults)
                 .Build();
@@ -604,7 +717,9 @@ namespace MMR.Randomizer.Utils
                     // Copy extra non-processed files
                     foreach (var item in Directory.GetFiles(originalTemp))
                     {
-                        if (item.EndsWith(".seq") || item.EndsWith(".zseq") || item.EndsWith(".aseq") || item.EndsWith(".zbank") || item.EndsWith(".bankmeta") || item.EndsWith(".zsound") || item.EndsWith(".formmask") || Path.GetFileName(item).Equals("categories.txt"))
+                        if (item.EndsWith(".seq") || item.EndsWith(".zseq") || item.EndsWith(".aseq") ||
+                            item.EndsWith(".zbank") || item.EndsWith(".bankmeta") || item.EndsWith(".zsound") ||
+                            item.EndsWith(".formmask") || Path.GetFileName(item).Equals("categories.txt", StringComparison.OrdinalIgnoreCase))
                             continue;
 
                         File.Copy(item, Path.Combine(songFolder, Path.GetFileName(item)), true);
@@ -635,6 +750,71 @@ namespace MMR.Randomizer.Utils
                 if (Directory.Exists(originalTemp))
                     Directory.Delete(originalTemp, true);
             }
+        }
+
+        public static void ConvertSEQSToYAML(string seqsTxtFile, string seqsYamlFile)
+        {
+            var lines = File.ReadAllLines(seqsTxtFile).Where(l => !string.IsNullOrWhiteSpace(l)).ToList();
+            var output = new Dictionary<string, SequenceUtils.SEQSYaml>();
+
+            for (int i = 0; i < lines.Count;)
+            {
+                string seqName = lines[i++].Trim();
+                string musicGroups = lines[i++].Trim();
+                string instrumentSetStr = lines[i++].Trim();
+                string seqIdStr = lines[i++].Trim();
+                var noRecycle = i < lines.Count && lines[i].Trim().Equals("no-recycle") ? lines[i++].Trim() : null;
+
+                // Convert instrument set to int
+                if (instrumentSetStr.StartsWith("0x", StringComparison.OrdinalIgnoreCase))
+                    instrumentSetStr = instrumentSetStr.Substring(2);
+
+                int instrumentSet = int.Parse(instrumentSetStr, NumberStyles.HexNumber);
+
+                // Convert sequence id to int
+                if (seqIdStr.StartsWith("0x", StringComparison.OrdinalIgnoreCase))
+                    seqIdStr = seqIdStr.Substring(2);
+
+                int seqId = int.Parse(seqIdStr, NumberStyles.HexNumber);
+
+                if (!SEQUENCE_ID_MAP.TryGetValue(seqId, out var def))
+                {
+                    continue;
+                }
+
+                var musicGroupList = musicGroups.Split(new[] { ',', '-' }, StringSplitOptions.RemoveEmptyEntries)
+                    .Select(s =>
+                    {
+                        bool parsed = int.TryParse(s.Trim(), NumberStyles.HexNumber, null, out int val);
+                        return parsed ? val : -1;  // Return the value if parsed, otherwise -1
+                    })
+                    .Where(val =>
+                    {
+                        return Enum.IsDefined(typeof(MusicGroups.Category), val);
+                    })
+                    .Select(val =>
+                    {
+                        return Enum.GetName(typeof(MusicGroups.Category), val);
+                    })
+                    .Where(name => !string.IsNullOrEmpty(name))  // Filter out null or empty names
+                    .ToList<object>();
+
+                output[def.Name] = new SequenceUtils.SEQSYaml
+                {
+                    DisplayName = def.DisplayName,
+                    MusicGroups = musicGroupList,
+                    InstrumentSet = instrumentSet,
+                    SequenceId = seqId,
+                    SongType = def.Type,
+                    NoRecycle = noRecycle != null,
+                };
+            }
+
+            var serializer = new SerializerBuilder()
+                             .WithEventEmitter(next => new FlowStyleListEmitter(next))
+                             .Build();
+
+            File.WriteAllText(seqsYamlFile, serializer.Serialize(output));
         }
     }
 }
