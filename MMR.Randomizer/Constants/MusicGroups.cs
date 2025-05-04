@@ -12,21 +12,21 @@ namespace MMR.Randomizer.Constants
 
         public static readonly List<int> DEFAULT_BGM_CATEGORIES = new()
         {
-            (int)MusicGroups.Category.Fields,
-            (int)MusicGroups.Category.Towns,
-            (int)MusicGroups.Category.Dungeons,
-            (int)MusicGroups.Category.Indoors,
-            (int)MusicGroups.Category.Minigames,
-            (int)MusicGroups.Category.ActionThemes,
-            (int)MusicGroups.Category.CalmThemes,
-            (int)MusicGroups.Category.Fights
+            (int)Category.Fields,
+            (int)Category.Towns,
+            (int)Category.Dungeons,
+            (int)Category.Indoors,
+            (int)Category.Minigames,
+            (int)Category.ActionThemes,
+            (int)Category.CalmThemes,
+            (int)Category.Fights
         };
 
         public static readonly List<int> DEFAULT_FANFARE_CATEGORIES = new()
         {
-            (int)MusicGroups.Category.ItemFanfares,
-            (int)MusicGroups.Category.EventFanfares,
-            (int)MusicGroups.Category.ClearFanfares
+            (int)Category.ItemFanfares,
+            (int)Category.EventFanfares,
+            (int)Category.ClearFanfares
         };
 
         public enum Type
