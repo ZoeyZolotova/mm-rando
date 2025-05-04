@@ -9,6 +9,26 @@ namespace MMR.Randomizer.Constants
     {
         // There's a few cases of alternative names being allowed, and quite a bit of special handling for spaces and proper punctuation
         // They could be removed to have a more standardized list... After all, why not? Why shouldn't I keep it?
+
+        public static readonly List<int> DEFAULT_BGM_CATEGORIES = new()
+        {
+            (int)MusicGroups.Category.Fields,
+            (int)MusicGroups.Category.Towns,
+            (int)MusicGroups.Category.Dungeons,
+            (int)MusicGroups.Category.Indoors,
+            (int)MusicGroups.Category.Minigames,
+            (int)MusicGroups.Category.ActionThemes,
+            (int)MusicGroups.Category.CalmThemes,
+            (int)MusicGroups.Category.Fights
+        };
+
+        public static readonly List<int> DEFAULT_FANFARE_CATEGORIES = new()
+        {
+            (int)MusicGroups.Category.ItemFanfares,
+            (int)MusicGroups.Category.EventFanfares,
+            (int)MusicGroups.Category.ClearFanfares
+        };
+
         public enum Type
         {
             Bgm,
@@ -17,7 +37,7 @@ namespace MMR.Randomizer.Constants
 
         public static readonly Dictionary<Type, string> TypeCheck = new()
         {
-            { Type.Bgm, "bgm" },
+            { Type.Bgm,     "bgm" },
             { Type.Fanfare, "fanfare" }
         };
 
