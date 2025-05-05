@@ -224,23 +224,23 @@ namespace MMR.Randomizer.Utils
                                 sourceSequence.Name = "drop";
                             }
 
-                            //if (RomData.TargetSequences.Find(u => u.Name == SEQUENCE_ID_MAP[seqId].Name) == null)
-                            if (RomData.TargetSequences.Find(u => u.Name == seqName) == null)
-                            //if (RomData.TargetSequences.Find(u => u.SeqId == seqId) == null)
-                            {
-                                RomData.TargetSequences.Add(targetSequence);
-                            }
-                        }
-                        else
-                        {
-                            if (File.Exists(Path.Combine(directory, seqName)))
-                            {
-                                sourceSequence.Directory = directory;
-                            }
-                            else
+                            //if (RomData.TargetSequences.Find(u => u.Name == SEQUENCE_ID_MAP[seqId].Name) != null)
+                            if (RomData.TargetSequences.Find(u => u.Name == seqName) != null)
+                            //if (RomData.TargetSequences.Find(u => u.SeqId == seqId) != null)
                             {
                                 continue;
                             }
+
+                            RomData.TargetSequences.Add(targetSequence);
+                        }
+                        else
+                        {
+                            if (!File.Exists(Path.Combine(directory, seqName)))
+                            {
+                                continue;
+                            }
+                            
+                            sourceSequence.Directory = directory;
                         }
 
                         if (sourceSequence.SeqId != FILE_SELECT && sourceSequence.Name != "drop")
