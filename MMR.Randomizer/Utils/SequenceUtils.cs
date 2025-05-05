@@ -63,10 +63,10 @@ namespace MMR.Randomizer.Utils
         public static bool TryParseCategory(object input, out int value)
         {
             // Ensures that categories return their proper int value if they are a string
-            
+
             value = 0;
 
-            // Handle ints
+            // Handle ints, if it's an int just return the value
             switch (input)
             {
                 case int intValue:
@@ -76,6 +76,7 @@ namespace MMR.Randomizer.Utils
                 case string strValue:
                     string trimmed = strValue.Trim();
 
+                    // Handle "0x" prefixed hex strings
                     if (trimmed.StartsWith("0x", StringComparison.OrdinalIgnoreCase)
                         && int.TryParse(trimmed[2..], System.Globalization.NumberStyles.HexNumber, null, out int hexCategory))
                     {
@@ -83,20 +84,21 @@ namespace MMR.Randomizer.Utils
                         return true;
                     }
 
-                    if (int.TryParse(trimmed, out int intCategory))
+                    // If there's no hex prefix, it's still probably in hex anyway
+                    if (int.TryParse(trimmed, System.Globalization.NumberStyles.HexNumber, null, out int intCategory))
                     {
                         value = intCategory;
                         return true;
                     }
 
-                    // Try enum values
+                    // Try to match the string with a named MusicGroup (e.g. TerminaField = 0x102)
                     if (Enum.TryParse<MusicGroups.Category>(trimmed, true, out var enumCategory))
                     {
                         value = (int)enumCategory;
                         return true;
                     }
 
-                    // Try dictionary
+                    // If the named MusicGroup has spaces, try matching it with the dictionary mappings
                     if (MusicGroups.CategoryDisplayNames.TryGetValue(trimmed, out var mappedCategory))
                     {
                         value = (int)mappedCategory;
@@ -113,10 +115,11 @@ namespace MMR.Randomizer.Utils
         {
             md5lib = MD5.Create();
 
+            // Initialize the list of sequences and targets
             RomData.SequenceList = new List<SequenceInfo>();
             RomData.TargetSequences = new List<SequenceInfo>();
 
-            // If the user has a SEQS.yml file, use it instead of the one in resources
+            // If the user has a SEQS.yml file, use that one instead of the one in resources
             string seqsContent;
             string seqsYamlPath = Directory.GetFiles(Values.MusicDirectory)
                                  .FirstOrDefault(f =>
@@ -131,7 +134,7 @@ namespace MMR.Randomizer.Utils
                 Debug.WriteLine("SEQS: Found a SEQS file in the music folder to use");
                 seqsContent = File.ReadAllText(seqsYamlPath);
             }
-            else
+            else // There was no SEQS.yml/yaml, use the one in resources
             {
                 seqsContent = Properties.Resources.SEQS;
             }
@@ -147,15 +150,28 @@ namespace MMR.Randomizer.Utils
             // Search through every directory in the music folder
             IEnumerable<string> directories = new[] { Values.MusicDirectory }.Concat(Directory.EnumerateDirectories(Values.MusicDirectory, "*", SearchOption.AllDirectories));
 
+            // Loop through every directory
             foreach (string directory in directories)
             {
                 try
                 {
                     foreach (var entry in sequenceEntries)
                     {
+                        // Entries are a YAML dictionary, for example:
+                        //
+                        // mm-terminafield:
+                        //   display name: "Termina Field"
+                        //   music groups: ["Fields", "TerminaField"]
+                        //   instrument set: 0x03
+                        //   sequence id: 0x02
+                        //   song type: "bgm"
+                        //   no recycle: false
+                        //
                         string seqName = entry.Key;
                         var seqData = entry.Value;
 
+                        // Check for missing song type field, if it is missing set to bgm
+                        // Then also assign a default music group based on that type
                         var seqType = string.IsNullOrEmpty(seqData.SongType) ? "bgm" : seqData.SongType.ToLower();
                         var defaultMusicGroup = seqType switch
                         {
@@ -164,8 +180,9 @@ namespace MMR.Randomizer.Utils
                             _ => MusicGroups.DEFAULT_BGM_CATEGORIES,
                         };
 
+                        // If there's no music groups, or the entry is null set to the default
+                        // Otherwise add each category
                         var seqCategories = new List<int>();
-
                         if (!seqData.MusicGroups.Any())
                         {
                             seqCategories.AddRange(defaultMusicGroup);
@@ -188,7 +205,7 @@ namespace MMR.Randomizer.Utils
                                 }
                             }
                         }
-                            
+                        
                         int seqInstrument = seqData.InstrumentSet;
                         int seqId = seqData.SequenceId;
 
@@ -208,11 +225,12 @@ namespace MMR.Randomizer.Utils
                             Instrument = seqInstrument,
                         };
 
-                        if (sourceSequence.Name.StartsWith("mm-"))
-                        //if (SEQUENCE_ID_MAP.ContainsKey(seqId) && (seqId >= 0x02 && seqId <= 0x7F))
+                        // Each entry should have a sequence ID that's available in the SEQUENCE_ID_MAP,
+                        // so try to match the entry's sequence ID with one in the sequence map between 0x02 and 0x7F
+                        //if (sourceSequence.Name.StartsWith("mm-"))
+                        if (SEQUENCE_ID_MAP.ContainsKey(seqId) && seqId >= 0x02 && seqId <= 0x7F)
                         {
-                            // If the sequence is vanilla, and searching by name is required, the map includes the name, a display name, and the type
-                            // So the name can be overwritten with the expected name, however matching by ID is better because vanilla IDs don't change
+                            // If the randomizer relies on searching for sequence names
                             //targetSequence.Name = SEQUENCE_ID_MAP[seqId].Name;
                             //sourceSequence.Name = SEQUENCE_ID_MAP[seqId].Name;
 
@@ -225,8 +243,7 @@ namespace MMR.Randomizer.Utils
                             }
 
                             //if (RomData.TargetSequences.Find(u => u.Name == SEQUENCE_ID_MAP[seqId].Name) != null)
-                            if (RomData.TargetSequences.Find(u => u.Name == seqName) != null)
-                            //if (RomData.TargetSequences.Find(u => u.SeqId == seqId) != null)
+                            if (RomData.TargetSequences.Find(u => u.Replaces == seqId) != null)
                             {
                                 continue;
                             }
@@ -239,7 +256,7 @@ namespace MMR.Randomizer.Utils
                             {
                                 continue;
                             }
-                            
+
                             sourceSequence.Directory = directory;
                         }
 
@@ -288,8 +305,8 @@ namespace MMR.Randomizer.Utils
             {
                 return RoundTo16(seq.SequenceBinaryList[0].SequenceBinary.Length);
             }
-            else if (seq.Name.StartsWith("mm-")) // Look up vanilla sequences from AudioSeq index table
-            //else if (SEQUENCE_ID_MAP.ContainsKey(seq.SeqId))
+            //else if (seq.Name.StartsWith("mm-")) // Look up vanilla sequences from AudioSeq index table
+            else if (SEQUENCE_ID_MAP.ContainsKey(seq.SeqId))
             {
                 // The code file ahould already be decompressed
                 int codeFID = RomUtils.GetFileIndexForWriting(Addresses.SeqTable);
@@ -503,7 +520,7 @@ namespace MMR.Randomizer.Utils
             string songType = validTypes.Contains(yamlData.Metadata.SongType?.ToLower()) ? yamlData.Metadata.SongType.ToLower() : "bgm";
 
             //Handle the categories
-            var categories = MusicGroups.DEFAULT_BGM_CATEGORIES;
+            var categories = new List<int>(MusicGroups.DEFAULT_BGM_CATEGORIES);
             if (yamlData.Metadata.MusicGroups != null && yamlData.Metadata.MusicGroups.Any())
             {
                 categories.Clear(); // Clear the defaults
@@ -962,11 +979,9 @@ namespace MMR.Randomizer.Utils
                         byte[] data;
                         if (File.Exists(sequenceList[j].Filename))
                         {
-                            using (var reader = new BinaryReader(File.OpenRead(sequenceList[j].Filename)))
-                            {
-                                data = new byte[(int)reader.BaseStream.Length];
-                                reader.Read(data, 0, data.Length);
-                            }
+                            using var reader = new BinaryReader(File.OpenRead(sequenceList[j].Filename));
+                            data = new byte[(int)reader.BaseStream.Length];
+                            reader.Read(data, 0, data.Length);
                         }
                         else if (sequenceList[j].Name == nameof(Properties.Resources.mmr_f_sot))
                         {
@@ -1084,7 +1099,7 @@ namespace MMR.Randomizer.Utils
                     name ??= "";
                     if (name.Length > MusicConfig.SEQUENCE_NAME_MAX_SIZE - 1)
                     {
-                        name = name.Substring(0, MusicConfig.SEQUENCE_NAME_MAX_SIZE - 4) + "...";
+                        name = name[..(MusicConfig.SEQUENCE_NAME_MAX_SIZE - 4)] + "...";
                     }
 
                     name += "\0";
@@ -1529,11 +1544,11 @@ namespace MMR.Randomizer.Utils
             // BGM or combat is the limiting factor, the other has to be smaller than the chosen limiter
             bool combatVsBGMCoinToss = rng.Next(2) == 1;
 
-            var usedCombatSequence = RomData.SequenceList.Find(u => u.Replaces == SMALL_ENEMY_BATTLE && u.Name != "mm-combat");//u.SeqId != SMALL_ENEMY_BATTLE); //u.Name != "mm-combat");
+            var usedCombatSequence = RomData.SequenceList.Find(u => u.Replaces == SMALL_ENEMY_BATTLE && u.SeqId != SMALL_ENEMY_BATTLE); // SequencesList has Replaces as -1, use SeqId (u.Name != "mm-combat")
             if (usedCombatSequence == null) // Songtest removes the sequence and points it at "File Select" for testing
             {
                 combatVsBGMCoinToss = true; // "COMBAT" manually selected because of combat songtest
-                usedCombatSequence = RomData.SequenceList.Find(u => u.Replaces == FILE_SELECT && u.Name != "mm-fileselect");//u.SeqId != FILE_SELECT); //u.Name != "mm-fileselect");
+                usedCombatSequence = RomData.SequenceList.Find(u => u.Replaces == FILE_SELECT && u.SeqId != FILE_SELECT); // SequencesList has Replaces as -1, use SeqId (u.Name != "mm-fileselect")
             }
             else if (RomData.SequenceList.Find(u => u.Name.Contains("songtest")) != null)
             {
@@ -1592,7 +1607,7 @@ namespace MMR.Randomizer.Utils
                 {
                     var seqName = usedCombatSequence.Name;
                     log.AppendLine($"Combat sequence {seqName} was too big to match your BGM music, replacing ... ");
-                    var combatSlot = RomData.TargetSequences.Find(u => u.Name == "mm-combat");//u.SeqId == SMALL_ENEMY_BATTLE); // Use the sequence id instead of relying on mm-combat
+                    var combatSlot = RomData.TargetSequences.Find(u => u.Replaces == SMALL_ENEMY_BATTLE); // TargetSequences has SeqId as -1, use Replaces (u.Name == "mm-combat")
                     usedCombatSequence.Replaces = -1; // Cancel using this song
                     bool status = SearchForValidSongReplacement(cosmeticSettings, unassignedSequences, combatSlot, rng, log);
                     if (status == false)
