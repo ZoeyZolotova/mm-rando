@@ -361,70 +361,57 @@ namespace MMR.Randomizer.Utils
             // Read the Formmask (".formmask") file, it's a single JSON/YAML list that determines which
             // sequence channels should be turned on and off for each of Link's states
 
+            static void ProcessFormmaskData(SequencePlayState[] states, SequenceBinaryData combo)
+            {
+                // Backwards compatibility for version 1.15 and lower sequence files
+                if (!states.Any(s => s.HasFlag(SequencePlayState.FierceDeity) && !s.HasFlag(SequencePlayState.Human)))
+                {
+                    for (var i = 0; i < states.Length; i++)
+                    {
+                        if (states[i].HasFlag(SequencePlayState.Human))
+                        {
+                            states[i] |= SequencePlayState.FierceDeity;
+                        }
+                    }
+                }
+
+                // Ensure unused cumulative states won't cause the channel to be muted when in those states
+                foreach (var cumulativeState in Enum.GetValues<SequencePlayState>().Where(s => s > SequencePlayState.All))
+                {
+                    if (!states.Any(s => s.HasFlag(cumulativeState)))
+                    {
+                        states[0x10] |= cumulativeState;
+                    }
+                }
+
+                combo.FormMask = ConvertUtils.U16ArrayToBytes(states.Cast<ushort>().ToArray());
+            }
+
             if (formmaskFile != null && formmaskMetaArray == null)
             {
-                using var reader = new StreamReader(formmaskFile.Open(), Encoding.Default);
-                string formMaskData = reader.ReadToEnd();
                 try
                 {
+                    using var reader = new StreamReader(formmaskFile.Open(), Encoding.Default);
+                    string formMaskData = reader.ReadToEnd();
+
                     // playState is a boolean bitfield, in the file it's "play with these states", but in the code it's "mute these states"
                     // so it needs to be reversed
-                    var playState = YamlSerializer.Deserialize<SequencePlayState[]>(formMaskData); // all JSON is valid YAML
+                    var playState = YamlSerializer.Deserialize<SequencePlayState[]>(formMaskData);
 
-                    // Backwards compatibility for version 1.15 and lower sequence files
-                    if (!playState.Any(s => s.HasFlag(SequencePlayState.FierceDeity) && !s.HasFlag(SequencePlayState.Human)))
-                    {
-                        for (var i = 0; i < playState.Length; i++)
-                        {
-                            if (playState[i].HasFlag(SequencePlayState.Human))
-                            {
-                                playState[i] |= SequencePlayState.FierceDeity;
-                            }
-                        }
-                    }
-
-                    // Ensure unused cumulative states won't cause the channel to be muted when in those states
-                    foreach (var cumulativeState in Enum.GetValues<SequencePlayState>().Where(s => s > SequencePlayState.All))
-                    {
-                        if (!playState.Any(s => s.HasFlag(cumulativeState)))
-                        {
-                            playState[0x10] |= cumulativeState;
-                        }
-                    }
-
-                    combo.FormMask = ConvertUtils.U16ArrayToBytes(playState.Cast<ushort>().ToArray());
+                    ProcessFormmaskData(playState, combo);
                 }
                 catch (Exception e)
                 {
                     throw new Exception($"Error: Music file's Formmask file is invalid: {e.Message}", e);
                 }
             }
-            else if (formmaskMetaArray != null && formmaskFile == null)
+            else if (formmaskFile != null && formmaskMetaArray != null)
             {
-                if (!formmaskMetaArray.Any(s => s.HasFlag(SequencePlayState.FierceDeity) && !s.HasFlag(SequencePlayState.Human)))
-                {
-                    for (var i = 0; i < formmaskMetaArray.Length; i++)
-                    {
-                        if (formmaskMetaArray[i].HasFlag(SequencePlayState.Human))
-                        {
-                            formmaskMetaArray[i] |= SequencePlayState.FierceDeity;
-                        }
-                    }
-                }
-
-                foreach (var cumulativeState in Enum.GetValues<SequencePlayState>().Where(s => s > SequencePlayState.All))
-                {
-                    if (!formmaskMetaArray.Any(s => s.HasFlag(cumulativeState)))
-                    {
-                        formmaskMetaArray[0x10] |= cumulativeState;
-                    }
-                }
-
-                combo.FormMask = ConvertUtils.U16ArrayToBytes(formmaskMetaArray.Cast<ushort>().ToArray());
+                ProcessFormmaskData(formmaskMetaArray, combo);
             }
         }
 
-        private static void ReadMMRSSequence(SequenceInfo song, MMRSArchiveContents mmrs, string instrumentSet, SequencePlayState[] formmaskArray)
+        private static void ReadMMRSSequence(SequenceInfo song, MMRSArchiveContents mmrs, MMRSMetadata metadata)
         {
             int claimedBankCount = 0;
             ZipArchiveEntry sequenceFile = mmrs.SequenceFile ?? throw new FileNotFoundException($"ReadMMRSSequence: Sequence file is missing.");
@@ -441,7 +428,7 @@ namespace MMR.Randomizer.Utils
             SequenceBinaryData sequence = new() { SequenceBinary = rawSeqData };
 
             // If the value is "custom" or "-", then the music file uses a custom bank
-            if (instrumentSet == "custom" || instrumentSet == "-")
+            if (metadata.InstrumentSet == "custom" || metadata.InstrumentSet == "-")
             {
                 song.Instrument = REQUIRES_NEW_BANK;
             }
@@ -449,7 +436,7 @@ namespace MMR.Randomizer.Utils
             {
                 try
                 {
-                    song.Instrument = Convert.ToInt32(instrumentSet, 16);
+                    song.Instrument = Convert.ToInt32(metadata.InstrumentSet, 16);
                 }
                 catch (FormatException)
                 {
@@ -472,7 +459,7 @@ namespace MMR.Randomizer.Utils
             if (song.Instrument == REQUIRES_NEW_BANK && !customBankIncluded)
             {
 #if DEBUG
-                throw new Exception($"Error: File with no bank has a bad instrument set: {instrumentSet}");
+                throw new Exception($"Error: File with no bank has a bad instrument set: {metadata.InstrumentSet}");
 #else
                 continue;
 #endif
@@ -483,7 +470,7 @@ namespace MMR.Randomizer.Utils
                 claimedBankCount++;
             }
 
-            ReadMMRSFormmask(sequence, mmrs.FormmaskFile, formmaskArray);
+            ReadMMRSFormmask(sequence, mmrs.FormmaskFile, metadata.Formmask);
 
             song.SequenceBinaryList.Add(sequence);
         }
@@ -762,7 +749,7 @@ namespace MMR.Randomizer.Utils
                         currentSong.InstrumentSamples = samplesList;
                         currentSong.SequenceBinaryList = new List<SequenceBinaryData>();
 
-                        ReadMMRSSequence(currentSong, mmrs, metadata.InstrumentSet, metadata.Formmask);
+                        ReadMMRSSequence(currentSong, mmrs, metadata);
 
                         if (currentSong != null && currentSong.SequenceBinaryList != null)
                         {
