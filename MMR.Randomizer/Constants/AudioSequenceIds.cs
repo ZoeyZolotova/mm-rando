@@ -136,6 +136,9 @@ namespace MMR.Randomizer.Constants
         public const int MOON_DESTROYED = 0x7E;
         public const int END_CREDITS_2 = 0x7F;
 
+        // Store the sequences that can currently be randomized, their internal name, their display name, and their type
+        // This is used during SEQS plaintext to YAML conversion, as well as ensuring the sequence ID from a SEQS file
+        // matches a vanilla ID if it's an available vanilla sequence slot
         public static readonly Dictionary<int, (string Name, string DisplayName, string Type)> SEQUENCE_ID_MAP = new()
         {
             // Sequence ID for matching, then tuple of data
@@ -229,6 +232,7 @@ namespace MMR.Randomizer.Constants
     }
 }
 
+// Should the constants ever want to be changed to have the SEQ_ prefix for better distinction
 //namespace MMR.Randomizer.Constants
 //{
 //    public static class AudioSequenceIds
