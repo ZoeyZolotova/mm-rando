@@ -44,7 +44,7 @@ namespace MMR.Randomizer.Utils
                         break;
 
                     default: // When reading .bankmeta there's already a check for 8 bytes, but never hurts to be extra safe
-                        throw new Exception($"Error: Audiobank cannot be parsed due to invalid metadata length");
+                        throw new Exception($"Audiobank Instnatiation Error: Invalid length for bankmeta binary - expected '8' or '16' bytes, but got '{metadata.Length}' bytes instead");
                 }
 
                 // Find all the drums and instantiate them
@@ -176,7 +176,7 @@ namespace MMR.Randomizer.Utils
                 SampleAddress = BinaryPrimitives.ReadUInt32BigEndian(bankData.AsSpan(drumOffset + 4, 4));
 
                 // Need to figure out how to pass the name so the error can report which song... should be good enough for sinlge song testing though...
-                Sample = SampleAddress != 0 ? new Sample<Drum>(bankData, SampleAddress, this) : throw new Exception($"Error: Drum sample address is 0x00000000 for audiobank, audio engine will crash!");
+                Sample = SampleAddress != 0 ? new Sample<Drum>(bankData, SampleAddress, this) : throw new Exception($"Drum Instantiation Error: Drum sample address is 0x00000000 for audiobank, audio engine will crash!");
             }
         }
 
@@ -195,7 +195,7 @@ namespace MMR.Randomizer.Utils
                 SampleAddress = BinaryPrimitives.ReadUInt32BigEndian(bankData.AsSpan(sampleOffset, 4));
 
                 // Unsure if this also crashes the audio engine, but it should never be 0 nonetheless...
-                Sample = SampleAddress != 0 ? new Sample<Effect>(bankData, SampleAddress, this) : throw new Exception($"Error: Effect sample address is 0x00000000 for audiobank, audio engine will crash!");
+                Sample = SampleAddress != 0 ? new Sample<Effect>(bankData, SampleAddress, this) : throw new Exception($"Effect Instantiation Error: Effect sample address is 0x00000000 for audiobank, audio engine will crash!");
             }
         }
     }
