@@ -1722,7 +1722,7 @@ namespace MMR.Randomizer.Utils
                         }
 
                         if (sampleBankAddress == 0)
-                            throw new Exception($"Error: Could not match any sample address to audio sample's address in the instrument bank for song: '{sample.ParentFile}'");
+                            throw new Exception($"Error: Could not match audio sample's address to any sample addresses in the instrument bank for song: '{sample.ParentFile}'");
 
                         // Replace the sample struct's address with the correct address
                         // The first 4 bytes are a bitfield, so add 4 to the index
