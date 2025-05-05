@@ -198,7 +198,7 @@ namespace MMR.Randomizer.Utils
                                 else
                                 {
 #if DEBUG
-                                    throw new Exception($"Error: Invalid category in SEQS file for '{seqName}': '{part}'");
+                                    throw new Exception($"SEQS Error: Invalid category in SEQS file for '{seqName}': '{part}'");
 #else
                                 continue;
 #endif
@@ -281,7 +281,7 @@ namespace MMR.Randomizer.Utils
                 }
                 catch (UnauthorizedAccessException)
                 {
-                    throw new Exception($"GetDirectories: Cannot access the following directory: {directory}");
+                    throw new Exception($"Directory Error: Cannot access the following directory in the music folder: '{directory}'");
                 }
             }
 
@@ -306,7 +306,7 @@ namespace MMR.Randomizer.Utils
                 return RoundTo16(seq.SequenceBinaryList[0].SequenceBinary.Length);
             }
             //else if (seq.Name.StartsWith("mm-")) // Look up vanilla sequences from AudioSeq index table
-            else if (SEQUENCE_ID_MAP.ContainsKey(seq.SeqId))
+            else if (SEQUENCE_ID_MAP.ContainsKey(seq.SeqId)) // If seq is vanilla, then SeqId is set and Replaces is -1; lookup from AudioSeq index table
             {
                 // The code file ahould already be decompressed
                 int codeFID = RomUtils.GetFileIndexForWriting(Addresses.SeqTable);
@@ -328,7 +328,7 @@ namespace MMR.Randomizer.Utils
                 }
             }
 
-            throw new Exception("GetSequenceSize: Sequence File is missing");
+            throw new Exception("GetSequenceSize Error: Sequence File is missing");
         }
 
         private static bool ReadMMRSInstrumentBank(SequenceInfo song, SequenceBinaryData combo, ZipArchiveEntry bankFile, ZipArchiveEntry bankmetaFile)
@@ -340,7 +340,7 @@ namespace MMR.Randomizer.Utils
             {
                 // The Bankmeta file that music files use is 8 bytes long
                 if (bankmetaFile.Length != 8)
-                    throw new Exception($"Error: Bankmeta file is too short for file: '{song.Name}'. Expected 8 bytes, but got {bankmetaFile.Length} bytes instead.");
+                    throw new Exception($"ReadMMRSInstrumentBank Error: Bankmeta file is too short for file: '{song.Name}' - expected '8' bytes, but got '{bankmetaFile.Length}' bytes instead");
 
                 byte[] bankmetaData = new byte[8];
 
@@ -351,7 +351,7 @@ namespace MMR.Randomizer.Utils
 
                 // The bank should have at least as many bytes as there are drum and instrument pointers
                 if (bankFile.Length < minLen)
-                    throw new Exception($"Error: Bank file is too short for file: '{song.Name}'. Expected at least {minLen} bytes, but got {bankFile.Length} bytes instead.");
+                    throw new Exception($"ReadMMRSInstrumentBank Error: Bank file is too short for file: '{song.Name}' - expected at least '{minLen}' bytes, but got '{bankFile.Length}' bytes instead");
 
                 byte[] bankData = new byte[bankFile.Length];
 
@@ -419,7 +419,7 @@ namespace MMR.Randomizer.Utils
                 }
                 catch (Exception e)
                 {
-                    throw new Exception($"Error: Music file's Formmask file is invalid: {e.Message}", e);
+                    throw new Exception($"ReadMMRSFormmask Error: Music file's Formmask file is invalid: {e.Message}", e);
                 }
             }
             else if (formmaskFile != null && formmaskMetaArray != null)
@@ -431,11 +431,11 @@ namespace MMR.Randomizer.Utils
         private static void ReadMMRSSequence(SequenceInfo song, MMRSArchiveContents mmrs, MMRSMetadata metadata)
         {
             int claimedBankCount = 0;
-            ZipArchiveEntry sequenceFile = mmrs.SequenceFile ?? throw new FileNotFoundException($"ReadMMRSSequence: Sequence file is missing.");
+            ZipArchiveEntry sequenceFile = mmrs.SequenceFile ?? throw new FileNotFoundException($"ReadMMRSSequence Error: Sequence file is missing");
 
             // The sequence file shouldn't be empty
             if (sequenceFile.Length == 0)
-                throw new Exception($"Error: Sequence file for '{song.Name}' contains no data.");
+                throw new Exception($"ReadMMRSSequence Error: Sequence file contains no data for song: '{song.Name}'");
 
             byte[] rawSeqData = new byte[sequenceFile.Length];
 
@@ -476,7 +476,7 @@ namespace MMR.Randomizer.Utils
             if (song.Instrument == REQUIRES_NEW_BANK && !customBankIncluded)
             {
 #if DEBUG
-                throw new Exception($"Error: File with no bank has a bad instrument set: {metadata.InstrumentSet}");
+                throw new Exception($"ReadMMRSSequence Error: Bad instrument set ('{metadata.InstrumentSet}') for song: '{song.Name}'");
 #else
                 continue;
 #endif
@@ -497,7 +497,7 @@ namespace MMR.Randomizer.Utils
             // Reads and collects the music files metadata from the .meta YAML file
 
             if (metaFile == null)
-                throw new Exception($"Error: No metadata file available for song: '{songname}'");
+                throw new Exception($"ReadMMRSMetaYaml Error: No metadata file available for song: '{songname}'");
 
             // Valid values
             var validTypes = new HashSet<string> { "bgm", "fanfare" };
@@ -515,7 +515,7 @@ namespace MMR.Randomizer.Utils
             }
 
             if (yamlData == null || yamlData.Metadata == null)
-                throw new Exception($"Error: Invalid or empty YAML metadata for song: '{songname}'");
+                throw new Exception($"ReadMMRSMetaYaml Error: Invalid or empty YAML metadata for song: '{songname}'");
 
             string songType = validTypes.Contains(yamlData.Metadata.SongType?.ToLower()) ? yamlData.Metadata.SongType.ToLower() : "bgm";
 
@@ -535,7 +535,7 @@ namespace MMR.Randomizer.Utils
 
                         // Ensure at least the first type matches the given song type, otherwise throw an error
                         if (firstType == null && !string.Equals(songType, MusicGroups.TypeCheck[currentType], StringComparison.OrdinalIgnoreCase))
-                            throw new Exception($"Error: Category '{category}' does not match given song type '{songType}' for song: {songname}");
+                            throw new Exception($"ReadMMRSMetaYaml Error: Category ('{category}') does not match given song type ('{songType}') for song: {songname}");
 
                         // After the first category, if any categories are mismatched then drop them entirely
                         // Might be good to throw an error or log the file... but this is fine for now
@@ -550,7 +550,7 @@ namespace MMR.Randomizer.Utils
                     else
                     {
 #if DEBUG
-                        throw new Exception($"Error: Bad category '{category}' in song: '{songname}'.");
+                        throw new Exception($"TryParseCategory Error: Bad category ('{category}') in song: '{songname}'.");
 #else
                         continue;
 #endif
@@ -573,28 +573,28 @@ namespace MMR.Randomizer.Utils
 
                     if (type == null && listIndex != null && sample.KeyRegion != null)
                     {
-                        throw new InvalidOperationException($"Error: Audio sample '{entry.Key}': If type is null, index and key region must also be null.");
+                        throw new InvalidOperationException($"ReadMMRSMetaYaml Error: If type is null, index and ke region must also be null for audio sample ('{entry.Key}') in song: '{songname}'");
                     }
                     else
                     {
                         if (!validTypes.Contains(type) && type != null)
-                            throw new InvalidOperationException($"Sample '{entry.Key}': Invalid instrument type '{type}'.");
+                            throw new InvalidOperationException($"ReadMMRSMetaYaml Error: Invalid instrument type ('{type}') for audio sample ('{entry.Key}'): '{songname}'");
 
                         if (validTypes.Contains(type) && listIndex == null)
-                            throw new InvalidOperationException($"Sample '{entry.Key}': Index must not be null when type is '{type}'.");
+                            throw new InvalidOperationException($"ReadMMRSMetaYaml Error: Index must not be null with given type ('{type}') for audio sample ('{entry.Key}') in song: '{songname}'");
 
                         if (type != null && tempAddr != null)
-                            throw new InvalidOperationException($"Sample '{entry.Key}': temp addr must be null in the new format.");
+                            throw new InvalidOperationException($"ReadMMRSMetaYaml Error: Temp address must be null with new format for audio sample ('{entry.Key}') in song: '{songname}'");
 
                         if (type == "INST")
                         {
                             if (string.IsNullOrEmpty(keyRegion) || !validKeyRegions.Contains(keyRegion))
-                                throw new InvalidOperationException($"Error: Audio sample '{entry.Key}': key region must be one of LOW, NORM, HIGH for INST.");
+                                throw new InvalidOperationException($"ReadMMRSMetaYaml Error: Key region must be LOW, PRIM, or HIGH with given type ('{type}') for audio sample ('{entry.Key}') in song: '{songname}'");
                         }
                         else // DRUM or SFX
                         {
                             if (!string.IsNullOrEmpty(keyRegion))
-                                throw new InvalidOperationException($"Error: Audio sample '{entry.Key}': key region must be null or empty for {type}.");
+                                throw new InvalidOperationException($"ReadMMMRSMetaYaml Error: Key region must not be null or empty with given type ('{type}') for audio sample ('{entry.Key}') in song: '{songname}'");
                         }
                     }
 
@@ -776,7 +776,7 @@ namespace MMR.Randomizer.Utils
                 }
                 catch (Exception e)
                 {
-                    Debug.WriteLine("Error attempting to read archive: " + filePath + " -- " + e);
+                    Debug.WriteLine($"ScanForMMRS Error: An exception occured when attempting to read archive ('{Path.GetFileNameWithoutExtension(filePath)}'): {e}");
                 }
             }
         }
@@ -945,7 +945,7 @@ namespace MMR.Randomizer.Utils
 
                 if (sequenceList.FindAll(u => u.Replaces == i).Count > 1)
                 {
-                    WriteOutput($"Error: Slot {i:X} has multiple songs pointing at it!");
+                    WriteOutput($"RebuildAudioSeq Error: Multiple songs pointing to song slot: '{i:X}'");
                 }
 
                 int p = RomData.PointerizedSequences.FindIndex(u => u.PreviousSlot == i);
@@ -965,14 +965,8 @@ namespace MMR.Randomizer.Utils
                     }
                     else if (sequenceList[j].SequenceBinaryList != null && sequenceList[j].SequenceBinaryList.Any())
                     {
-                        if (sequenceList[j].SequenceBinaryList.Count > 1)
-                        {
-                            WriteOutput("Warning: writing song with multiple sequence/bank combos, selecting first available");
-                        }
-
                         newentry.Data = sequenceList[j].SequenceBinaryList[0].SequenceBinary;
                         WriteOutput($"Slot {i:X2} := {sequenceList[j].Name} *");
-
                     }
                     else // Not an MM sequence, load and add file
                     {
@@ -989,7 +983,7 @@ namespace MMR.Randomizer.Utils
                         }
                         else
                         {
-                            throw new Exception($"Music not found as file or built-in resource: '{sequenceList[j].Filename}'");
+                            throw new Exception($"RebuildAudioSeq Error: Music not found as file or built-in resource: '{sequenceList[j].Filename}'");
                         }
 
                         // This might check if the sequence type is correct for MM
@@ -1279,7 +1273,7 @@ namespace MMR.Randomizer.Utils
             }
 
             WriteSongLog(log, settings);
-            throw new Exception($"Cannot randomize music on this seed with available music: \nSlot Name:[{targetSlot.Name}] PreviousSlot: [{targetSlot.Replaces:X}]");
+            throw new Exception($"TryBackupSongPlacement Error: Cannot randomize music for current seed with available music: \nSlot Name:[{targetSlot.Name}] PreviousSlot: [{targetSlot.Replaces:X}]");
         }
 
         public static void WriteSongLog(StringBuilder log, OutputSettings settings)
@@ -1588,8 +1582,8 @@ namespace MMR.Randomizer.Utils
                         bool status = SearchForValidSongReplacement(cosmeticSettings, unassignedSequences, bgmSlot, rng, log);
                         if (status == false)
                         {
-                            throw new Exception("Music Budget Error: this seed cannot find acceptable music for this combat slot\n" +
-                                "Try another!");
+                            throw new Exception("CheckBGMCombatMusicBudget Error: Current seed cannot find acceptable music for the combat slot\n" +
+                                "Try a different seed!");
                         }
                     }
                 }
@@ -1612,7 +1606,7 @@ namespace MMR.Randomizer.Utils
                     bool status = SearchForValidSongReplacement(cosmeticSettings, unassignedSequences, combatSlot, rng, log);
                     if (status == false)
                     {
-                        throw new Exception("Music Budget Error: this seed cannot find acceptable music for this combat slot\n" + "Try another!");
+                        throw new Exception("CheckBGMCombatMusicBudget Error: Current seed cannot find acceptable music for the combat slot\n" + "Try a different seed!");
                     }
                 }
 
@@ -1707,13 +1701,13 @@ namespace MMR.Randomizer.Utils
                                     "LOW"  => instrumentBank.Instruments[sample.ListIndex].LowSampleAddress,
                                     "PRIM" => instrumentBank.Instruments[sample.ListIndex].PrimSampleAddress,
                                     "HIGH" => instrumentBank.Instruments[sample.ListIndex].HighSampleAddress,
-                                    _      => throw new Exception($"Error: Invalid audio sample key region for song: '{sample.ParentFile}'")
+                                    _      => throw new Exception($"UpdateBankInstrumentPointers Error: Invalid audio sample key region in metadata for song: '{sample.ParentFile}'")
                                 },
 
                                 // Drums and SFX don't have key regions
                                 "DRUM" => instrumentBank.Drums[sample.ListIndex].SampleAddress,
                                 "SFX"  => instrumentBank.Effects[sample.ListIndex].SampleAddress,
-                                _      => throw new Exception($"Error: Invalid audio sample type for song: '{sample.ParentFile}'")
+                                _      => throw new Exception($"UpdateBankInstrumentPointers Error: Invalid audio sample type in metadata for song: '{sample.ParentFile}'")
                             };
                         }
                         else // Fallback to sample marker matching
@@ -1737,7 +1731,7 @@ namespace MMR.Randomizer.Utils
                         }
 
                         if (sampleBankAddress == 0)
-                            throw new Exception($"Error: Could not match audio sample's address to any sample addresses in the instrument bank for song: '{sample.ParentFile}'");
+                            throw new Exception($"UpdateBankInstrumentPointers Error: Could not match audio sample's address ('{sample.Marker:X}') to any sample addresses in the instrument bank for song: '{sample.ParentFile}'");
 
                         // Replace the sample struct's address with the correct address
                         // The first 4 bytes are a bitfield, so add 4 to the index
