@@ -208,8 +208,8 @@ namespace MMR.Randomizer.Utils
                             Instrument = seqInstrument,
                         };
 
-                        //if (sourceSequence.Name.StartsWith("mm-"))
-                        if (SEQUENCE_ID_MAP.ContainsKey(seqId) && (seqId >= 0x02 && seqId <= 0x7F))
+                        if (sourceSequence.Name.StartsWith("mm-"))
+                        //if (SEQUENCE_ID_MAP.ContainsKey(seqId) && (seqId >= 0x02 && seqId <= 0x7F))
                         {
                             // If the sequence is vanilla, and searching by name is required, the map includes the name, a display name, and the type
                             // So the name can be overwritten with the expected name, however matching by ID is better because vanilla IDs don't change
@@ -225,8 +225,8 @@ namespace MMR.Randomizer.Utils
                             }
 
                             //if (RomData.TargetSequences.Find(u => u.Name == SEQUENCE_ID_MAP[seqId].Name) == null)
-                            //if (RomData.TargetSequences.Find(u => u.Name == seqName) == null)
-                            if (RomData.TargetSequences.Find(u => u.SeqId == seqId) == null)
+                            if (RomData.TargetSequences.Find(u => u.Name == seqName) == null)
+                            //if (RomData.TargetSequences.Find(u => u.SeqId == seqId) == null)
                             {
                                 RomData.TargetSequences.Add(targetSequence);
                             }
@@ -288,8 +288,8 @@ namespace MMR.Randomizer.Utils
             {
                 return RoundTo16(seq.SequenceBinaryList[0].SequenceBinary.Length);
             }
-            //else if (seq.Name.StartsWith("mm-")) // Look up vanilla sequences from AudioSeq index table
-            else if (SEQUENCE_ID_MAP.ContainsKey(seq.SeqId))
+            else if (seq.Name.StartsWith("mm-")) // Look up vanilla sequences from AudioSeq index table
+            //else if (SEQUENCE_ID_MAP.ContainsKey(seq.SeqId))
             {
                 // The code file ahould already be decompressed
                 int codeFID = RomUtils.GetFileIndexForWriting(Addresses.SeqTable);
@@ -1529,11 +1529,11 @@ namespace MMR.Randomizer.Utils
             // BGM or combat is the limiting factor, the other has to be smaller than the chosen limiter
             bool combatVsBGMCoinToss = rng.Next(2) == 1;
 
-            var usedCombatSequence = RomData.SequenceList.Find(u => u.Replaces == SMALL_ENEMY_BATTLE && u.SeqId != SMALL_ENEMY_BATTLE); //u.Name != "mm-combat");
+            var usedCombatSequence = RomData.SequenceList.Find(u => u.Replaces == SMALL_ENEMY_BATTLE && u.Name != "mm-combat");//u.SeqId != SMALL_ENEMY_BATTLE); //u.Name != "mm-combat");
             if (usedCombatSequence == null) // Songtest removes the sequence and points it at "File Select" for testing
             {
                 combatVsBGMCoinToss = true; // "COMBAT" manually selected because of combat songtest
-                usedCombatSequence = RomData.SequenceList.Find(u => u.Replaces == FILE_SELECT && u.SeqId != FILE_SELECT); //u.Name != "mm-fileselect");
+                usedCombatSequence = RomData.SequenceList.Find(u => u.Replaces == FILE_SELECT && u.Name != "mm-fileselect");//u.SeqId != FILE_SELECT); //u.Name != "mm-fileselect");
             }
             else if (RomData.SequenceList.Find(u => u.Name.Contains("songtest")) != null)
             {
@@ -1592,7 +1592,7 @@ namespace MMR.Randomizer.Utils
                 {
                     var seqName = usedCombatSequence.Name;
                     log.AppendLine($"Combat sequence {seqName} was too big to match your BGM music, replacing ... ");
-                    var combatSlot = RomData.TargetSequences.Find(u => u.SeqId == SMALL_ENEMY_BATTLE); // Use the sequence id instead of relying on mm-combat
+                    var combatSlot = RomData.TargetSequences.Find(u => u.Name == "mm-combat");//u.SeqId == SMALL_ENEMY_BATTLE); // Use the sequence id instead of relying on mm-combat
                     usedCombatSequence.Replaces = -1; // Cancel using this song
                     bool status = SearchForValidSongReplacement(cosmeticSettings, unassignedSequences, combatSlot, rng, log);
                     if (status == false)
