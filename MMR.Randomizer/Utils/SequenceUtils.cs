@@ -334,7 +334,7 @@ namespace MMR.Randomizer.Utils
 
                 // The bank should have at least as many bytes as there are drum and instrument pointers
                 if (bankFile.Length < minLen)
-                    throw new Exception($"Error: Zbank file is too short for file: '{song.Name}'. Expected at least {minLen} bytes, but got {bankFile.Length} bytes instead.");
+                    throw new Exception($"Error: Bank file is too short for file: '{song.Name}'. Expected at least {minLen} bytes, but got {bankFile.Length} bytes instead.");
 
                 byte[] bankData = new byte[bankFile.Length];
 
@@ -356,12 +356,12 @@ namespace MMR.Randomizer.Utils
             return false; // The music file does not use a custom bank
         }
 
-        private static void ReadMMRSFormmask(SequenceBinaryData combo, ZipArchiveEntry formmaskFile)
+        private static void ReadMMRSFormmask(SequenceBinaryData combo, ZipArchiveEntry formmaskFile, SequencePlayState[] formmaskMetaArray = null)
         {
             // Read the Formmask (".formmask") file, it's a single JSON/YAML list that determines which
             // sequence channels should be turned on and off for each of Link's states
 
-            if (formmaskFile != null)
+            if (formmaskFile != null && formmaskMetaArray == null)
             {
                 using var reader = new StreamReader(formmaskFile.Open(), Encoding.Default);
                 string formMaskData = reader.ReadToEnd();
@@ -399,9 +399,32 @@ namespace MMR.Randomizer.Utils
                     throw new Exception($"Error: Music file's Formmask file is invalid: {e.Message}", e);
                 }
             }
+            else if (formmaskMetaArray != null && formmaskFile == null)
+            {
+                if (!formmaskMetaArray.Any(s => s.HasFlag(SequencePlayState.FierceDeity) && !s.HasFlag(SequencePlayState.Human)))
+                {
+                    for (var i = 0; i < formmaskMetaArray.Length; i++)
+                    {
+                        if (formmaskMetaArray[i].HasFlag(SequencePlayState.Human))
+                        {
+                            formmaskMetaArray[i] |= SequencePlayState.FierceDeity;
+                        }
+                    }
+                }
+
+                foreach (var cumulativeState in Enum.GetValues<SequencePlayState>().Where(s => s > SequencePlayState.All))
+                {
+                    if (!formmaskMetaArray.Any(s => s.HasFlag(cumulativeState)))
+                    {
+                        formmaskMetaArray[0x10] |= cumulativeState;
+                    }
+                }
+
+                combo.FormMask = ConvertUtils.U16ArrayToBytes(formmaskMetaArray.Cast<ushort>().ToArray());
+            }
         }
 
-        private static void ReadMMRSSequence(SequenceInfo song, MMRSArchiveContents mmrs, string instrumentSet)
+        private static void ReadMMRSSequence(SequenceInfo song, MMRSArchiveContents mmrs, string instrumentSet, SequencePlayState[] formmaskArray)
         {
             int claimedBankCount = 0;
             ZipArchiveEntry sequenceFile = mmrs.SequenceFile ?? throw new FileNotFoundException($"ReadMMRSSequence: Sequence file is missing.");
@@ -428,7 +451,7 @@ namespace MMR.Randomizer.Utils
                 {
                     song.Instrument = Convert.ToInt32(instrumentSet, 16);
                 }
-                catch (FormatException e)
+                catch (FormatException)
                 {
                     song.Instrument = REQUIRES_NEW_BANK;
                 }
@@ -460,7 +483,7 @@ namespace MMR.Randomizer.Utils
                 claimedBankCount++;
             }
 
-            ReadMMRSFormmask(sequence, mmrs.FormmaskFile);
+            ReadMMRSFormmask(sequence, mmrs.FormmaskFile, formmaskArray);
 
             song.SequenceBinaryList.Add(sequence);
         }
@@ -598,7 +621,8 @@ namespace MMR.Randomizer.Utils
                 InstrumentSet = yamlData.Metadata.InstrumentSet,
                 SongType = songType,
                 Categories = categories,
-                Commands = commands
+                Commands = commands,
+                Formmask = yamlData.Formmask
             };
         }
 
@@ -738,7 +762,7 @@ namespace MMR.Randomizer.Utils
                         currentSong.InstrumentSamples = samplesList;
                         currentSong.SequenceBinaryList = new List<SequenceBinaryData>();
 
-                        ReadMMRSSequence(currentSong, mmrs, metadata.InstrumentSet);
+                        ReadMMRSSequence(currentSong, mmrs, metadata.InstrumentSet, metadata.Formmask);
 
                         if (currentSong != null && currentSong.SequenceBinaryList != null)
                         {
@@ -1845,6 +1869,7 @@ namespace MMR.Randomizer.Utils
             public string SongType { get; set; }
             public List<int> Categories { get; set; } = new();
             public List<Dictionary<string, object>> Commands { get; set; } = new();
+            public SequencePlayState[] Formmask { get; set; }
         }
 
         public class SEQSYaml
