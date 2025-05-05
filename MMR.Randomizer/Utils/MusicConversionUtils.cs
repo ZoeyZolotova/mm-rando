@@ -11,6 +11,7 @@ using YamlDotNet.Serialization;
 using YamlDotNet.Core.Events;
 using YamlDotNet.Core;
 using YamlDotNet.Serialization.EventEmitters;
+using MMR.Common.Utils;
 
 namespace MMR.Randomizer.Utils
 {
@@ -22,17 +23,6 @@ namespace MMR.Randomizer.Utils
         // Step 3: Convert music files
 
         public static List<string> OLD_MUSIC_FILES = new();
-
-        public class FlowStyleListEmitter : ChainedEventEmitter
-        {
-            public FlowStyleListEmitter(IEventEmitter nextEmitter) : base(nextEmitter) { }
-
-            public override void Emit(SequenceStartEventInfo eventInfo, IEmitter emitter)
-            {
-                eventInfo.Style = SequenceStyle.Flow;
-                base.Emit(eventInfo, emitter);
-            }
-        }
 
         // fanfare categories to ensure correct song type
         private static readonly string[] FANFARE_CATEGORIES =
@@ -441,12 +431,7 @@ namespace MMR.Randomizer.Utils
             }
 
             // Serialize to YAML
-            var serializer = new SerializerBuilder()
-                .WithEventEmitter(next => new FlowStyleListEmitter(next))
-                .ConfigureDefaultValuesHandling(DefaultValuesHandling.OmitDefaults)
-                .Build();
-
-            string yamlOutput = serializer.Serialize(yaml);
+            string yamlOutput = YamlSerializer.FlowListSerialize(yaml);
 
             File.WriteAllText(Path.Combine(folder, $"{baseName}.meta"), yamlOutput);
         }
@@ -718,11 +703,7 @@ namespace MMR.Randomizer.Utils
                 };
             }
 
-            var serializer = new SerializerBuilder()
-                             .WithEventEmitter(next => new FlowStyleListEmitter(next))
-                             .Build();
-
-            File.WriteAllText(seqsYamlFile, serializer.Serialize(output));
+            File.WriteAllText(seqsYamlFile, YamlSerializer.FlowListSerialize(output));
         }
     }
 }
