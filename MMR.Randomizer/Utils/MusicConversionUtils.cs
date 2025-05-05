@@ -7,10 +7,6 @@ using System.IO.Compression;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Globalization;
-using YamlDotNet.Serialization;
-using YamlDotNet.Core.Events;
-using YamlDotNet.Core;
-using YamlDotNet.Serialization.EventEmitters;
 using MMR.Common.Utils;
 
 namespace MMR.Randomizer.Utils
