@@ -11,6 +11,9 @@ namespace MMR.Randomizer.Models.Rom
         [YamlMember(Alias = "metadata")]
         public Meta Metadata { get; set; }
 
+        [YamlMember(Alias = "formmask")]
+        public SequencePlayState[] Formmask { get; set; }
+
         public class Meta
         {
             [YamlMember(Alias = "display name")]
@@ -27,7 +30,6 @@ namespace MMR.Randomizer.Models.Rom
 
             [YamlMember(Alias = "audio samples")]
             public Dictionary<string, Sample> AudioSamples { get; set; }
-
         }
 
         public class Sample
