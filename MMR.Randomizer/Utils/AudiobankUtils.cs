@@ -10,8 +10,9 @@ namespace MMR.Randomizer.Utils
 
         public interface ISample
         {
-            uint Address { get; set; }
+            uint? Address { get; set; }
             uint BankOffset { get; set; }
+            byte[] Data { get; set; }
         }
 
         // Should only need the sample offsets, and int should be fine for bank addresses
@@ -228,8 +229,8 @@ namespace MMR.Randomizer.Utils
             public int Codec {  get; set; }
             public int Medium {  get; set; }
             public uint Size { get; set; }
-            public uint Address {  get; set; }
-            public uint AudiotableAddress { get; set; }
+            public uint? Address {  get; set; }
+            public uint? AudiotableAddress { get; set; }
             public byte[] Data { get; set; }
 
             public Sample(byte[] bankData, byte[] audiotable, byte[] audiotableIndex, uint sampleOffset, int audiotableId, TParent parent)
@@ -253,12 +254,12 @@ namespace MMR.Randomizer.Utils
                     byte[] audiotableEntry = new byte[0x10];
                     Array.Copy(audiotableIndex, atOffset, audiotableEntry, 0, 0x10);
                     uint audiotableOffset = BinaryPrimitives.ReadUInt32BigEndian(audiotableEntry.AsSpan(0, 4));
-                    uint sampleAddress = audiotableOffset + Address;
+                    uint? sampleAddress = audiotableOffset + Address;
                     AudiotableAddress = sampleAddress;
 
                     // Read and store the sample data
                     byte[] sampleData = new byte[Size];
-                    Array.Copy(audiotable, AudiotableAddress, sampleData, 0, Size);
+                    Array.Copy(audiotable, (int)AudiotableAddress, sampleData, 0, Size);
                     Data = sampleData;
                 }
             }
