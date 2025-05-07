@@ -53,6 +53,10 @@ namespace MMR.Randomizer.Utils
 
         public static MD5 md5lib; // Used for zip
 
+        // The path for the Ocarina of Time audiobin file
+        public static string OOT_AUDIOBIN_PATH = Path.Combine(Values.MusicDirectory, "OOT.audiobin");
+        public static AudiobankUtils.Audiobin OOT_AUDIOBIN = null;
+
         public static void ResetBudget()
         {
             MAX_BGM_BUDGET = 0x6000;
@@ -84,7 +88,7 @@ namespace MMR.Randomizer.Utils
                         return true;
                     }
 
-                    // If there's no hex prefix, it's still probably in hex anyway
+                    // If there's no hex prefix, it's still probably in hex anyway (and is expected to be)
                     if (int.TryParse(trimmed, System.Globalization.NumberStyles.HexNumber, null, out int intCategory))
                     {
                         value = intCategory;
@@ -277,7 +281,7 @@ namespace MMR.Randomizer.Utils
                         Replaces = INTRO_CUTSCENE_2,
                     });
 
-                    ScanForMMRS(directory); // Scan for .mmrs files in the music directory
+                    ScanForCustomMusicFiles(directory); // Scan for custom music files in the music directory
                 }
                 catch (UnauthorizedAccessException)
                 {
@@ -331,7 +335,7 @@ namespace MMR.Randomizer.Utils
             throw new Exception("GetSequenceSize Error: Sequence File is missing");
         }
 
-        private static bool ReadMMRSInstrumentBank(SequenceInfo song, SequenceBinaryData combo, ZipArchiveEntry bankFile, ZipArchiveEntry bankmetaFile)
+        private static bool ReadMusicInstrumentBank(SequenceInfo song, SequenceBinaryData combo, ZipArchiveEntry bankFile, ZipArchiveEntry bankmetaFile)
         {
             // Instrument bank files are a binary file with the ".zbank" extension, they're paired with a binary metadata file with the ".bankmeta" extension
             // Returns true/false if the music file uses a custom instrument bank
@@ -340,7 +344,7 @@ namespace MMR.Randomizer.Utils
             {
                 // The Bankmeta file that music files use is 8 bytes long
                 if (bankmetaFile.Length != 8)
-                    throw new Exception($"ReadMMRSInstrumentBank Error: Bankmeta file is too short for file: '{song.Name}' - expected '8' bytes, but got '{bankmetaFile.Length}' bytes instead");
+                    throw new Exception($"ReadMusicInstrumentBank Error: Bankmeta file is too short for file: '{song.Name}' - expected '8' bytes, but got '{bankmetaFile.Length}' bytes instead");
 
                 byte[] bankmetaData = new byte[8];
 
@@ -351,7 +355,7 @@ namespace MMR.Randomizer.Utils
 
                 // The bank should have at least as many bytes as there are drum and instrument pointers
                 if (bankFile.Length < minLen)
-                    throw new Exception($"ReadMMRSInstrumentBank Error: Bank file is too short for file: '{song.Name}' - expected at least '{minLen}' bytes, but got '{bankFile.Length}' bytes instead");
+                    throw new Exception($"ReadMusicInstrumentBank Error: Bank file is too short for file: '{song.Name}' - expected at least '{minLen}' bytes, but got '{bankFile.Length}' bytes instead");
 
                 byte[] bankData = new byte[bankFile.Length];
 
@@ -367,13 +371,102 @@ namespace MMR.Randomizer.Utils
                     Hash = BitConverter.ToInt64(md5lib.ComputeHash(bankData), 0),
                 };
 
+                // If the file is an OOTRS file, we need to extract OOT samples for injection
+                // Not gonna bother fixing offsets to samples that already exist in MM right now
+                if (song.Game == "oot")
+                {
+                    // Add 8 empty bytes to the bankmeta so the bank searches at address 0 for the bankdata
+                    var customOOTBank = new AudiobankUtils.Audiobank(bankmetaData, bankData, null, null);
+                    var ootSamples = customOOTBank.GetBankSamples();
+
+                    foreach (var s in ootSamples)
+                    {
+                        // Make sure already added samples don't get added again, just in case
+                        long sampleHash = BitConverter.ToInt64(md5lib.ComputeHash(s.Data), 0);
+                        if (!song.InstrumentSamples.Any(e => e.Hash == sampleHash))
+                        {
+                            song.InstrumentSamples.Add(
+                                new SequenceSoundSampleBinaryData()
+                                {
+                                    BinaryData = s.Data,
+                                    Addr = s.Address ?? 0,
+                                    Marker = s.Address ?? 0,
+                                    Hash = sampleHash,
+
+                                    // New type could be used here with some math, not gonna bother though
+                                    ParentFile = song.Name,
+                                    InstrumentType = null,
+                                    ListIndex = -1,
+                                    KeyRegion = null,
+                                }
+                            );
+                        }
+                    }
+                }
+
                 return true; // The music file uses a custom bank
             }
+            else if (song.Game == "oot") // OOTRS files will need a custom bank, so create one
+            {
+                // The bank is vanilla; thankfully MM has 0x28 banks
+                if (song.Instrument < 0x25)
+                {
+                    switch (song.Instrument)
+                    {
+                        //case 0x03:
+                            //break;
 
-            return false; // The music file does not use a custom bank
+                        default:
+                            Debug.WriteLine("PROCESSING OOTRS");
+                            int offset = 0x10 + (song.Instrument * 0x10);
+                            byte[] bankmeta = new byte[0x10];
+                            Array.Copy(OOT_AUDIOBIN.AudiobankIndex, offset, bankmeta, 0, 0x10);
+
+                            var vanillaOOTBank = new AudiobankUtils.Audiobank(bankmeta, OOT_AUDIOBIN.AudiobankTable, OOT_AUDIOBIN.Audiotable, OOT_AUDIOBIN.AudiotableIndex);
+                            vanillaOOTBank.Bankmeta[0x02] = 1; // Set to audiotable 1
+
+                            combo.InstrumentSet = new InstrumentSetInfo()
+                            {
+                                BankBinary = vanillaOOTBank.BankData,
+                                BankSlot = REQUIRES_NEW_BANK,
+                                BankMetaData = vanillaOOTBank.Bankmeta,
+                                Modified = 1,
+                                Hash = BitConverter.ToInt64(md5lib.ComputeHash(vanillaOOTBank.BankData), 0),
+                            };
+
+                            var ootSamples = vanillaOOTBank.GetBankSamples();
+                            foreach (var s in ootSamples)
+                            {
+                                // Make sure already added samples don't get added again, just in case
+                                long sampleHash = BitConverter.ToInt64(md5lib.ComputeHash(s.Data), 0);
+                                if (!song.InstrumentSamples.Any(e => e.Hash == sampleHash))
+                                {
+                                    song.InstrumentSamples.Add(
+                                        new SequenceSoundSampleBinaryData()
+                                        {
+                                            BinaryData = s.Data,
+                                            Addr = s.Address ?? 0,
+                                            Marker = s.Address ?? 0,
+                                            Hash = sampleHash,
+
+                                            // New type could be used here with some math, not gonna bother though
+                                            ParentFile = song.Name,
+                                            InstrumentType = null,
+                                            ListIndex = -1,
+                                            KeyRegion = null,
+                                        }
+                                    );
+                                }
+                            }
+                            break;
+                    }
+                }
+            }
+
+                return false; // The music file does not use a custom bank
         }
 
-        private static void ReadMMRSFormmask(SequenceBinaryData combo, ZipArchiveEntry formmaskFile, SequencePlayState[] formmaskMetaArray = null)
+        private static void ReadMusicFormmask(SequenceBinaryData combo, ZipArchiveEntry formmaskFile, SequencePlayState[] formmaskMetaArray = null)
         {
             // Read the Formmask (".formmask") file, it's a single JSON/YAML list that determines which
             // sequence channels should be turned on and off for each of Link's states
@@ -419,7 +512,7 @@ namespace MMR.Randomizer.Utils
                 }
                 catch (Exception e)
                 {
-                    throw new Exception($"ReadMMRSFormmask Error: Music file's Formmask file is invalid: {e.Message}", e);
+                    throw new Exception($"ReadMusicFormmask Error: Music file's Formmask file is invalid: {e.Message}", e);
                 }
             }
             else if (formmaskFile != null && formmaskMetaArray != null)
@@ -428,14 +521,14 @@ namespace MMR.Randomizer.Utils
             }
         }
 
-        private static void ReadMMRSSequence(SequenceInfo song, MMRSArchiveContents mmrs, MMRSMetadata metadata)
+        private static void ReadMusicSequence(SequenceInfo song, MusicArchiveContents musicArchive, MusicMetadata metadata)
         {
             int claimedBankCount = 0;
-            ZipArchiveEntry sequenceFile = mmrs.SequenceFile ?? throw new FileNotFoundException($"ReadMMRSSequence Error: Sequence file is missing");
+            ZipArchiveEntry sequenceFile = musicArchive.SequenceFile ?? throw new FileNotFoundException($"ReadMusicSequence Error: Sequence file is missing");
 
             // The sequence file shouldn't be empty
             if (sequenceFile.Length == 0)
-                throw new Exception($"ReadMMRSSequence Error: Sequence file contains no data for song: '{song.Name}'");
+                throw new Exception($"ReadMusicSequence Error: Sequence file contains no data for song: '{song.Name}'");
 
             byte[] rawSeqData = new byte[sequenceFile.Length];
 
@@ -461,7 +554,7 @@ namespace MMR.Randomizer.Utils
                 }
             }
 
-            var customBankIncluded = ReadMMRSInstrumentBank(song, sequence, mmrs.BankFile, mmrs.BankmetaFile);
+            var customBankIncluded = ReadMusicInstrumentBank(song, sequence, musicArchive.BankFile, musicArchive.BankmetaFile);
 
             // Before AudioBankTable expansion, MMR used to overwrite the original instrument bank
             // However, this causes more problems now that expansion is available, so if an old instrument bank exists, treat it as custom
@@ -476,7 +569,7 @@ namespace MMR.Randomizer.Utils
             if (song.Instrument == REQUIRES_NEW_BANK && !customBankIncluded)
             {
 #if DEBUG
-                throw new Exception($"ReadMMRSSequence Error: Bad instrument set ('{metadata.InstrumentSet}') for song: '{song.Name}'");
+                throw new Exception($"ReadMusicSequence Error: Bad instrument set ('{metadata.InstrumentSet}') for song: '{song.Name}'");
 #else
                 continue;
 #endif
@@ -487,17 +580,17 @@ namespace MMR.Randomizer.Utils
                 claimedBankCount++;
             }
 
-            ReadMMRSFormmask(sequence, mmrs.FormmaskFile, metadata.Formmask);
+            ReadMusicFormmask(sequence, musicArchive.FormmaskFile, metadata.Formmask);
 
             song.SequenceBinaryList.Add(sequence);
         }
 
-        private static MMRSMetadata ReadMMRSMetaYaml(string songname, ZipArchiveEntry metaFile)
+        private static MusicMetadata ReadMusicMetaYaml(string songname, ZipArchiveEntry metaFile)
         {
             // Reads and collects the music files metadata from the .meta YAML file
 
             if (metaFile == null)
-                throw new Exception($"ReadMMRSMetaYaml Error: No metadata file available for song: '{songname}'");
+                throw new Exception($"ReadMusicMetaYaml Error: No metadata file available for song: '{songname}'");
 
             // Valid values
             var validTypes = new HashSet<string> { "bgm", "fanfare" };
@@ -515,9 +608,10 @@ namespace MMR.Randomizer.Utils
             }
 
             if (yamlData == null || yamlData.Metadata == null)
-                throw new Exception($"ReadMMRSMetaYaml Error: Invalid or empty YAML metadata for song: '{songname}'");
+                throw new Exception($"ReadMusicMetaYaml Error: Invalid or empty YAML metadata for song: '{songname}'");
 
             string songType = validTypes.Contains(yamlData.Metadata.SongType?.ToLower()) ? yamlData.Metadata.SongType.ToLower() : "bgm";
+            string songGame = validGames.Contains(yamlData.Game?.ToLower()) ? yamlData.Game.ToLower() : "mm"; // Default to MM if no game
 
             //Handle the categories
             var categories = new List<int>(MusicGroups.DEFAULT_BGM_CATEGORIES);
@@ -535,7 +629,7 @@ namespace MMR.Randomizer.Utils
 
                         // Ensure at least the first type matches the given song type, otherwise throw an error
                         if (firstType == null && !string.Equals(songType, MusicGroups.TypeCheck[currentType], StringComparison.OrdinalIgnoreCase))
-                            throw new Exception($"ReadMMRSMetaYaml Error: Category ('{category}') does not match given song type ('{songType}') for song: {songname}");
+                            throw new Exception($"ReadMusicMetaYaml Error: Category ('{category}') does not match given song type ('{songType}') for song: {songname}");
 
                         // After the first category, if any categories are mismatched then drop them entirely
                         // Might be good to throw an error or log the file... but this is fine for now
@@ -573,28 +667,28 @@ namespace MMR.Randomizer.Utils
 
                     if (type == null && listIndex != null && sample.KeyRegion != null)
                     {
-                        throw new InvalidOperationException($"ReadMMRSMetaYaml Error: If type is null, index and ke region must also be null for audio sample ('{entry.Key}') in song: '{songname}'");
+                        throw new InvalidOperationException($"ReadMusicMetaYaml Error: If type is null, index and ke region must also be null for audio sample ('{entry.Key}') in song: '{songname}'");
                     }
                     else
                     {
                         if (!validTypes.Contains(type) && type != null)
-                            throw new InvalidOperationException($"ReadMMRSMetaYaml Error: Invalid instrument type ('{type}') for audio sample ('{entry.Key}'): '{songname}'");
+                            throw new InvalidOperationException($"ReadMusicMetaYaml Error: Invalid instrument type ('{type}') for audio sample ('{entry.Key}'): '{songname}'");
 
                         if (validTypes.Contains(type) && listIndex == null)
-                            throw new InvalidOperationException($"ReadMMRSMetaYaml Error: Index must not be null with given type ('{type}') for audio sample ('{entry.Key}') in song: '{songname}'");
+                            throw new InvalidOperationException($"ReadMusicMetaYaml Error: Index must not be null with given type ('{type}') for audio sample ('{entry.Key}') in song: '{songname}'");
 
                         if (type != null && tempAddr != null)
-                            throw new InvalidOperationException($"ReadMMRSMetaYaml Error: Temp address must be null with new format for audio sample ('{entry.Key}') in song: '{songname}'");
+                            throw new InvalidOperationException($"ReadMusicMetaYaml Error: Temp address must be null with new format for audio sample ('{entry.Key}') in song: '{songname}'");
 
                         if (type == "INST")
                         {
                             if (string.IsNullOrEmpty(keyRegion) || !validKeyRegions.Contains(keyRegion))
-                                throw new InvalidOperationException($"ReadMMRSMetaYaml Error: Key region must be LOW, PRIM, or HIGH with given type ('{type}') for audio sample ('{entry.Key}') in song: '{songname}'");
+                                throw new InvalidOperationException($"ReadMusicMetaYaml Error: Key region must be LOW, PRIM, or HIGH with given type ('{type}') for audio sample ('{entry.Key}') in song: '{songname}'");
                         }
                         else // DRUM or SFX
                         {
                             if (!string.IsNullOrEmpty(keyRegion))
-                                throw new InvalidOperationException($"ReadMMMRSMetaYaml Error: Key region must not be null or empty with given type ('{type}') for audio sample ('{entry.Key}') in song: '{songname}'");
+                                throw new InvalidOperationException($"ReadMusicMetaYaml Error: Key region must not be null or empty with given type ('{type}') for audio sample ('{entry.Key}') in song: '{songname}'");
                         }
                     }
 
@@ -619,8 +713,9 @@ namespace MMR.Randomizer.Utils
                 }
             }
 
-            return new MMRSMetadata
+            return new MusicMetadata
             {
+                Game = songGame,
                 CosmeticName = yamlData.Metadata.DisplayName,
                 InstrumentSet = yamlData.Metadata.InstrumentSet,
                 SongType = songType,
@@ -630,10 +725,46 @@ namespace MMR.Randomizer.Utils
             };
         }
 
-        public static void ScanForMMRS(string directory)
+        public static void LoadOOTAudiobin()
         {
-            // Check the directory for MMRS files the user added
-            // MMRS is a zip file with a custom file extension ".mmrs" and can contain the following:
+            if (OOT_AUDIOBIN != null)
+                return; // Audiobin was already loaded
+
+            byte[] ootAudiobank = null;
+            byte[] ootAudiobankIndex = null;
+            byte[] ootAudiotable = null;
+            byte[] ootAudiotableIndex = null;
+
+            var binHandler = new Dictionary<string, Action<byte[]>>
+            {
+                { "Audiobank",        data => ootAudiobank       = data },
+                { "Audiobank_index",  data => ootAudiobankIndex  = data },
+                { "Audiotable",       data => ootAudiotable      = data },
+                { "Audiotable_index", data => ootAudiotableIndex = data }
+            };
+
+            using (ZipArchive archive = ZipFile.OpenRead(OOT_AUDIOBIN_PATH))
+            {
+                foreach (var entry in archive.Entries)
+                {
+                    if (binHandler.TryGetValue(entry.Name, out var action))
+                    {
+                        byte[] data = new byte[entry.Length];
+                        using var stream = entry.Open();
+                        stream.Read(data, 0, (int)entry.Length);
+                        action(data);
+                    }
+                }
+            }
+
+            OOT_AUDIOBIN = new AudiobankUtils.Audiobin(ootAudiobank, ootAudiobankIndex, ootAudiotable, ootAudiotableIndex);
+        }
+
+        public static void ScanForCustomMusicFiles(string directory)
+        {
+            // Check the directory for custom music files (MMRS and OOTRS) the user added
+            // MMRS and OOTRS are zip files with a custom file extension ".mmrs" and ".ootrs" respectively
+            // They can contain the following music-related files:
             //   - Sequence file (.seq; required)
             //   - Metadata file (.meta; required)
             //   - Instrument bank file (.zbank)
@@ -644,140 +775,161 @@ namespace MMR.Randomizer.Utils
             // Only one file for each file type is allowed except custom audio sample files
             // an instrument bank may contain multiple sounds, so multiple may be required
 
-            // Check for old standalone sequence files and add them to the old file list
-            foreach (string filePath in Directory.GetFiles(directory, "*.zseq"))
+            foreach (string filePath in Directory.GetFiles(directory))
             {
-                MusicConversionUtils.OLD_MUSIC_FILES.Add(Path.GetFileName(filePath));
-            }
-
-            foreach (string filePath in Directory.GetFiles(directory, "*.mmrs"))
-            {
-                try
+                var extension = Path.GetExtension(filePath);
+                switch (extension)
                 {
-                    using (ZipArchive zip = ZipFile.OpenRead(filePath))
+                    case ".mmrs":
+                        ProcessCustomMusicFile(filePath);
+                        break;
+
+                    case ".ootrs":
+                        ProcessCustomMusicFile(filePath);
+                        break;
+
+                    // Standalone sequences are a legacy format, they should have been converted, but double check
+                    case ".zseq":
+                        MusicConversionUtils.OLD_MUSIC_FILES.Add(Path.GetFileName(filePath));
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+        }
+
+        public static void ProcessCustomMusicFile(string filePath)
+        {
+            try
+            {
+                using (ZipArchive zip = ZipFile.OpenRead(filePath))
+                {
+                    var musicArchive = new MusicArchiveContents();
+
+                    // Setter factory
+                    Action<ZipArchiveEntry> CreateSetter(Func<ZipArchiveEntry> getter, Action<ZipArchiveEntry> setter, string fileType)
                     {
-                        var mmrs = new MMRSArchiveContents();
-
-                        // Setter factory
-                        Action<ZipArchiveEntry> CreateSetter(Func<ZipArchiveEntry> getter, Action<ZipArchiveEntry> setter, string fileType)
+                        return entry =>
                         {
-                            return entry =>
-                            {
-                                if (getter() != null)
-                                    return;
+                            if (getter() != null)
+                                return;
 
-                                setter(entry);
-                             };
-                        }
+                            setter(entry);
+                            };
+                    }
 
-                        var handlers = new Dictionary<string, Action<ZipArchiveEntry>>(StringComparer.OrdinalIgnoreCase)
+                    var handlers = new Dictionary<string, Action<ZipArchiveEntry>>(StringComparer.OrdinalIgnoreCase)
+                    {
+                        // Only allow a single file type for each file, except zsounds which may require multiple
+                        { ".seq",      CreateSetter(() => musicArchive.SequenceFile,     e => musicArchive.SequenceFile = e, "sequence") },
+                        { ".meta",     CreateSetter(() => musicArchive.MetaFile,         e => musicArchive.MetaFile = e,     "meta") },
+                        { ".zbank",    CreateSetter(() => musicArchive.BankFile,         e => musicArchive.BankFile = e,     "zbank") },
+                        { ".bankmeta", CreateSetter(() => musicArchive.BankmetaFile,     e => musicArchive.BankmetaFile = e, "bankmeta") },
+                        { ".formmask", CreateSetter(() => musicArchive.FormmaskFile,     e => musicArchive.FormmaskFile = e, "formmask") },
+                        { ".zsound",   entry => musicArchive.AudioSamples.Add(entry) },
+                    };
+
+                    foreach (var entry in zip.Entries)
+                    {
+                        if (entry.FullName.Contains('/'))
+                            continue;
+
+                        // If the file is using the old format, it will have a categories file
+                        if (entry.Name.Equals("categories.txt"))
                         {
-                            // Only allow a single file type for each file, except zsounds which may require multiple
-                            { ".seq",      CreateSetter(() => mmrs.SequenceFile,     e => mmrs.SequenceFile = e, "sequence") },
-                            { ".meta",     CreateSetter(() => mmrs.MetaFile,         e => mmrs.MetaFile = e,     "meta") },
-                            { ".zbank",    CreateSetter(() => mmrs.BankFile,         e => mmrs.BankFile = e,     "zbank") },
-                            { ".bankmeta", CreateSetter(() => mmrs.BankmetaFile,     e => mmrs.BankmetaFile = e, "bankmeta") },
-                            { ".formmask", CreateSetter(() => mmrs.FormmaskFile,     e => mmrs.FormmaskFile = e, "formmask") },
-                            { ".zsound",   entry => mmrs.AudioSamples.Add(entry) },
-                        };
-
-                        foreach (var entry in zip.Entries)
-                        {
-                            if (entry.FullName.Contains('/'))
-                                continue;
-
-                            // If the file is using the old format, it will have a categories file
-                            if (entry.Name.Equals("categories.txt"))
-                            {
-                                mmrs.CategoriesFile = entry;
-                                continue;
-                            }
-
-                            string ext = Path.GetExtension(entry.Name).ToLowerInvariant();
-                            if (handlers.TryGetValue(ext, out var handler))
-                            {
-                                handler(entry);
-                            }
-                        }
-
-                        // Verify all required files are present
-                        if (mmrs.SequenceFile == null || mmrs.MetaFile == null)
-                        {
-                            // If the file is an old file, it will have categories and no meta file
-                            if (mmrs.CategoriesFile != null)
-                            {
-                                MusicConversionUtils.OLD_MUSIC_FILES.Add(Path.GetFileName(filePath));
-                            }
-
+                            musicArchive.CategoriesFile = entry;
                             continue;
                         }
 
-                        bool hasBankFile = mmrs.BankFile != null;
-                        bool hasBankmetaFile = mmrs.BankmetaFile != null;
-
-                        if (hasBankFile != hasBankmetaFile)
-                            continue;
-
-                        SequenceInfo currentSong = new()
+                        string ext = Path.GetExtension(entry.Name).ToLowerInvariant();
+                        if (handlers.TryGetValue(ext, out var handler))
                         {
-                            Name = Path.GetFileNameWithoutExtension(filePath)
-                        };
-
-                        var metadata = ReadMMRSMetaYaml(currentSong.Name, mmrs.MetaFile);
-
-                        currentSong.DisplayName = metadata.CosmeticName;
-                        currentSong.Categories = metadata.Categories;
-
-                        // Handle custom audio samples
-                        var samplesList = new List<SequenceSoundSampleBinaryData>();
-                        foreach (var command in metadata.Commands)
-                        {
-                            var zsoundName = command.TryGetValue("file", out var nameVal) ? nameVal as string : null;
-                            var zsoundFile = mmrs.AudioSamples.FirstOrDefault(entry => entry.Name.Contains(zsoundName));
-
-                            if (zsoundFile != null)
-                            {
-                                byte[] sampleData = new byte[zsoundFile.Length];
-                                zsoundFile.Open().Read(sampleData, 0, sampleData.Length);
-
-                                var zsoundType = command.TryGetValue("type", out var typeVal) ? typeVal as string : null;
-                                var zsoundIndex = command.TryGetValue("index", out var indexVal) ? indexVal as int? : null;
-                                var zsoundKeyRegion = command.TryGetValue("key region", out var regionVal) ? regionVal as string : null;
-                                var zsoundTempAddr = command.TryGetValue("temp addr", out var markerVal) ? markerVal as uint? : null;
-
-                                samplesList.Add(
-                                    new SequenceSoundSampleBinaryData()
-                                    {
-                                        BinaryData = sampleData,
-                                        Addr = zsoundTempAddr ?? 0,
-                                        Marker = zsoundTempAddr ?? 0,
-                                        Hash = BitConverter.ToInt64(md5lib.ComputeHash(sampleData), 0),
-
-                                        // Store the new type if available
-                                        ParentFile = currentSong.Name,
-                                        InstrumentType = zsoundType,
-                                        ListIndex = zsoundIndex ?? -1,
-                                        KeyRegion = zsoundKeyRegion,
-                                    }
-                                );
-                            }
-                        }
-
-                        currentSong.InstrumentSamples = samplesList;
-                        currentSong.SequenceBinaryList = new List<SequenceBinaryData>();
-
-                        ReadMMRSSequence(currentSong, mmrs, metadata);
-
-                        if (currentSong != null && currentSong.SequenceBinaryList != null)
-                        {
-                            RomData.SequenceList.Add(currentSong);
+                            handler(entry);
                         }
                     }
+
+                    // Verify all required files are present
+                    if (musicArchive.SequenceFile == null || musicArchive.MetaFile == null)
+                    {
+                        // If the file is an old file, it will have categories and no meta file
+                        if (musicArchive.CategoriesFile != null)
+                        {
+                            MusicConversionUtils.OLD_MUSIC_FILES.Add(Path.GetFileName(filePath));
+                        }
+
+                        return;
+                    }
+
+                    bool hasBankFile = musicArchive.BankFile != null;
+                    bool hasBankmetaFile = musicArchive.BankmetaFile != null;
+
+                    if (hasBankFile != hasBankmetaFile)
+                        return;
+
+                    SequenceInfo currentSong = new()
+                    {
+                        Name = Path.GetFileNameWithoutExtension(filePath)
+                    };
+
+                    var metadata = ReadMusicMetaYaml(currentSong.Name, musicArchive.MetaFile);
+
+                    if (metadata.Game == "oot")
+                        LoadOOTAudiobin();
+
+                    currentSong.Game = metadata.Game;
+                    currentSong.DisplayName = metadata.CosmeticName;
+                    currentSong.Categories = metadata.Categories;
+
+                    // Handle custom audio samples
+                    var samplesList = new List<SequenceSoundSampleBinaryData>();
+                    foreach (var command in metadata.Commands)
+                    {
+                        var zsoundName = command.TryGetValue("file", out var nameVal) ? nameVal as string : null;
+                        var zsoundFile = musicArchive.AudioSamples.FirstOrDefault(entry => entry.Name.Contains(zsoundName));
+
+                        if (zsoundFile != null)
+                        {
+                            byte[] sampleData = new byte[zsoundFile.Length];
+                            zsoundFile.Open().Read(sampleData, 0, sampleData.Length);
+
+                            var zsoundType = command.TryGetValue("type", out var typeVal) ? typeVal as string : null;
+                            var zsoundIndex = command.TryGetValue("index", out var indexVal) ? indexVal as int? : null;
+                            var zsoundKeyRegion = command.TryGetValue("key region", out var regionVal) ? regionVal as string : null;
+                            var zsoundTempAddr = command.TryGetValue("temp addr", out var markerVal) ? markerVal as uint? : null;
+
+                            samplesList.Add(
+                                new SequenceSoundSampleBinaryData()
+                                {
+                                    BinaryData = sampleData,
+                                    Addr = zsoundTempAddr ?? 0,
+                                    Marker = zsoundTempAddr ?? 0,
+                                    Hash = BitConverter.ToInt64(md5lib.ComputeHash(sampleData), 0),
+
+                                    // Store the new type if available
+                                    ParentFile = currentSong.Name,
+                                    InstrumentType = zsoundType,
+                                    ListIndex = zsoundIndex ?? -1,
+                                    KeyRegion = zsoundKeyRegion,
+                                }
+                            );
+                        }
+                    }
+
+                    currentSong.InstrumentSamples = samplesList;
+                    currentSong.SequenceBinaryList = new List<SequenceBinaryData>();
+
+                    ReadMusicSequence(currentSong, musicArchive, metadata);
+
+                    if (currentSong != null && currentSong.SequenceBinaryList != null)
+                    {
+                        RomData.SequenceList.Add(currentSong);
+                    }
                 }
-                catch (Exception e)
-                {
-                    Debug.WriteLine($"ScanForMMRS Error: An exception occured when attempting to read archive ('{Path.GetFileNameWithoutExtension(filePath)}'): {e}");
-                }
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine($"ProcessCustomMusicFile Error: An exception occured when attempting to read archive ('{Path.GetFileNameWithoutExtension(filePath)}'): {e}");
             }
         }
 
@@ -1688,8 +1840,16 @@ namespace MMR.Randomizer.Utils
                             Array.Reverse(newAddressBytes); // Ensure the byte[] is big endian so indices aren't reversed
 
                         // Parse the audiobank binary to find the sample address offsets
-                        AudiobankUtils.Audiobank instrumentBank = new(instrumentset.BankMetaData, instrumentset.BankBinary);
-
+                        AudiobankUtils.Audiobank instrumentBank = null;
+                        try
+                        {
+                            instrumentBank = new(instrumentset.BankMetaData, instrumentset.BankBinary, null, null);
+                        }
+                        catch (Exception e)
+                        {
+                            Debug.WriteLine(e);
+                        }
+                        
                         uint sampleBankAddress = 0;
                         if (sample.InstrumentType != null && sample.ListIndex != -1 && sample.Marker == 0) // Key region can be null
                         {
@@ -1845,7 +2005,7 @@ namespace MMR.Randomizer.Utils
             audiobankFile.End = audiobankFile.Addr + audiobankFile.Data.Length;
         }
 
-        private class MMRSArchiveContents
+        private class MusicArchiveContents
         {
             // Intermediary class to store files contained in the music file archive
             public ZipArchiveEntry MetaFile { get; set; }
@@ -1857,9 +2017,10 @@ namespace MMR.Randomizer.Utils
             public List<ZipArchiveEntry> AudioSamples { get; set; } = new();
         }
 
-        private class MMRSMetadata
+        private class MusicMetadata
         {
             // Intermediary class to store metadata information from the META file
+            public string Game {  get; set; }
             public string CosmeticName { get; set; }
             public string InstrumentSet { get; set; }
             public string SongType { get; set; }
