@@ -1,11 +1,14 @@
 using System;
 using System.Buffers.Binary;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace MMR.Randomizer.Utils
 {
     public class AudiobankUtils
     {
+        // Parses through a binary instrument bank (.zbank, decompressed) file and stores data
+
         public enum AudioSampleCodec : int
         {
             CODEC_ADPCM,
@@ -23,7 +26,6 @@ namespace MMR.Randomizer.Utils
             MEDIUM_CART,
             MEDIUM_DISK_DRIVE
         }
-        // Parses through a binary instrument bank (.zbank, decompressed) file and stores data
 
         public interface ISample
         {
@@ -172,7 +174,7 @@ namespace MMR.Randomizer.Utils
                 {
                     uint offset = drumListAddr + (uint)(4 * i);
                     offset = BinaryPrimitives.ReadUInt32BigEndian(BankData.AsSpan((int)offset, 4));
-                    Drum drum = offset != 0 ? new Drum(i, BankData, audiotableFile, audiotableIndex, (int)offset, AudiotableId) : null;
+                    Drum drum = offset != 0 ? new Drum(i, BankData, audiotableFile, audiotableIndex, (int)offset, AudiotableId) : null; // Maybe just leave 0...
                     Drums.Add(drum);
                 }
 
@@ -181,7 +183,7 @@ namespace MMR.Randomizer.Utils
                 for (int i = 0; i < NumEffects; i++)
                 {
                     uint offset = effectListAddr + (uint)(8 * i);
-                    Effect effect = offset != 0 ? new Effect(i, BankData, audiotableFile, audiotableIndex, (int)offset, AudiotableId) : null;
+                    Effect effect = offset != 0 ? new Effect(i, BankData, audiotableFile, audiotableIndex, (int)offset, AudiotableId) : null; // Maybe just leave 0...
                     Effects.Add(effect);
                 }
 
@@ -336,7 +338,8 @@ namespace MMR.Randomizer.Utils
                 SampleTuning = BinaryPrimitives.ReadSingleBigEndian(bankData.AsSpan(sampleOffset + 4, 4));
 
                 // Unsure if this also crashes the audio engine, but it should never be 0 nonetheless...
-                Sample = SampleAddress != 0 ? new Sample<Effect>(bankData, audiotable, audiotableIndex, SampleAddress, audiotableId, this) : throw new Exception($"Effect Instantiation Error: Effect sample address is 0x00000000 for audiobank, audio engine will crash!");
+                //Sample = SampleAddress != 0 ? new Sample<Effect>(bankData, audiotable, audiotableIndex, SampleAddress, audiotableId, this) : throw new Exception($"Effect Instantiation Error: Effect sample address is 0x00000000 for audiobank, audio engine will crash!");
+                Sample = new Sample<Effect>(bankData, audiotable, audiotableIndex, SampleAddress, audiotableId, this);
             }
         }
 
