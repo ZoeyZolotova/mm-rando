@@ -875,7 +875,7 @@ namespace MMR.Randomizer.Utils
 
                     var metadata = ReadMusicMetaYaml(currentSong.Name, musicArchive.MetaFile);
 
-                    if (metadata.Game == "oot" || Path.GetExtension(filePath).ToLower() == ".ootrs")
+                    if ((metadata.Game == "oot" && Path.GetExtension(filePath).ToLower() != ".mmrs") || Path.GetExtension(filePath).ToLower() == ".ootrs")
                         LoadOOTAudiobin();
 
                     currentSong.Game = metadata.Game;
