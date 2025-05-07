@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.IO;
 using MMR.Randomizer.Constants;
 
@@ -10,6 +10,7 @@ namespace MMR.Randomizer.Models.Rom
     {
         public string Name { get; set; }
         public string DisplayName { get; set; }
+        public string Game {  get; set; }
         public string Directory { get; set; } = Values.MusicDirectory;
         public string Filename => Path.Combine(Directory, Name);
         public int Replaces { get; set; } = -1;
@@ -28,18 +29,18 @@ namespace MMR.Randomizer.Models.Rom
 
             // get list of banks that: their slot has not been modified, or their bank is already used by another song and can be reused
             this.SequenceBinaryList = this.SequenceBinaryList.FindAll(u => u.InstrumentSet == null
-                                                                  || (RomData.InstrumentSetList[u.InstrumentSet.BankSlot].Modified == 0
-                                                                  || (u.InstrumentSet.Hash != 0
-                                                                  && u.InstrumentSet.Hash == RomData.InstrumentSetList[u.InstrumentSet.BankSlot].Hash)));
+                                                                        || (RomData.InstrumentSetList[u.InstrumentSet.BankSlot].Modified == 0
+                                                                        || (u.InstrumentSet.Hash != 0
+                                                                        && u.InstrumentSet.Hash == RomData.InstrumentSetList[u.InstrumentSet.BankSlot].Hash)));
         }
 
         public bool CheckAvailableBanks()
         {
             // get list of banks that: their slot has not been modified, or their bank is already used by another song and can be reused
             var banks = this.SequenceBinaryList.FindAll(u => u.InstrumentSet == null
-                                                                  || (RomData.InstrumentSetList[u.InstrumentSet.BankSlot].Modified == 0
-                                                                  || (u.InstrumentSet.Hash != 0
-                                                                  && u.InstrumentSet.Hash == RomData.InstrumentSetList[u.InstrumentSet.BankSlot].Hash)));
+                                                          || (RomData.InstrumentSetList[u.InstrumentSet.BankSlot].Modified == 0
+                                                          || (u.InstrumentSet.Hash != 0
+                                                          && u.InstrumentSet.Hash == RomData.InstrumentSetList[u.InstrumentSet.BankSlot].Hash)));
             if (banks.Count == 0)
             {
                 return false;
