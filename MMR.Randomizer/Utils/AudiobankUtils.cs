@@ -6,6 +6,23 @@ namespace MMR.Randomizer.Utils
 {
     public class AudiobankUtils
     {
+        public enum AudioSampleCodec : int
+        {
+            CODEC_ADPCM,
+            CODEC_S8,
+            CODEC_S16_INMEM,
+            CODEC_SMALL_ADPCM,
+            CODEC_REVERB,
+            CODEC_S16
+        }
+
+        public enum AudioStorageMedium: int
+        {
+            MEDIUM_RAM,
+            MEDIUM_UNK,
+            MEDIUM_CART,
+            MEDIUM_DISK_DRIVE
+        }
         // Parses through a binary instrument bank (.zbank, decompressed) file and stores data
 
         public interface ISample
@@ -33,12 +50,12 @@ namespace MMR.Randomizer.Utils
                 Audiotable = audiotable;
                 AudiotableIndex = audiotableIndex;
 
-                var numBanks = BinaryPrimitives.ReadUInt16BigEndian(audiobankIndex.AsSpan(0, 2));
+                var numBanks = BinaryPrimitives.ReadUInt16BigEndian(AudiobankIndex.AsSpan(0, 2));
                 for (int i = 0; i < numBanks; i++)
                 {
                     int index = 0x10 + (0x10 * i);
                     byte[] currentEntry = new byte[0x10];
-                    Array.Copy(audiobankIndex, index, currentEntry, 0, 0x10);
+                    Array.Copy(AudiobankIndex, index, currentEntry, 0, 0x10);
                     var audiobank = new Audiobank(currentEntry, AudiobankTable, Audiotable, AudiotableIndex);
                     Audiobanks.Add(audiobank);
                 }
@@ -101,7 +118,6 @@ namespace MMR.Randomizer.Utils
                 switch (tableEntry.Length)
                 {
                     case 0x08: // 8 Bytes (.bankmeta): [Sample Medium, Sequence Player, Audiotable, ID, Num Inst, Num Drum, Num Effect MSB, Num Effect LSB]
-                        if (tableEntry.Length < 8) throw new Exception("tableEntry is too small for .bankmeta 8 bytes");
                         BankOffset = 0;
                         BankLength = 0;
                         SampleMedium = tableEntry[0];
@@ -116,7 +132,6 @@ namespace MMR.Randomizer.Utils
                         break;
 
                     case 0x10: // 16 Bytes: [Address, Length, Sample Medium, Sequence Player, Audiotable, ID, Num Inst, Num Drum, Num Effect MSB, Num Effect LSB]
-                        if (tableEntry.Length < 16) throw new Exception("tableEntry is too small for .bankmeta 16 bytes");
                         BankOffset = BinaryPrimitives.ReadUInt32BigEndian(tableEntry.AsSpan(0, 4));
                         BankLength = BinaryPrimitives.ReadUInt32BigEndian(tableEntry.AsSpan(4, 4));
                         SampleMedium = tableEntry[8];
@@ -226,8 +241,11 @@ namespace MMR.Randomizer.Utils
             public TParent Parent;
             public uint BankOffset {  get; set; }
             public byte[] SampleHeader { get; set; }
-            public int Codec {  get; set; }
-            public int Medium {  get; set; }
+            public uint Unk0 { get; set; }
+            public AudioSampleCodec Codec {  get; set; }
+            public AudioStorageMedium Medium {  get; set; }
+            public bool IsCached { get; set; }
+            public bool IsRelocated { get; set; }
             public uint Size { get; set; }
             public uint? Address {  get; set; }
             public uint? AudiotableAddress { get; set; }
@@ -242,9 +260,14 @@ namespace MMR.Randomizer.Utils
                 Array.Copy(bankData, sampleOffset, sampleHeader, 0, 0x10);
                 SampleHeader = sampleHeader;
 
-                Codec = (sampleHeader[0] & 0xF0) >> 4;
-                Medium = (sampleHeader[0] & 0x0C) >> 2;
-                Size = BinaryPrimitives.ReadUInt32BigEndian(sampleHeader.AsSpan(1, 4));
+                uint bits = BinaryPrimitives.ReadUInt32BigEndian(sampleHeader.AsSpan(0, 4));
+
+                Unk0 = (bits >> 31) & 0b1;
+                Codec = (AudioSampleCodec)((bits >> 28) & 0b111);
+                Medium = (AudioStorageMedium)((bits >> 26) & 0b11);
+                IsCached = ((bits >> 25) & 1) != 0;
+                IsRelocated = ((bits >> 24) & 1) != 0;
+                Size = bits & 0b111111111111111111111111;
                 Address = BinaryPrimitives.ReadUInt32BigEndian(sampleHeader.AsSpan(4, 4));
 
                 // Read the sample data from the audiotable
