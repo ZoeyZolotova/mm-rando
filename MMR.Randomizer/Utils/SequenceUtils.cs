@@ -216,7 +216,6 @@ namespace MMR.Randomizer.Utils
                         SequenceInfo targetSequence = new()
                         {
                             Name = seqName,
-                            Game = "mm",
                             DisplayName = seqData.DisplayName ?? seqName,
                             Categories = seqCategories,
                             Instrument = seqInstrument,
@@ -225,7 +224,6 @@ namespace MMR.Randomizer.Utils
                         SequenceInfo sourceSequence = new()
                         {
                             Name = seqName,
-                            Game = "mm",
                             DisplayName = seqData.DisplayName ?? seqName,
                             Categories = seqCategories,
                             Instrument = seqInstrument,
@@ -1501,7 +1499,7 @@ namespace MMR.Randomizer.Utils
             replacementSequence.Replaces = slotSequence.Replaces; // Determines what song will be placed in slot_seq later
 
             // -40 and +10 pad the text to align in the same middle area for visual clarity
-            log.AppendLine($"{slotSequence.Name,-40} {debugString,+10} -> " + $"{replacementSequence.Name} ({replacementSequence.Game.ToUpper()}");
+            log.AppendLine($"{slotSequence.Name,-40} {debugString,+10} -> " + $"{replacementSequence.Name} {(replacementSequence.Game != null ? $"({replacementSequence.Game.ToUpper()})" : "")}");
             remainingSequences.Remove(replacementSequence);
         }
 
