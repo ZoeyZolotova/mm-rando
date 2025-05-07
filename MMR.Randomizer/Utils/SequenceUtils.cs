@@ -216,6 +216,7 @@ namespace MMR.Randomizer.Utils
                         SequenceInfo targetSequence = new()
                         {
                             Name = seqName,
+                            Game = "mm",
                             DisplayName = seqData.DisplayName ?? seqName,
                             Categories = seqCategories,
                             Instrument = seqInstrument,
@@ -224,6 +225,7 @@ namespace MMR.Randomizer.Utils
                         SequenceInfo sourceSequence = new()
                         {
                             Name = seqName,
+                            Game = "mm",
                             DisplayName = seqData.DisplayName ?? seqName,
                             Categories = seqCategories,
                             Instrument = seqInstrument,
@@ -417,7 +419,6 @@ namespace MMR.Randomizer.Utils
                             //break;
 
                         default:
-                            Debug.WriteLine("PROCESSING OOTRS");
                             int offset = 0x10 + (song.Instrument * 0x10);
                             byte[] bankmeta = new byte[0x10];
                             Array.Copy(OOT_AUDIOBIN.AudiobankIndex, offset, bankmeta, 0, 0x10);
@@ -463,7 +464,7 @@ namespace MMR.Randomizer.Utils
                 }
             }
 
-                return false; // The music file does not use a custom bank
+            return false; // The music file does not use a custom bank
         }
 
         private static void ReadMusicFormmask(SequenceBinaryData combo, ZipArchiveEntry formmaskFile, SequencePlayState[] formmaskMetaArray = null)
@@ -770,7 +771,7 @@ namespace MMR.Randomizer.Utils
             //   - Instrument bank file (.zbank)
             //   - Instrument bank metadata file (.bankmeta)
             //   - Custom audio sample file (.zsound)
-            //   - Formmask array file (.formmask)
+            //   - Formmask array file (.formmask; may be present in .meta file)
             //
             // Only one file for each file type is allowed except custom audio sample files
             // an instrument bank may contain multiple sounds, so multiple may be required
@@ -874,7 +875,7 @@ namespace MMR.Randomizer.Utils
 
                     var metadata = ReadMusicMetaYaml(currentSong.Name, musicArchive.MetaFile);
 
-                    if (metadata.Game == "oot")
+                    if (metadata.Game == "oot" || Path.GetExtension(filePath).ToLower() == ".ootrs")
                         LoadOOTAudiobin();
 
                     currentSong.Game = metadata.Game;
@@ -1500,7 +1501,7 @@ namespace MMR.Randomizer.Utils
             replacementSequence.Replaces = slotSequence.Replaces; // Determines what song will be placed in slot_seq later
 
             // -40 and +10 pad the text to align in the same middle area for visual clarity
-            log.AppendLine($"{slotSequence.Name,-40} {debugString,+10} -> " + replacementSequence.Name);
+            log.AppendLine($"{slotSequence.Name,-40} {debugString,+10} -> " + $"{replacementSequence.Name} ({replacementSequence.Game.ToUpper()}");
             remainingSequences.Remove(replacementSequence);
         }
 
