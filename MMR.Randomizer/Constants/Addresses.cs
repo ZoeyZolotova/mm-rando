@@ -1,4 +1,4 @@
-﻿namespace MMR.Randomizer.Constants
+namespace MMR.Randomizer.Constants
 {
     public static class Addresses
     {
@@ -13,5 +13,15 @@
         public const int AudiobankTable     = 0xC776D0; // audiobank index (c0 + 0x10)
         public const int Audiobank          = 0x020700;
         // TODO add audiobank and soundbank pointers
+
+        // Majora's Mask Audiobin
+        public const int AUDIOBANK_INDEX_ADDR    = 0x00C776C0;
+        public const int AUDIOBANK_INDEX_SIZE    = 0x000002A0;
+        public const int AUDIOBANK_ADDR          = 0x00020700;
+        public const int AUDIOBANK_SIZE          = 0x000263F0;
+        public const int AUDIOTABLE_INDEX_ADDR   = 0x00C78380;
+        public const int AUDIOTABLE_INDEX_SIZE   = 0x000002A0;
+        public const int AUDIOTABLE_ADDR         = 0x00097F70;
+        public const int AUDIOTABLE_SIZE         = 0x00548770;
     }
 }
