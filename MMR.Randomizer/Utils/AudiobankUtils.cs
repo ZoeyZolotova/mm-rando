@@ -2,6 +2,7 @@ using System;
 using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 
 namespace MMR.Randomizer.Utils
 {
@@ -72,25 +73,25 @@ namespace MMR.Randomizer.Utils
                 {
                     foreach (var instrument in bank.Instruments)
                     {
-                        if (instrument?.LowSample?.Data == sampleData)
+                        if (instrument?.LowSample?.Data.SequenceEqual(sampleData) == true)
                             return instrument.LowSample;
 
-                        if (instrument?.PrimSample?.Data == sampleData)
+                        if (instrument?.PrimSample?.Data.SequenceEqual(sampleData) == true)
                             return instrument.PrimSample;
 
-                        if (instrument?.HighSample?.Data == sampleData)
+                        if (instrument?.HighSample?.Data.SequenceEqual(sampleData) == true)
                             return instrument.HighSample;
                     }
 
                     foreach (var drum in bank.Drums)
                     {
-                        if (drum?.Sample?.Data == sampleData)
+                        if (drum?.Sample?.Data.SequenceEqual(sampleData) == true)
                             return drum.Sample;
                     }
 
                     foreach (var effect in bank.Effects)
                     {
-                        if (effect?.Sample?.Data == sampleData)
+                        if (effect?.Sample?.Data.SequenceEqual(sampleData) == true)
                             return effect.Sample;
                     }
                 }
@@ -288,6 +289,14 @@ namespace MMR.Randomizer.Utils
                 Size = bits & 0b111111111111111111111111;
                 Address = BinaryPrimitives.ReadUInt32BigEndian(sampleHeader.AsSpan(4, 4));
 
+                // If the data is outside the audiotable, it does not exist
+                if (audiotable != null && Address > audiotable.Length)
+                {
+                    Data = null;
+                    Address = null;
+                    return;
+                }
+
                 // Read the sample data from the audiotable
                 if (audiotable != null && audiotableIndex != null)
                 {
@@ -302,6 +311,11 @@ namespace MMR.Randomizer.Utils
                     byte[] sampleData = new byte[Size];
                     Array.Copy(audiotable, (int)AudiotableAddress, sampleData, 0, Size);
                     Data = sampleData;
+                }
+                else // There was no audiotable
+                {
+                    Data = null;
+                    AudiotableAddress = null;
                 }
             }
         }
