@@ -279,6 +279,9 @@ namespace MMR.Randomizer.Utils
                 Array.Copy(bankData, sampleOffset, sampleHeader, 0, 0x10);
                 SampleHeader = sampleHeader;
 
+                // The first 4 bytes of the sample struct are a bitfield, the size is required
+                // when copying the data into a bytearray and is the last 24 bits of data,
+                // so the bitfield needs to be unpacked properly - not unpacking it properly will cause issues
                 uint bits = BinaryPrimitives.ReadUInt32BigEndian(sampleHeader.AsSpan(0, 4));
 
                 Unk0 = (bits >> 31) & 0b1;
@@ -288,6 +291,16 @@ namespace MMR.Randomizer.Utils
                 IsRelocated = ((bits >> 24) & 1) != 0;
                 Size = bits & 0b111111111111111111111111;
                 Address = BinaryPrimitives.ReadUInt32BigEndian(sampleHeader.AsSpan(4, 4));
+
+                if (Codec != AudioSampleCodec.CODEC_ADPCM && Codec != AudioSampleCodec.CODEC_SMALL_ADPCM)
+                    throw new InvalidOperationException($"AudiobankUtils Error: Expected Codec of 'CODEC_ADPCM' or 'CODEC_SMALL_ADPCM', but got '{Codec}' instead.");
+
+                if (Medium != AudioStorageMedium.MEDIUM_RAM)
+                    throw new InvalidOperationException($"AudiobankUtils Error: Expected Medium of 'MEDIUM_RAM', but got '{Medium}' instead.");
+
+                if (IsRelocated)
+                    throw new InvalidOperationException($"AudiobankUtils Error: Expected IsRelocated of 'false', but got '{IsRelocated}' instead.");
+
 
                 // If the data is outside the audiotable, it does not exist
                 if (audiotable != null && Address > audiotable.Length)
@@ -312,7 +325,7 @@ namespace MMR.Randomizer.Utils
                     Array.Copy(audiotable, (int)AudiotableAddress, sampleData, 0, Size);
                     Data = sampleData;
                 }
-                else // There was no audiotable
+                else // There was no audiotable, so we can't get the data
                 {
                     Data = null;
                     AudiotableAddress = null;
