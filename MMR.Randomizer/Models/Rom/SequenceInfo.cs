@@ -10,9 +10,10 @@ namespace MMR.Randomizer.Models.Rom
     {
         public string Name { get; set; }
         public string DisplayName { get; set; }
-        public string Game {  get; set; }
+        public string Game { get; set; }
         public string Directory { get; set; } = Values.MusicDirectory;
         public string Filename => Path.Combine(Directory, Name);
+        public string Filepath { get; set; } // For music cache
         public int Replaces { get; set; } = -1;
         public int SeqId { get; set; } = -1; // MM_seq -> SeqId
         public List<int> Categories { get; set; } = new List<int>();
