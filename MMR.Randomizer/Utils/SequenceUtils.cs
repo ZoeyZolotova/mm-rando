@@ -813,13 +813,11 @@ namespace MMR.Randomizer.Utils
                         case ".mmrs":
                             //LoadMMAudiobin(); // Debug
                             ProcessCustomMusicFile(filePath);
-                            updatedHashes[filePath] = hash;
                             break;
 
                         case ".ootrs":
                             LoadOOTAudiobin(); // Load the OOT audio binary because an OOTR file was found
                             ProcessCustomMusicFile(filePath);
-                            updatedHashes[filePath] = hash;
                             break;
 
                         // Standalone sequences are a legacy format, they should have been converted, but double check
@@ -830,6 +828,16 @@ namespace MMR.Randomizer.Utils
                         default:
                             break;
                     }
+                }
+
+                // Only add hashes for custom music files
+                switch (extension) {
+                    default:
+                        break;
+
+                    case ".mmrs":
+                    case ".ootrs":
+                        updatedHashes[filePath] = hash;
                 }
             }
         }
