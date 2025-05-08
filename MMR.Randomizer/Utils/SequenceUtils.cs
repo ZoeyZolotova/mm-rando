@@ -343,6 +343,65 @@ namespace MMR.Randomizer.Utils
             throw new Exception("GetSequenceSize Error: Sequence File is missing");
         }
 
+        private static byte[] ProcessOOTSampleData(SequenceInfo song, byte[] bankData, byte[] bankmetaData)
+        {
+            // Processes samples in an OOT bank and fixes sample offsets if the sample matches vanilla data
+            // If the sample doesn't match, then add it as a zsound
+
+            var newBank = new AudiobankUtils.Audiobank(bankmetaData, bankData, OOT_AUDIOBIN.Audiotable, OOT_AUDIOBIN.AudiotableIndex);
+            var samples = newBank.GetBankSamples();//.Where(s => s.Data != null).ToList();
+
+            foreach (var s in samples)
+            {
+                // Search the MM audio binary for data that matches the current sample's data
+                // If the data matches, instead of creating a sound to inject, update the address
+                // to the MM sample's address
+                var matched = MM_AUDIOBIN.FindSampleInBanks(s.Data);
+                if (matched.Address != null)
+                {
+                    // Addresses in vanilla shouldn't be above 0x7FFFFFFF, but keep uint just in case
+                    byte[] matchedBytes = BitConverter.GetBytes((uint)matched.Address); 
+                    if (BitConverter.IsLittleEndian)
+                        Array.Reverse(matchedBytes);
+
+                    var thing = matchedBytes;
+
+                    // Update the address to the matched sample's address
+                    for (int i = 0; i < 4; i++)
+                    {
+                        // The sample struct starts with a 32-bit bitfield, so the sample address is 4 bytes later
+                        newBank.BankData[s.BankOffset + i + 4] = matchedBytes[i];
+                    }
+                }
+                else // There was no MM match
+                {
+                    // Ensure the hash of the current sample doesn't match the hash of previously added samples
+                    long sampleHash = BitConverter.ToInt64(md5lib.ComputeHash(s.Data), 0);
+                    if (!song.InstrumentSamples.Any(e => e.Hash == sampleHash))
+                    {
+                        // Create a new sample to inject
+                        song.InstrumentSamples.Add(
+                            new SequenceSoundSampleBinaryData()
+                            {
+                                BinaryData = s.Data,
+                                Addr = s.Address ?? 0,
+                                Marker = 0,//s.Address ?? 0,
+                                Hash = sampleHash,
+
+                                // Use new format
+                                ParentFile = song.Name,
+                                InstrumentType = s.ParentString,//null,
+                                ListIndex = s.ParentId,//-1,
+                                KeyRegion = s.KeyRegion,//null,
+                            }
+                        );
+                    }
+                }
+            }
+
+            return newBank.BankData;
+        }
+
         private static bool ReadMusicInstrumentBank(SequenceInfo song, SequenceBinaryData combo, ZipArchiveEntry bankFile, ZipArchiveEntry bankmetaFile)
         {
             // Instrument bank files are a binary file with the ".zbank" extension, they're paired with a binary metadata file with the ".bankmeta" extension
@@ -370,6 +429,14 @@ namespace MMR.Randomizer.Utils
                 using var bankStream = bankFile.Open();
                 bankStream.Read(bankData, 0, bankData.Length);
 
+                // If the game set in the metadata is OOT, then match OOT sample data to MM sample data
+                // and update the addresses or add the sample as a custom audio sample
+                if (song.Game == "oot")
+                    bankData = ProcessOOTSampleData(song, bankData, bankmetaData);
+
+                // The audiotable should be 1, and the audiobin should correct all sample data to use AT1
+                bankmetaData[0x02] = 1;
+
                 combo.InstrumentSet = new InstrumentSetInfo()
                 {
                     BankBinary = bankData,
@@ -379,95 +446,29 @@ namespace MMR.Randomizer.Utils
                     Hash = BitConverter.ToInt64(md5lib.ComputeHash(bankData), 0),
                 };
 
-                // If the file is an OOTRS file, we need to extract OOT samples for injection
-                // Not gonna bother fixing offsets to samples that already exist in MM right now
-                if (song.Game == "oot")
-                {
-                    // Add 8 empty bytes to the bankmeta so the bank searches at address 0 for the bankdata
-                    var customOOTBank = new AudiobankUtils.Audiobank(bankmetaData, bankData, null, null);
-                    var ootSamples = customOOTBank.GetBankSamples();
-
-                    foreach (var s in ootSamples)
-                    {
-                        // Make sure already added samples don't get added again, just in case
-                        long sampleHash = BitConverter.ToInt64(md5lib.ComputeHash(s.Data), 0);
-                        if (!song.InstrumentSamples.Any(e => e.Hash == sampleHash))
-                        {
-                            song.InstrumentSamples.Add(
-                                new SequenceSoundSampleBinaryData()
-                                {
-                                    BinaryData = s.Data,
-                                    Addr = s.Address ?? 0,
-                                    Marker = 0,//s.Address ?? 0,
-                                    Hash = sampleHash,
-
-                                    // Use new format
-                                    ParentFile = song.Name,
-                                    InstrumentType = s.ParentString,//null,
-                                    ListIndex = s.ParentId,//-1,
-                                    KeyRegion = s.KeyRegion,//null,
-                                }
-                            );
-                        }
-                    }
-                }
-
-                return true; // The music file uses a custom bank
+                return true;
             }
-            else if (song.Game == "oot") // OOTRS files will need a custom bank, so create one
+            else if (song.Game == "oot" && song.Instrument < 0x25)
             {
-                // The bank is vanilla; thankfully MM has 0x28 banks
-                if (song.Instrument < 0x25)
+                int offset = 0x10 + (song.Instrument * 0x10); // The audiobank index's first line is the number of banks, so skip the first line
+                byte[] bankmeta = new byte[0x10];
+                Array.Copy(OOT_AUDIOBIN.AudiobankIndex, offset, bankmeta, 0, 0x10);
+
+                var vanillaOOTBank = new AudiobankUtils.Audiobank(bankmeta, OOT_AUDIOBIN.AudiobankTable, OOT_AUDIOBIN.Audiotable, OOT_AUDIOBIN.AudiotableIndex);
+                vanillaOOTBank.Bankmeta[0x02] = 1; // Set the to audiotable to 1
+
+                var bankData = ProcessOOTSampleData(song, vanillaOOTBank.BankData, vanillaOOTBank.Bankmeta);
+
+                combo.InstrumentSet = new InstrumentSetInfo()
                 {
-                    switch (song.Instrument)
-                    {
-                        //case 0x03:
-                            //break;
+                    BankBinary = bankData,
+                    BankSlot = REQUIRES_NEW_BANK,
+                    BankMetaData = vanillaOOTBank.Bankmeta,
+                    Modified = 1,
+                    Hash = BitConverter.ToInt64(md5lib.ComputeHash(bankData), 0),
+                };
 
-                        default:
-                            int offset = 0x10 + (song.Instrument * 0x10);
-                            byte[] bankmeta = new byte[0x10];
-                            Array.Copy(OOT_AUDIOBIN.AudiobankIndex, offset, bankmeta, 0, 0x10);
-
-                            var vanillaOOTBank = new AudiobankUtils.Audiobank(bankmeta, OOT_AUDIOBIN.AudiobankTable, OOT_AUDIOBIN.Audiotable, OOT_AUDIOBIN.AudiotableIndex);
-                            vanillaOOTBank.Bankmeta[0x02] = 1; // Set to audiotable 1
-
-                            combo.InstrumentSet = new InstrumentSetInfo()
-                            {
-                                BankBinary = vanillaOOTBank.BankData,
-                                BankSlot = REQUIRES_NEW_BANK,
-                                BankMetaData = vanillaOOTBank.Bankmeta,
-                                Modified = 1,
-                                Hash = BitConverter.ToInt64(md5lib.ComputeHash(vanillaOOTBank.BankData), 0),
-                            };
-
-                            var ootSamples = vanillaOOTBank.GetBankSamples();
-                            foreach (var s in ootSamples)
-                            {
-                                // Make sure already added samples don't get added again, just in case
-                                long sampleHash = BitConverter.ToInt64(md5lib.ComputeHash(s.Data), 0);
-                                if (!song.InstrumentSamples.Any(e => e.Hash == sampleHash))
-                                {
-                                    song.InstrumentSamples.Add(
-                                        new SequenceSoundSampleBinaryData()
-                                        {
-                                            BinaryData = s.Data,
-                                            Addr = s.Address ?? 0,
-                                            Marker = 0,//s.Address ?? 0,
-                                            Hash = sampleHash,
-
-                                            // Use new format
-                                            ParentFile = song.Name,
-                                            InstrumentType = s.ParentString,//null,
-                                            ListIndex = s.ParentId,//-1,
-                                            KeyRegion = s.KeyRegion,//null,
-                                        }
-                                    );
-                                }
-                            }
-                            break;
-                    }
-                }
+                return true;
             }
 
             return false; // The music file does not use a custom bank
@@ -742,10 +743,10 @@ namespace MMR.Randomizer.Utils
             byte[] mmAudiotable = RomData.MMFileList[5].Data;
             byte[] mmAudiotableIndex = new byte[Addresses.AUDIOTABLE_INDEX_SIZE];
 
-            byte[] code = RomData.MMFileList[31].Data;
+            byte[] mmCode = RomData.MMFileList[31].Data;
 
-            Array.Copy(code, Addresses.AUDIOBANK_INDEX_ADDR - Addresses.CODE_ADDR, mmAudiobankIndex, 0, Addresses.AUDIOBANK_INDEX_SIZE);
-            Array.Copy(code, Addresses.AUDIOTABLE_INDEX_ADDR - Addresses.CODE_ADDR, mmAudiotableIndex, 0, Addresses.AUDIOTABLE_INDEX_SIZE);
+            Array.Copy(mmCode, Addresses.AUDIOBANK_INDEX_ADDR - Addresses.CODE_ADDR, mmAudiobankIndex, 0, Addresses.AUDIOBANK_INDEX_SIZE);
+            Array.Copy(mmCode, Addresses.AUDIOTABLE_INDEX_ADDR - Addresses.CODE_ADDR, mmAudiotableIndex, 0, Addresses.AUDIOTABLE_INDEX_SIZE);
 
             MM_AUDIOBIN = new AudiobankUtils.Audiobin(mmAudiobank, mmAudiobankIndex, mmAudiotable, mmAudiotableIndex);
         }
@@ -768,21 +769,28 @@ namespace MMR.Randomizer.Utils
                 { "Audiotable_index", data => ootAudiotableIndex = data }
             };
 
-            using (ZipArchive archive = ZipFile.OpenRead(OOT_AUDIOBIN_PATH))
+            try
             {
-                foreach (var entry in archive.Entries)
+                using (ZipArchive archive = ZipFile.OpenRead(OOT_AUDIOBIN_PATH))
                 {
-                    if (binHandler.TryGetValue(entry.Name, out var action))
+                    foreach (var entry in archive.Entries)
                     {
-                        byte[] data = new byte[entry.Length];
-                        using var stream = entry.Open();
-                        stream.Read(data, 0, (int)entry.Length);
-                        action(data);
+                        if (binHandler.TryGetValue(entry.Name, out var action))
+                        {
+                            byte[] data = new byte[entry.Length];
+                            using var stream = entry.Open();
+                            stream.Read(data, 0, (int)entry.Length);
+                            action(data);
+                        }
                     }
                 }
-            }
 
-            OOT_AUDIOBIN = new AudiobankUtils.Audiobin(ootAudiobank, ootAudiobankIndex, ootAudiotable, ootAudiotableIndex);
+                OOT_AUDIOBIN = new AudiobankUtils.Audiobin(ootAudiobank, ootAudiobankIndex, ootAudiotable, ootAudiotableIndex);
+            }
+            catch (FileNotFoundException)
+            {
+                throw new Exception($"LoadOOTAudiobin Error: ScanForCustomMusicFiles found an OOTR music file, but could not find the Ocarina of Time audio binary ('OOT.audiobin') in the root directory of the music folder.");
+            }
         }
 
         public static void ScanForCustomMusicFiles(string directory, Dictionary<string, string> cachedhHashes, Dictionary<string, string> updatedHashes)
@@ -811,12 +819,11 @@ namespace MMR.Randomizer.Utils
                     switch (extension)
                     {
                         case ".mmrs":
-                            //LoadMMAudiobin(); // Debug
-                            ProcessCustomMusicFile(filePath);
-                            break;
-
                         case ".ootrs":
-                            LoadOOTAudiobin(); // Load the OOT audio binary because an OOTR file was found
+                            if (extension == ".ootrs")
+                            {
+                                LoadOOTAudiobin(); // We need the OOT audiobin loaded if the file is OOTRS
+                            } 
                             ProcessCustomMusicFile(filePath);
                             break;
 
@@ -830,8 +837,9 @@ namespace MMR.Randomizer.Utils
                     }
                 }
 
-                // Only add hashes for custom music files
-                switch (extension) {
+                // Make sure the hash gets added so the cache is properly updated later
+                switch (extension)
+                {
                     default:
                         break;
 
@@ -860,7 +868,7 @@ namespace MMR.Randomizer.Utils
                                 return;
 
                             setter(entry);
-                            };
+                        };
                     }
 
                     var handlers = new Dictionary<string, Action<ZipArchiveEntry>>(StringComparer.OrdinalIgnoreCase)
@@ -924,7 +932,7 @@ namespace MMR.Randomizer.Utils
                     currentSong.Categories = metadata.Categories;
 
                     // Handle custom audio samples
-                    var samplesList = new List<SequenceSoundSampleBinaryData>();
+                    List<SequenceSoundSampleBinaryData> samplesList = new();
                     foreach (var command in metadata.Commands)
                     {
                         var zsoundName = command.TryGetValue("file", out var nameVal) ? nameVal as string : null;
@@ -1334,6 +1342,10 @@ namespace MMR.Randomizer.Utils
 
         public static void MoveAudioBankTable()
         {
+            // Store a copy of the audiobin before it gets moved if it wasn't already created
+            if (MM_AUDIOBIN == null)
+                LoadMMAudiobin();
+
             // Grab original AudioBankTable out of code, plus extra for modifying
             var table = ReadWriteUtils.ReadBytes(0xB3C000 + 0x13B6C0, 0x820);
             // Move to unused fbdemo.c (0x80163DC0)
