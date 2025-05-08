@@ -292,6 +292,7 @@ namespace MMR.Randomizer.Utils
                 Size = bits & 0b111111111111111111111111;
                 Address = BinaryPrimitives.ReadUInt32BigEndian(sampleHeader.AsSpan(4, 4));
 
+                // Samples should always be ADPCM or small ADPCM, using RAM, and not be relocated
                 if (Codec != AudioSampleCodec.CODEC_ADPCM && Codec != AudioSampleCodec.CODEC_SMALL_ADPCM)
                     throw new InvalidOperationException($"AudiobankUtils Error: Expected Codec of 'CODEC_ADPCM' or 'CODEC_SMALL_ADPCM', but got '{Codec}' instead.");
 
@@ -300,7 +301,6 @@ namespace MMR.Randomizer.Utils
 
                 if (IsRelocated)
                     throw new InvalidOperationException($"AudiobankUtils Error: Expected IsRelocated of 'false', but got '{IsRelocated}' instead.");
-
 
                 // If the data is outside the audiotable, it does not exist
                 if (audiotable != null && Address > audiotable.Length)
