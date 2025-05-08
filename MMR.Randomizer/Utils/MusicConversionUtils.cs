@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Globalization;
 using MMR.Common.Utils;
+using System.Threading.Tasks;
 
 namespace MMR.Randomizer.Utils
 {
@@ -54,19 +55,59 @@ namespace MMR.Randomizer.Utils
             // backs up the music folder into a zip file with the .old extension
             // all the files are copied, but one can never be too careful
 
-            string folderName = Path.GetFileName(folder);
             string tempZipFolder = Path.Combine(Path.GetTempPath(), $"mmr_music_folder_{Guid.NewGuid()}");
             string finalBackupPath = Path.Combine(folder, $"music.old");
 
-            if (File.Exists(finalBackupPath))
-                File.Delete(finalBackupPath);
+            try
+            {
+                if (File.Exists(finalBackupPath))
+                    File.Delete(finalBackupPath);
 
-            ZipFile.CreateFromDirectory(folder, tempZipFolder, CompressionLevel.Optimal, includeBaseDirectory: false);
+                ZipFile.CreateFromDirectory(folder, tempZipFolder, CompressionLevel.Optimal, includeBaseDirectory: false);
             
-            File.Move(tempZipFolder, finalBackupPath);
+                File.Move(tempZipFolder, finalBackupPath);
+            }
+            catch
+            {
+                //
+            }
+            finally
+            {
+                if (Directory.Exists(tempZipFolder))
+                    Directory.Delete(tempZipFolder);
+            }
+        }
 
-            if (Directory.Exists(tempZipFolder))
-                Directory.Delete(tempZipFolder);
+        public static void CheckForOldFiles(string baseFolder)
+        {
+            if (OLD_MUSIC_FILES.Any())
+                OLD_MUSIC_FILES.Clear(); // Clear out the list if it's populated
+
+            // These are the only files that need to be checked
+            var zseqFiles = Directory.GetFiles(baseFolder, "*.zseq", SearchOption.AllDirectories);
+            var mmrsFiles = Directory.GetFiles(baseFolder, "*.mmrs", SearchOption.AllDirectories);
+            var seqsFile = Directory.GetFiles(baseFolder, "SEQS.txt", SearchOption.AllDirectories).FirstOrDefault();
+
+            bool seqsTxtFound = seqsFile != null;
+
+            foreach (var f in zseqFiles)
+            {
+                OLD_MUSIC_FILES.Add(f);
+            }
+
+            foreach (var f in mmrsFiles)
+            {
+                using ZipArchive zip = ZipFile.OpenRead(f);
+                bool hasCategoriesTxt = zip.Entries.Any(e => e.FullName.Equals("categories.txt", StringComparison.OrdinalIgnoreCase));
+
+                if (hasCategoriesTxt)
+                    OLD_MUSIC_FILES.Add(f); // Add to the list if a .meta file doesn't exist
+            }
+
+            if (seqsTxtFound && seqsFile != null)
+            {
+                OLD_MUSIC_FILES.Add(seqsFile);
+            }
         }
 
         public static void ConvertMusicFiles()
@@ -75,20 +116,17 @@ namespace MMR.Randomizer.Utils
             // directory structure is maintained, and all non-music files are copied as well
 
             var convFolder = Path.Combine(Path.GetDirectoryName(Values.MusicDirectory), "converted");
-            if (Directory.Exists(Values.MusicDirectory)) // This isn't needed, but keeping it just in case
+            try
             {
-                try
-                {
-                    ProcessFiles(Values.MusicDirectory, convFolder);
-                }
-                catch
-                {
-                    if (Directory.Exists(convFolder))
-                        Directory.Delete(convFolder, true);
-                }
+                ProcessFiles(Values.MusicDirectory, convFolder);
 
                 Directory.Delete(Values.MusicDirectory, true);
                 Directory.Move(convFolder, Values.MusicDirectory);
+            }
+            catch (Exception)
+            {
+                if (Directory.Exists(convFolder))
+                    Directory.Delete(convFolder, true);
             }
         }
 
@@ -125,12 +163,6 @@ namespace MMR.Randomizer.Utils
             public void Copy(string filepath)
             {
                 // copies the sequence into its temp directory
-                
-                //if (File.Exists(Filename + ".zip"))
-                //    File.Delete(Filename + ".zip");
-
-                //if (File.Exists(Filename + ".mmrs"))
-                //    File.Delete(Filename + ".mmrs");
 
                 string tempSeqFilePath = Path.Combine(TempFolder, Filename + ".seq");
 
@@ -157,9 +189,6 @@ namespace MMR.Randomizer.Utils
 
                 if (File.Exists(zipFilePath))
                     File.Move(zipFilePath, mmrsFilePath);
-
-                if (Directory.Exists(TempFolder))
-                    Directory.Delete(TempFolder, true);
             }
         }
 
@@ -189,12 +218,6 @@ namespace MMR.Randomizer.Utils
                 
                 if (Directory.Exists(TempFolder))
                     Directory.Delete(TempFolder, recursive: true);
-
-                //if (File.Exists(filename + ".zip"))
-                //    File.Delete(filename + ".zip");
-
-                //if (File.Exists(filename + ".mmrs"))
-                //    File.Delete(filename + ".mmrs");
 
                 ZipFile.ExtractToDirectory(filePath, TempFolder);
 
@@ -281,9 +304,6 @@ namespace MMR.Randomizer.Utils
 
                 if (File.Exists(zipFilePath))
                     File.Move(zipFilePath, mmrsFilePath);
-
-                if (Directory.Exists(TempFolder))
-                    Directory.Delete(TempFolder, true);
             }
         }
 
@@ -296,94 +316,55 @@ namespace MMR.Randomizer.Utils
             Directory.CreateDirectory(convFolder);
 
             var allFiles = Directory.GetFiles(baseFolder, "*", SearchOption.AllDirectories);
-            var seqsTxtFile = allFiles.FirstOrDefault(f => Path.GetFileName(f).Equals("SEQS.txt", StringComparison.OrdinalIgnoreCase));
+            var seqsTxtFile = Directory.EnumerateFiles(baseFolder, "SEQS.txt", SearchOption.AllDirectories).FirstOrDefault();
 
-            foreach (var inputFile in allFiles)
+            var oldFiles = new HashSet<string>(OLD_MUSIC_FILES, StringComparer.OrdinalIgnoreCase);
+
+            Parallel.ForEach(allFiles, (inputFile) =>
             {
-                string extension = Path.GetExtension(inputFile).ToLower();
-                string filename = Path.GetFileName(inputFile);
-                string relativePath = Path.GetRelativePath(baseFolder, inputFile);
-                string destinationFile = Path.Combine(convFolder, relativePath);
-                string destinationDir = Path.GetDirectoryName(destinationFile);
-
-                if (!Directory.Exists(destinationDir))
-                    Directory.CreateDirectory(destinationDir);
-
-                // Don't copy the SEQS file because it gets converted too
-                if (filename.Equals("SEQS.txt", StringComparison.OrdinalIgnoreCase))
-                    continue;
-
-                File.Copy(inputFile, destinationFile, overwrite: true);
-
-                switch (extension)
+                try
                 {
-                    case ".zseq":
-                        ConvertStandalone(destinationFile, destinationDir);
-                        break;
+                    string extension = Path.GetExtension(inputFile).ToLower();
+                    string filename = Path.GetFileName(inputFile);
+                    string relativePath = Path.GetRelativePath(baseFolder, inputFile);
+                    string destinationFile = Path.Combine(convFolder, relativePath);
+                    string destinationDir = Path.GetDirectoryName(destinationFile);
 
-                    case ".mmrs":
-                        ConvertArchive(destinationFile, destinationDir);
-                        break;
+                    Directory.CreateDirectory(destinationDir);
+                    
+                    // Don't copy the SEQS file because it gets converted too
+                    if (filename.Equals("SEQS.txt", StringComparison.OrdinalIgnoreCase))
+                        return;
 
-                    default:
-                        break;
+                    File.Copy(inputFile, destinationFile, overwrite: true);
+
+                    switch (extension)
+                    {
+                        case ".zseq":
+                            ConvertStandalone(destinationFile, destinationDir);
+                            break;
+
+                        case ".mmrs":
+                            var originalPath = Path.Combine(baseFolder, relativePath);
+                            if (oldFiles.Contains(originalPath))
+                                ConvertArchive(destinationFile, destinationDir);
+                            break;
+
+                        default:
+                            break;
+                    }
                 }
-            }
+                catch (Exception)
+                {
+                    //
+                }
+            });
 
             if (seqsTxtFile != null)
             {
                 string seqsYamlFile = Path.Combine(convFolder, "SEQS.yml");
                 ConvertSEQSToYAML(seqsTxtFile, seqsYamlFile);
-            }
-        }
-
-        public static void CheckForOldFiles(string baseFolder)
-        {
-            if (OLD_MUSIC_FILES.Any())
-                OLD_MUSIC_FILES.Clear(); // Clear out the list if it's populated
-
-            var allFiles = Directory.GetFiles(baseFolder, "*", SearchOption.AllDirectories);
-            bool seqsTxtFound = false;
-
-            foreach (var inputFile in allFiles)
-            {
-                string extension = Path.GetExtension(inputFile).ToLower();
-
-                switch (extension)
-                {
-                    case ".zseq":
-                        OLD_MUSIC_FILES.Add(inputFile);
-                        break;
-
-                    case ".mmrs":
-                        using (ZipArchive zip = ZipFile.OpenRead(inputFile))
-                        {
-                            bool metaExists = false;
-
-                            foreach (var entry in zip.Entries)
-                            {
-                                if (entry.FullName.EndsWith(".meta", StringComparison.OrdinalIgnoreCase))
-                                {
-                                    metaExists = true;
-                                    break;
-                                }
-                            }
-
-                            if (!metaExists)
-                                OLD_MUSIC_FILES.Add(inputFile); // Add to the list if a .meta file doesn't exist
-                        }
-                        break;
-
-                    default:
-                        break;
-                }
-
-                if (!seqsTxtFound && Path.GetFileName(inputFile).Equals("SEQS.txt", StringComparison.OrdinalIgnoreCase))
-                {
-                    OLD_MUSIC_FILES.Add(inputFile);
-                    seqsTxtFound = true;
-                }
-            }
+            }   
         }
 
         public static void WriteMetadata(string folder, string baseName, string cosmeticName, string metaBank, string songType, List<object> categories, Dictionary<string, uint> zsounds = null)
@@ -487,7 +468,7 @@ namespace MMR.Randomizer.Utils
 
                 standaloneSeq.Pack(standaloneSeq.Filename, destinationDir);
             }
-            catch
+            catch (Exception)
             {
                 return;
             }
@@ -501,18 +482,6 @@ namespace MMR.Randomizer.Utils
         public static void ConvertArchive(string destinationFile, string destinationDir)
         {
             // converts an old mmrs file into a new mmrs file
-            
-            // if the file is new, skip it~
-            using (ZipArchive zip = ZipFile.OpenRead(destinationFile))
-            {
-                foreach (var entry in zip.Entries)
-                {
-                    // only new files should have a .meta
-                    if (Path.GetExtension(entry.FullName).Equals(".meta", StringComparison.OrdinalIgnoreCase))
-                        return;
-                }
-            }
-
             string cosmeticName = "";
             string metaBank = "";
             string songType = "";
@@ -630,7 +599,7 @@ namespace MMR.Randomizer.Utils
                         Directory.Delete(songFolder, true);
                 }
             }
-            catch
+            catch (Exception)
             {
                 return;
             }
