@@ -39,9 +39,9 @@ namespace MMR.Randomizer.Utils
 
         public static string GetFileHash(string filePath)
         {
-            using var sha256 = SHA256.Create();
+            using var hash = SHA256.Create();
             using var stream = File.OpenRead(filePath);
-            return BitConverter.ToString(sha256.ComputeHash(stream)).Replace("-", "").ToLowerInvariant();
+            return BitConverter.ToString(hash.ComputeHash(stream)).Replace("-", "").ToLowerInvariant();
         }
 
         public class MusicCache
