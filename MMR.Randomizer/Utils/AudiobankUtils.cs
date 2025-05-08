@@ -29,9 +29,12 @@ namespace MMR.Randomizer.Utils
 
         public interface ISample
         {
-            uint? Address { get; set; }
-            uint BankOffset { get; set; }
-            byte[] Data { get; set; }
+            string ParentString { get; }
+            int ParentId { get; }
+            string KeyRegion { get; }
+            uint? Address { get; }
+            uint BankOffset { get; }
+            byte[] Data { get; }
         }
 
         // Should only need the sample offsets, and int should be fine for bank addresses
@@ -174,7 +177,7 @@ namespace MMR.Randomizer.Utils
                 {
                     uint offset = drumListAddr + (uint)(4 * i);
                     offset = BinaryPrimitives.ReadUInt32BigEndian(BankData.AsSpan((int)offset, 4));
-                    Drum drum = offset != 0 ? new Drum(i, BankData, audiotableFile, audiotableIndex, (int)offset, AudiotableId) : null; // Maybe just leave 0...
+                    Drum drum = offset != 0 ? new Drum(i, BankData, audiotableFile, audiotableIndex, (int)offset, AudiotableId) : null;
                     Drums.Add(drum);
                 }
 
@@ -183,7 +186,7 @@ namespace MMR.Randomizer.Utils
                 for (int i = 0; i < NumEffects; i++)
                 {
                     uint offset = effectListAddr + (uint)(8 * i);
-                    Effect effect = offset != 0 ? new Effect(i, BankData, audiotableFile, audiotableIndex, (int)offset, AudiotableId) : null; // Maybe just leave 0...
+                    Effect effect = offset != 0 ? new Effect(i, BankData, audiotableFile, audiotableIndex, (int)offset, AudiotableId) : null;
                     Effects.Add(effect);
                 }
 
@@ -241,6 +244,9 @@ namespace MMR.Randomizer.Utils
             // The bitfield is ignored because it is unneeded currently
 
             public TParent Parent;
+            public string ParentString { get; set; }
+            public int ParentId { get; set; }
+            public string KeyRegion { get; set; }
             public uint BankOffset {  get; set; }
             public byte[] SampleHeader { get; set; }
             public uint Unk0 { get; set; }
@@ -253,9 +259,19 @@ namespace MMR.Randomizer.Utils
             public uint? AudiotableAddress { get; set; }
             public byte[] Data { get; set; }
 
-            public Sample(byte[] bankData, byte[] audiotable, byte[] audiotableIndex, uint sampleOffset, int audiotableId, TParent parent)
+            public Sample(byte[] bankData, byte[] audiotable, byte[] audiotableIndex, uint sampleOffset, int audiotableId, TParent parent, int parentId, string keyRegion = null)
             {
                 Parent = parent;
+                ParentString = parent switch
+                {
+                    Instrument => "INST",
+                    Drum => "DRUM",
+                    Effect => "SFX",
+                    _ => null
+                };
+                ParentId = parentId;
+                KeyRegion = keyRegion;
+
                 BankOffset = sampleOffset;
 
                 byte[] sampleHeader = new byte[0x10];
@@ -316,7 +332,7 @@ namespace MMR.Randomizer.Utils
                 EnvelopeAddress = BinaryPrimitives.ReadUInt32BigEndian(bankData.AsSpan(drumOffset + 12, 4));
 
                 // Need to figure out how to pass the name so the error can report which song... should be good enough for sinlge song testing though...
-                Sample = SampleAddress != 0 ? new Sample<Drum>(bankData, audiotable, audiotableIndex, SampleAddress, audiotableId, this) : throw new Exception($"Drum Instantiation Error: Drum sample address is 0x00000000 for audiobank, audio engine will crash!");
+                Sample = SampleAddress != 0 ? new Sample<Drum>(bankData, audiotable, audiotableIndex, SampleAddress, audiotableId, this, DrumId) : throw new Exception($"Drum Instantiation Error: Drum sample address is 0x00000000 for audiobank, audio engine will crash!");
             }
         }
 
@@ -339,7 +355,7 @@ namespace MMR.Randomizer.Utils
 
                 // Unsure if this also crashes the audio engine, but it should never be 0 nonetheless...
                 //Sample = SampleAddress != 0 ? new Sample<Effect>(bankData, audiotable, audiotableIndex, SampleAddress, audiotableId, this) : throw new Exception($"Effect Instantiation Error: Effect sample address is 0x00000000 for audiobank, audio engine will crash!");
-                Sample = new Sample<Effect>(bankData, audiotable, audiotableIndex, SampleAddress, audiotableId, this);
+                Sample = new Sample<Effect>(bankData, audiotable, audiotableIndex, SampleAddress, audiotableId, this, EffectId);
             }
         }
 
@@ -383,9 +399,9 @@ namespace MMR.Randomizer.Utils
                 HighSampleTuning = BinaryPrimitives.ReadSingleBigEndian(bankData.AsSpan(instrumentOffset + 28, 4));
 
                 // Instantiate and store sample structs as objects
-                LowSample = LowSampleAddress != 0 ? new Sample<Instrument>(bankData, audiotable, audiotableIndex, LowSampleAddress, audiotableId, this) : null;
-                PrimSample = PrimSampleAddress != 0 ? new Sample<Instrument>(bankData, audiotable, audiotableIndex, PrimSampleAddress, audiotableId, this) : null;
-                HighSample = HighSampleAddress != 0 ? new Sample<Instrument>(bankData, audiotable, audiotableIndex, HighSampleAddress, audiotableId, this) : null;
+                LowSample = LowSampleAddress != 0 ? new Sample<Instrument>(bankData, audiotable, audiotableIndex, LowSampleAddress, audiotableId, this, InstrumentId, "LOW") : null;
+                PrimSample = PrimSampleAddress != 0 ? new Sample<Instrument>(bankData, audiotable, audiotableIndex, PrimSampleAddress, audiotableId, this, InstrumentId, "PRIM") : null;
+                HighSample = HighSampleAddress != 0 ? new Sample<Instrument>(bankData, audiotable, audiotableIndex, HighSampleAddress, audiotableId, this, InstrumentId, "HIGH") : null;
             }
         }
     }
