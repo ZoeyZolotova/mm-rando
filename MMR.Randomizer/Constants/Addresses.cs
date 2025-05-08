@@ -20,8 +20,10 @@ namespace MMR.Randomizer.Constants
         public const int AUDIOBANK_ADDR          = 0x00020700;
         public const int AUDIOBANK_SIZE          = 0x000263F0;
         public const int AUDIOTABLE_INDEX_ADDR   = 0x00C78380;
-        public const int AUDIOTABLE_INDEX_SIZE   = 0x00000040;
+        public const int AUDIOTABLE_INDEX_SIZE   = 0x000002A0;
         public const int AUDIOTABLE_ADDR         = 0x00097F70;
         public const int AUDIOTABLE_SIZE         = 0x00548770;
+
+        public const int CODE_ADDR               = 0x00B3C000;
     }
 }
