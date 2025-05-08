@@ -838,6 +838,7 @@ namespace MMR.Randomizer.Utils
                     case ".mmrs":
                     case ".ootrs":
                         updatedHashes[filePath] = hash;
+                        break;
                 }
             }
         }
