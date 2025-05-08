@@ -53,7 +53,10 @@ namespace MMR.Randomizer.Utils
 
         public static MD5 md5lib; // Used for zip
 
-        // The path for the Ocarina of Time audiobin file
+        // Majora's Mask Audio Binary
+        public static AudiobankUtils.Audiobin MM_AUDIOBIN = null;
+
+        // Ocarina of Time Audio Binary
         public static string OOT_AUDIOBIN_PATH = Path.Combine(Values.MusicDirectory, "OOT.audiobin");
         public static AudiobankUtils.Audiobin OOT_AUDIOBIN = null;
 
@@ -120,8 +123,23 @@ namespace MMR.Randomizer.Utils
             md5lib = MD5.Create();
 
             // Initialize the list of sequences and targets
-            RomData.SequenceList = new List<SequenceInfo>();
+            //RomData.SequenceList = new List<SequenceInfo>();
             RomData.TargetSequences = new List<SequenceInfo>();
+
+            // Load the music cache, if it doesn't exist it returns an empty MusicCache
+            var cache = MusicCacheUtils.Load();
+            var updatedHashes = new Dictionary<string, string>();
+
+            var validFiles = cache.FileHashes
+                .AsParallel()
+                .Where(kvp => File.Exists(kvp.Key) && MusicCacheUtils.GetFileHash(kvp.Key) == kvp.Value)
+                .Select(kvp => kvp.Key)
+                .ToHashSet();
+
+            // Reload the cached sequence list and remove vanilla sequences
+            RomData.SequenceList = cache.SequenceList
+                .Where(f => f.Filepath != null && validFiles.Contains(f.Filepath))
+                .ToList();
 
             // If the user has a SEQS.yml file, use that one instead of the one in resources
             string seqsContent;
@@ -147,154 +165,144 @@ namespace MMR.Randomizer.Utils
 
             // If the music directory doesn't exist, create it because it's required still
             if (!Directory.Exists(Values.MusicDirectory))
-            {
                 Directory.CreateDirectory(Values.MusicDirectory);
+
+            foreach (var entry in sequenceEntries)
+            {
+                // Entries are a YAML dictionary, for example:
+                //
+                // mm-terminafield:
+                //   display name: "Termina Field"
+                //   music groups: ["Fields", "TerminaField"]
+                //   instrument set: 0x03
+                //   sequence id: 0x02
+                //   song type: "bgm"
+                //   no recycle: false
+                //
+                string seqName = entry.Key;
+                var seqData = entry.Value;
+
+                // Check for missing song type field, if it is missing set to bgm
+                // Then also assign a default music group based on that type
+                var seqType = string.IsNullOrEmpty(seqData.SongType) ? "bgm" : seqData.SongType.ToLower();
+                var defaultMusicGroup = seqType switch
+                {
+                    "bgm" => MusicGroups.DEFAULT_BGM_CATEGORIES,
+                    "Fanfares" => MusicGroups.DEFAULT_FANFARE_CATEGORIES,
+                    _ => MusicGroups.DEFAULT_BGM_CATEGORIES,
+                };
+
+                // If there's no music groups, or the entry is null set to the default
+                // Otherwise add each category
+                var seqCategories = new List<int>();
+                if (!seqData.MusicGroups.Any())
+                {
+                    seqCategories.AddRange(defaultMusicGroup);
+                }
+                else
+                {
+                    foreach (var part in seqData.MusicGroups)
+                    {
+                        if (TryParseCategory(part, out int c) && !seqCategories.Contains(c))
+                        {
+                            seqCategories.Add(c);
+                        }
+                        else
+                        {
+#if DEBUG
+                            throw new Exception($"SEQS Error: Invalid category in SEQS file for '{seqName}': '{part}'");
+#else
+                            continue;
+#endif
+                        }
+                    }
+                }
+
+                int seqInstrument = seqData.InstrumentSet;
+                int seqId = seqData.SequenceId;
+
+                SequenceInfo targetSequence = new()
+                {
+                    Name = seqName,
+                    DisplayName = seqData.DisplayName ?? seqName,
+                    Categories = seqCategories,
+                    Instrument = seqInstrument,
+                };
+
+                SequenceInfo sourceSequence = new()
+                {
+                    Name = seqName,
+                    DisplayName = seqData.DisplayName ?? seqName,
+                    Categories = seqCategories,
+                    Instrument = seqInstrument,
+                };
+
+                // Each entry should have a sequence ID that's available in the SEQUENCE_ID_MAP,
+                // so try to match the entry's sequence ID with one in the sequence map between 0x02 and 0x7F
+                //if (sourceSequence.Name.StartsWith("mm-"))
+                if (SEQUENCE_ID_MAP.ContainsKey(seqId) && seqId >= 0x02 && seqId <= 0x7F)
+                {
+                    // If the randomizer relies on searching for sequence names
+                    //targetSequence.Name = SEQUENCE_ID_MAP[seqId].Name;
+                    //sourceSequence.Name = SEQUENCE_ID_MAP[seqId].Name;
+
+                    targetSequence.Replaces = seqId;
+                    sourceSequence.SeqId = seqId;
+
+                    if (seqData.NoRecycle)
+                        sourceSequence.Name = "drop";
+
+                    //if (RomData.TargetSequences.Find(u => u.Name == SEQUENCE_ID_MAP[seqId].Name) != null)
+                    if (RomData.TargetSequences.Find(u => u.Replaces == seqId) != null)
+                        continue;
+
+                    RomData.TargetSequences.Add(targetSequence);
+                }
+
+                if (sourceSequence.SeqId != FILE_SELECT && sourceSequence.Name != "drop")
+                    RomData.SequenceList.Add(sourceSequence);
             }
+
+            // MMR shortens the Song of Time cutscene and uses a custom sequence
+            // It uses an unused slot because Song of Time doesn't have its own slot
+            RomData.SequenceList.Add(new SequenceInfo
+            {
+                Name = nameof(Properties.Resources.mmr_f_sot),
+                DisplayName = "MMR - Song of Time",
+                Categories = new List<int> { (int)MusicGroups.Category.ItemFanfares },
+                Instrument = 0x03,
+                Replaces = INTRO_CUTSCENE_2,
+            });
 
             // Search through every directory in the music folder
             IEnumerable<string> directories = new[] { Values.MusicDirectory }.Concat(Directory.EnumerateDirectories(Values.MusicDirectory, "*", SearchOption.AllDirectories));
 
-            // Loop through every directory
+            // Scan for custom music files in the music directory
             foreach (string directory in directories)
             {
                 try
                 {
-                    foreach (var entry in sequenceEntries)
-                    {
-                        // Entries are a YAML dictionary, for example:
-                        //
-                        // mm-terminafield:
-                        //   display name: "Termina Field"
-                        //   music groups: ["Fields", "TerminaField"]
-                        //   instrument set: 0x03
-                        //   sequence id: 0x02
-                        //   song type: "bgm"
-                        //   no recycle: false
-                        //
-                        string seqName = entry.Key;
-                        var seqData = entry.Value;
-
-                        // Check for missing song type field, if it is missing set to bgm
-                        // Then also assign a default music group based on that type
-                        var seqType = string.IsNullOrEmpty(seqData.SongType) ? "bgm" : seqData.SongType.ToLower();
-                        var defaultMusicGroup = seqType switch
-                        {
-                            "bgm" => MusicGroups.DEFAULT_BGM_CATEGORIES,
-                            "Fanfares" => MusicGroups.DEFAULT_FANFARE_CATEGORIES,
-                            _ => MusicGroups.DEFAULT_BGM_CATEGORIES,
-                        };
-
-                        // If there's no music groups, or the entry is null set to the default
-                        // Otherwise add each category
-                        var seqCategories = new List<int>();
-                        if (!seqData.MusicGroups.Any())
-                        {
-                            seqCategories.AddRange(defaultMusicGroup);
-                        }
-                        else
-                        {
-                            foreach (var part in seqData.MusicGroups)
-                            {
-                                if (TryParseCategory(part, out int c) && !seqCategories.Contains(c))
-                                {
-                                    seqCategories.Add(c);
-                                }
-                                else
-                                {
-#if DEBUG
-                                    throw new Exception($"SEQS Error: Invalid category in SEQS file for '{seqName}': '{part}'");
-#else
-                                continue;
-#endif
-                                }
-                            }
-                        }
-                        
-                        int seqInstrument = seqData.InstrumentSet;
-                        int seqId = seqData.SequenceId;
-
-                        SequenceInfo targetSequence = new()
-                        {
-                            Name = seqName,
-                            DisplayName = seqData.DisplayName ?? seqName,
-                            Categories = seqCategories,
-                            Instrument = seqInstrument,
-                        };
-
-                        SequenceInfo sourceSequence = new()
-                        {
-                            Name = seqName,
-                            DisplayName = seqData.DisplayName ?? seqName,
-                            Categories = seqCategories,
-                            Instrument = seqInstrument,
-                        };
-
-                        // Each entry should have a sequence ID that's available in the SEQUENCE_ID_MAP,
-                        // so try to match the entry's sequence ID with one in the sequence map between 0x02 and 0x7F
-                        //if (sourceSequence.Name.StartsWith("mm-"))
-                        if (SEQUENCE_ID_MAP.ContainsKey(seqId) && seqId >= 0x02 && seqId <= 0x7F)
-                        {
-                            // If the randomizer relies on searching for sequence names
-                            //targetSequence.Name = SEQUENCE_ID_MAP[seqId].Name;
-                            //sourceSequence.Name = SEQUENCE_ID_MAP[seqId].Name;
-
-                            targetSequence.Replaces = seqId;
-                            sourceSequence.SeqId = seqId;
-
-                            if (seqData.NoRecycle)
-                            {
-                                sourceSequence.Name = "drop";
-                            }
-
-                            //if (RomData.TargetSequences.Find(u => u.Name == SEQUENCE_ID_MAP[seqId].Name) != null)
-                            if (RomData.TargetSequences.Find(u => u.Replaces == seqId) != null)
-                            {
-                                continue;
-                            }
-
-                            RomData.TargetSequences.Add(targetSequence);
-                        }
-                        else
-                        {
-                            if (!File.Exists(Path.Combine(directory, seqName)))
-                            {
-                                continue;
-                            }
-
-                            sourceSequence.Directory = directory;
-                        }
-
-                        if (sourceSequence.SeqId != FILE_SELECT && sourceSequence.Name != "drop")
-                        {
-                            RomData.SequenceList.Add(sourceSequence);
-                        }
-                    }
-
-                    // MMR shortens the Song of Time cutscene and uses a custom sequence
-                    // It uses an unused slot because Song of Time doesn't have its own slot
-                    RomData.SequenceList.Add(new SequenceInfo
-                    {
-                        Name = nameof(Properties.Resources.mmr_f_sot),
-                        DisplayName = "MMR - Song of Time",
-                        Categories = new List<int> { (int)MusicGroups.Category.ItemFanfares },
-                        Instrument = 0x03,
-                        Replaces = INTRO_CUTSCENE_2,
-                    });
-
-                    ScanForCustomMusicFiles(directory); // Scan for custom music files in the music directory
+                    ScanForCustomMusicFiles(directory, cache.FileHashes, updatedHashes);
                 }
                 catch (UnauthorizedAccessException)
                 {
                     throw new Exception($"Directory Error: Cannot access the following directory in the music folder: '{directory}'");
                 }
             }
-
-            // Secondary check for old music files returned some, so write it out!
+            
+            // Secondary check for old music files returned some, so write the list of old files for users
             // This is contained within its own file because it could be hundreds of lines long
             if (MusicConversionUtils.OLD_MUSIC_FILES.Any())
-            {
                 File.WriteAllLines(Path.Combine(Values.MusicDirectory, "unsupported_music_files.txt"), MusicConversionUtils.OLD_MUSIC_FILES);
-            }
+
+            // Update the music cache
+            MusicCacheUtils.Save(
+                new MusicCacheUtils.MusicCache
+                {
+                    FileHashes = updatedHashes,
+                    SequenceList = RomData.SequenceList
+                }
+            );
         }
 
         private static int RoundTo16(int value)
@@ -390,14 +398,14 @@ namespace MMR.Randomizer.Utils
                                 {
                                     BinaryData = s.Data,
                                     Addr = s.Address ?? 0,
-                                    Marker = s.Address ?? 0,
+                                    Marker = 0,//s.Address ?? 0,
                                     Hash = sampleHash,
 
-                                    // New type could be used here with some math, not gonna bother though
+                                    // Use new format
                                     ParentFile = song.Name,
-                                    InstrumentType = null,
-                                    ListIndex = -1,
-                                    KeyRegion = null,
+                                    InstrumentType = s.ParentString,//null,
+                                    ListIndex = s.ParentId,//-1,
+                                    KeyRegion = s.KeyRegion,//null,
                                 }
                             );
                         }
@@ -445,14 +453,14 @@ namespace MMR.Randomizer.Utils
                                         {
                                             BinaryData = s.Data,
                                             Addr = s.Address ?? 0,
-                                            Marker = s.Address ?? 0,
+                                            Marker = 0,//s.Address ?? 0,
                                             Hash = sampleHash,
 
-                                            // New type could be used here with some math, not gonna bother though
+                                            // Use new format
                                             ParentFile = song.Name,
-                                            InstrumentType = null,
-                                            ListIndex = -1,
-                                            KeyRegion = null,
+                                            InstrumentType = s.ParentString,//null,
+                                            ListIndex = s.ParentId,//-1,
+                                            KeyRegion = s.KeyRegion,//null,
                                         }
                                     );
                                 }
@@ -724,10 +732,28 @@ namespace MMR.Randomizer.Utils
             };
         }
 
+        public static void LoadMMAudiobin()
+        {
+            if (MM_AUDIOBIN != null)
+                return; // Audiobin was already loaded into memory
+
+            byte[] mmAudiobank = RomData.MMFileList[3].Data;
+            byte[] mmAudiobankIndex = new byte[Addresses.AUDIOBANK_INDEX_SIZE];
+            byte[] mmAudiotable = RomData.MMFileList[5].Data;
+            byte[] mmAudiotableIndex = new byte[Addresses.AUDIOTABLE_INDEX_SIZE];
+
+            byte[] code = RomData.MMFileList[31].Data;
+
+            Array.Copy(code, Addresses.AUDIOBANK_INDEX_ADDR - Addresses.CODE_ADDR, mmAudiobankIndex, 0, Addresses.AUDIOBANK_INDEX_SIZE);
+            Array.Copy(code, Addresses.AUDIOTABLE_INDEX_ADDR - Addresses.CODE_ADDR, mmAudiotableIndex, 0, Addresses.AUDIOTABLE_INDEX_SIZE);
+
+            MM_AUDIOBIN = new AudiobankUtils.Audiobin(mmAudiobank, mmAudiobankIndex, mmAudiotable, mmAudiotableIndex);
+        }
+
         public static void LoadOOTAudiobin()
         {
             if (OOT_AUDIOBIN != null)
-                return; // Audiobin was already loaded
+                return; // Audiobin was already loaded into memory
 
             byte[] ootAudiobank = null;
             byte[] ootAudiobankIndex = null;
@@ -759,7 +785,7 @@ namespace MMR.Randomizer.Utils
             OOT_AUDIOBIN = new AudiobankUtils.Audiobin(ootAudiobank, ootAudiobankIndex, ootAudiotable, ootAudiotableIndex);
         }
 
-        public static void ScanForCustomMusicFiles(string directory)
+        public static void ScanForCustomMusicFiles(string directory, Dictionary<string, string> cachedhHashes, Dictionary<string, string> updatedHashes)
         {
             // Check the directory for custom music files (MMRS and OOTRS) the user added
             // MMRS and OOTRS are zip files with a custom file extension ".mmrs" and ".ootrs" respectively
@@ -777,23 +803,33 @@ namespace MMR.Randomizer.Utils
             foreach (string filePath in Directory.GetFiles(directory))
             {
                 var extension = Path.GetExtension(filePath);
-                switch (extension)
+                string hash = MusicCacheUtils.GetFileHash(filePath);
+
+                // Only process files if they don't exist in the music cache
+                if (!cachedhHashes.TryGetValue(filePath, out string cachedHash) || cachedHash != hash)
                 {
-                    case ".mmrs":
-                        ProcessCustomMusicFile(filePath);
-                        break;
+                    switch (extension)
+                    {
+                        case ".mmrs":
+                            //LoadMMAudiobin(); // Debug
+                            ProcessCustomMusicFile(filePath);
+                            updatedHashes[filePath] = hash;
+                            break;
 
-                    case ".ootrs":
-                        ProcessCustomMusicFile(filePath);
-                        break;
+                        case ".ootrs":
+                            LoadOOTAudiobin(); // Load the OOT audio binary because an OOTR file was found
+                            ProcessCustomMusicFile(filePath);
+                            updatedHashes[filePath] = hash;
+                            break;
 
-                    // Standalone sequences are a legacy format, they should have been converted, but double check
-                    case ".zseq":
-                        MusicConversionUtils.OLD_MUSIC_FILES.Add(Path.GetFileName(filePath));
-                        break;
+                        // Standalone sequences are a legacy format, they should have been converted, but double check
+                        case ".zseq":
+                            MusicConversionUtils.OLD_MUSIC_FILES.Add(Path.GetFileName(filePath));
+                            break;
 
-                    default:
-                        break;
+                        default:
+                            break;
+                    }
                 }
             }
         }
@@ -843,9 +879,7 @@ namespace MMR.Randomizer.Utils
 
                         string ext = Path.GetExtension(entry.Name).ToLowerInvariant();
                         if (handlers.TryGetValue(ext, out var handler))
-                        {
                             handler(entry);
-                        }
                     }
 
                     // Verify all required files are present
@@ -853,9 +887,7 @@ namespace MMR.Randomizer.Utils
                     {
                         // If the file is an old file, it will have categories and no meta file
                         if (musicArchive.CategoriesFile != null)
-                        {
                             MusicConversionUtils.OLD_MUSIC_FILES.Add(Path.GetFileName(filePath));
-                        }
 
                         return;
                     }
@@ -868,11 +900,13 @@ namespace MMR.Randomizer.Utils
 
                     SequenceInfo currentSong = new()
                     {
-                        Name = Path.GetFileNameWithoutExtension(filePath)
+                        Name = Path.GetFileNameWithoutExtension(filePath),
+                        Filepath = filePath // Store the filepath for the music cache
                     };
 
                     var metadata = ReadMusicMetaYaml(currentSong.Name, musicArchive.MetaFile);
 
+                    // If the music
                     if ((metadata.Game == "oot" && Path.GetExtension(filePath).ToLower() != ".mmrs") || Path.GetExtension(filePath).ToLower() == ".ootrs")
                         LoadOOTAudiobin();
 
@@ -921,9 +955,7 @@ namespace MMR.Randomizer.Utils
                     ReadMusicSequence(currentSong, musicArchive, metadata);
 
                     if (currentSong != null && currentSong.SequenceBinaryList != null)
-                    {
                         RomData.SequenceList.Add(currentSong);
-                    }
                 }
             }
             catch (Exception e)
