@@ -805,7 +805,7 @@ namespace MMR.Randomizer.Utils
                 var extension = Path.GetExtension(filePath);
                 string hash = MusicCacheUtils.GetFileHash(filePath);
 
-                // Only process files if they don't exist in the music cache
+                // Only process files if they don't exist in the music cache or their hash has changed
                 if (!cachedhHashes.TryGetValue(filePath, out string cachedHash) || cachedHash != hash)
                 {
                     switch (extension)
