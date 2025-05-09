@@ -27,14 +27,14 @@ namespace MMR.Randomizer.Utils
             if (!File.Exists(CachePath))
                 return new MusicCache
                 {
-                    FileHashes = new Dictionary<string, string>(),
+                    FileHashes = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase),
                     SequenceList = new List<SequenceInfo>()
                 };
 
             var json = File.ReadAllText(CachePath);
             return JsonSerializer.Deserialize<MusicCache>(json) ?? new MusicCache
             {
-                FileHashes = new Dictionary<string, string>(),
+                FileHashes = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase),
                 SequenceList = new List<SequenceInfo>()
             };
         }
@@ -68,7 +68,7 @@ namespace MMR.Randomizer.Utils
             // The sequence list containing all the sequence info added is also stored, that way if there are no
             // changes to the music folder, the randomizer can just load the cached list and skip looking through
             // the music directory
-            public Dictionary<string, string> FileHashes { get; set; } = new();
+            public Dictionary<string, string> FileHashes { get; set; } = new(StringComparer.OrdinalIgnoreCase);
             public List<SequenceInfo> SequenceList { get; set; } = new();
         }
     }
