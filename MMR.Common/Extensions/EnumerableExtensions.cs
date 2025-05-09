@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using MMR.Common.Utils;
@@ -125,20 +125,20 @@ namespace MMR.Common.Extensions
         /// <exception cref="ArgumentOutOfRangeException">
         /// <paramref name="size"/> is below 1.
         /// </exception>
-        public static IEnumerable<TSource[]> Chunk<TSource>(this IEnumerable<TSource> source, int size)
-        {
-            if (source == null)
-            {
-                throw new ArgumentNullException(nameof(source));
-            }
+        //public static IEnumerable<TSource[]> Chunk<TSource>(this IEnumerable<TSource> source, int size)
+        //{
+        //    if (source == null)
+        //    {
+        //        throw new ArgumentNullException(nameof(source));
+        //    }
 
-            if (size < 1)
-            {
-                throw new ArgumentOutOfRangeException(nameof(size));
-            }
+        //    if (size < 1)
+        //    {
+        //        throw new ArgumentOutOfRangeException(nameof(size));
+        //    }
 
-            return ChunkIterator(source, size);
-        }
+        //    return ChunkIterator(source, size);
+        //}
 
         private static IEnumerable<TSource[]> ChunkIterator<TSource>(IEnumerable<TSource> source, int size)
         {
