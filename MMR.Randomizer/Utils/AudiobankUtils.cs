@@ -39,6 +39,7 @@ namespace MMR.Randomizer.Utils
         /// </summary>
         public interface ISample
         {
+            // For information on the fields, read the Sample class
             string ParentString { get; }
             int ParentId { get; }
             string KeyRegion { get; }
@@ -52,11 +53,11 @@ namespace MMR.Randomizer.Utils
         /// </summary>
         public class Audiobin
         {
-            public byte[] AudiobankTable { get; set; }
-            public byte[] AudiobankIndex { get; set; }
-            public byte[] Audiotable { get; set; }
-            public byte[] AudiotableIndex { get; set; }
-            public List<Audiobank> Audiobanks { get; set; } = new();
+            public byte[] AudiobankTable { get; set; } // Audiobank data
+            public byte[] AudiobankIndex { get; set; } // Audiobank index data
+            public byte[] Audiotable { get; set; } // Audiotable data
+            public byte[] AudiotableIndex { get; set; } // Audiotable index data
+            public List<Audiobank> Audiobanks { get; set; } = new(); // A list of all audiobanks in the audio binary
 
             public Audiobin(byte[] audiobankTable, byte[] audiobankIndex, byte[] audiotable, byte[] audiotableIndex)
             {
@@ -120,17 +121,17 @@ namespace MMR.Randomizer.Utils
         /// </summary>
         public class Audiobank {
 
-            public uint BankOffset { get; set; }
-            public uint BankLength { get; set; }
-            public int SampleMedium { get; set; }
-            public int SequencePlayer { get; set; }
-            public int AudiotableId { get; set; }
-            public int BankId { get; set; }
-            public int NumInsts { get; set; }
-            public int NumDrums { get; set; }
-            public int NumEffects { get; set; }
-            public byte[] BankData { get; set; }
-            public byte[] Bankmeta { get; set; }
+            public uint BankOffset { get; set; } // Offset of the bank in the audiotable
+            public uint BankLength { get; set; } // Length of the bank in th audiotable
+            public int SampleMedium { get; set; } // The storage medium for samples, default is RAM (u8)
+            public int SequencePlayer { get; set; } // The sequence player the bank uses (u8)
+            public int AudiotableId { get; set; } // The ID of the audiotable the samples use (u8)
+            public int BankId { get; set; } // The ID of the bank, default is 0xFF (u8)
+            public int NumInsts { get; set; } // The number of instruments in the bank (u8)
+            public int NumDrums { get; set; } // The number of drums in the bank (u8)
+            public int NumEffects { get; set; } // The number of effects in the bank (u16)
+            public byte[] BankData { get; set; } // The bank's binary data
+            public byte[] Bankmeta { get; set; } // 8 byte long bytearray, not 16 bytes
 
             public List<Instrument> Instruments = new();
             public List<Drum> Drums = new();
@@ -155,7 +156,7 @@ namespace MMR.Randomizer.Utils
                         bankmetaData = tableEntry;
                         break;
 
-                    case 0x10: // 16 Bytes: [Address, Length, Sample Medium, Sequence Player, Audiotable, ID, Num Inst, Num Drum, Num Effect MSB, Num Effect LSB]
+                    case 0x10: // 16 Bytes: [4-byte Address, 4-byte Length, Sample Medium, Sequence Player, Audiotable, ID, Num Inst, Num Drum, 2-byte Num Effects]
                         BankOffset = BinaryPrimitives.ReadUInt32BigEndian(tableEntry.AsSpan(0, 4));
                         BankLength = BinaryPrimitives.ReadUInt32BigEndian(tableEntry.AsSpan(4, 4));
                         SampleMedium = tableEntry[8];
@@ -175,19 +176,11 @@ namespace MMR.Randomizer.Utils
 
                 // If the bankmeta is just the 8 bytes, the audiobankFile should be the zbank file
                 // Because of this, BankLength is 0 so use the length of the zbank getting passed in
-                if (BankLength == 0)
-                {
-                    byte[] bankData = new byte[audiobankFile.Length];
-                    Array.Copy(audiobankFile, BankOffset, bankData, 0, audiobankFile.Length);
-                    BankData = bankData;
-                }
-                else
-                {
-                    byte[] bankData = new byte[BankLength];
-                    Array.Copy(audiobankFile, BankOffset, bankData, 0, BankLength);
-                    BankData = bankData;
-                }
-                
+                var length = BankLength == 0 ? audiobankFile.Length : (int)BankLength;
+                byte[] bankData = new byte[length];
+                Array.Copy(audiobankFile, BankOffset, bankData, 0, length);
+                BankData = bankData;
+
                 Bankmeta = bankmetaData;
 
                 // Find all the drums and instantiate them
@@ -269,20 +262,20 @@ namespace MMR.Randomizer.Utils
         {
             // The parent object is stored for fallback to get the index value in Instruments, Drums, or Effects
 
-            public TParent Parent;
-            public string ParentString { get; set; }
-            public int ParentId { get; set; }
-            public string KeyRegion { get; set; }
-            public uint BankOffset {  get; set; }
+            public TParent Parent; // The parent structure as its memory object
+            public string ParentString { get; set; } // The type of struct the parent is as a string: INST, DRUM, SFx
+            public int ParentId { get; set; } // The index of the parent struct in the corresponding list
+            public string KeyRegion { get; set; } // The audio sample's key region in the parent struct
+            public uint BankOffset {  get; set; } // Offset of the sample struct in the bank
             public byte[] SampleHeader { get; set; }
             public uint Unk0 { get; set; }
-            public AudioSampleCodec Codec {  get; set; }
-            public AudioStorageMedium Medium {  get; set; }
-            public bool IsCached { get; set; }
-            public bool IsRelocated { get; set; }
-            public uint Size { get; set; }
-            public uint? Address {  get; set; }
-            public uint? AudiotableAddress { get; set; }
+            public AudioSampleCodec Codec {  get; set; } // Audio codec of the audio sample
+            public AudioStorageMedium Medium {  get; set; } // Storage medium of the audio sample
+            public bool IsCached { get; set; } // Whether the sample is cached or not
+            public bool IsRelocated { get; set; } // Whether the sample is relocated in memory or not
+            public uint Size { get; set; } // Size of the binary ADPCM audio sample
+            public uint? Address {  get; set; } // Sample address if it was in audiotable 0 or 1
+            public uint? AudiotableAddress { get; set; } // Sample address in the bank's corresponding audiotable
             public byte[] Data { get; set; }
 
             public Sample(byte[] bankData, byte[] audiotable, byte[] audiotableIndex, uint sampleOffset, int audiotableId, TParent parent, int parentId, string keyRegion = null)
@@ -314,7 +307,7 @@ namespace MMR.Randomizer.Utils
                 Medium = (AudioStorageMedium)((bits >> 26) & 0b11);
                 IsCached = ((bits >> 25) & 1) != 0;
                 IsRelocated = ((bits >> 24) & 1) != 0;
-                Size = bits & 0b111111111111111111111111;
+                Size = bits & 0b111111111111111111111111; // Extract only the last 24 bits
                 Address = BinaryPrimitives.ReadUInt32BigEndian(sampleHeader.AsSpan(4, 4));
 
                 // Samples should always be ADPCM or small ADPCM, using RAM, and not be relocated
@@ -363,12 +356,12 @@ namespace MMR.Randomizer.Utils
         /// </summary>
         public class Drum
         {
-            public int DrumId { get; set; }
-            public int DecayIndex { get; set; }
-            public int Pan {  get; set; }
-            public uint SampleAddress { get; set; }
-            public float SampleTuning { get; set; }
-            public uint EnvelopeAddress { get; set; }
+            public int DrumId { get; set; } // The index of the struct in the drum list
+            public int DecayIndex { get; set; } // The index of the note release decay rate in the adsr decay table
+            public int Pan {  get; set; } // Individual drum panning
+            public uint SampleAddress { get; set; } // Offset to the sample struct in the bank
+            public float SampleTuning { get; set; } // The tuning float for the audio sample
+            public uint EnvelopeAddress { get; set; } // Offset to the envelope point array in the bank
             public Sample<Drum> Sample { get; set; } = null;
 
             public Drum(int drumId, byte[] bankData, byte[] audiotable, byte[] audiotableIndex, int drumOffset, int audiotableId)
@@ -394,9 +387,9 @@ namespace MMR.Randomizer.Utils
         /// </summary>
         public class Effect
         {
-            public int EffectId { get; set; }
-            public uint SampleAddress { get; set; }
-            public float SampleTuning { get; set; }
+            public int EffectId { get; set; } // The index of the effect in the effect list
+            public uint SampleAddress { get; set; } // Offset to the sample struct in the bank
+            public float SampleTuning { get; set; } // The tuning float for the audio sample
             public Sample<Effect> Sample { get; set; } = null;
 
             public Effect(int effectId, byte[] bankData, byte[] audiotable, byte[] audiotableIndex, int sampleOffset, int audiotableId)
@@ -418,17 +411,17 @@ namespace MMR.Randomizer.Utils
         /// </summary>
         public class Instrument
         {
-            public int InstrumentId {  get; set; }
-            public int LowKeyRegion { get; set; }
-            public int HighKeyRegion { get; set; }
-            public int DecayIndex { get; set; }
-            public uint EnvelopeAddress { get; set; }
-            public uint LowSampleAddress { get; set; }
-            public float LowSampleTuning { get; set; }
-            public uint PrimSampleAddress { get; set; }
-            public float PrimSampleTuning { get; set; }
-            public uint HighSampleAddress { get; set; }
-            public float HighSampleTuning { get; set; }
+            public int InstrumentId {  get; set; } // The index of the instrument in the instrument list
+            public int LowKeyRegion { get; set; } // The max range for the instrument's low key region
+            public int HighKeyRegion { get; set; } // The min range for the instrument's high key region
+            public int DecayIndex { get; set; } // The index of the note release decay rate in the adsr decay table
+            public uint EnvelopeAddress { get; set; } // Offset to the envelope point array in the bank
+            public uint LowSampleAddress { get; set; } // Offset to the sample struct in the bank for the low key region sample
+            public float LowSampleTuning { get; set; } // The tuning float for the low key region's audio sample
+            public uint PrimSampleAddress { get; set; } // Offset to the sample struct in the bank for the primary key region sample
+            public float PrimSampleTuning { get; set; } // The tuning float for the primary key region's audio sample
+            public uint HighSampleAddress { get; set; } // Offset to the sample struct in the bank for the high key region sample
+            public float HighSampleTuning { get; set; } // The tuning float for the high key region's audio sample
 
             public Sample<Instrument> LowSample { get; set; } = null;
             public Sample<Instrument> PrimSample { get; set; } = null;
