@@ -19,7 +19,7 @@ namespace MMR.Randomizer.Models.Rom
         /// Majora's Mask sequence ID that the sequence represents.
         /// </summary>
         public int SeqId { get; set; } = -1; // MM_seq -> SeqId
-        public List<int> Categories { get; set; } = new List<int>();
+        public List<int> Categories { get; set; } = [];
         public int Instrument { get; set; }
         public SequenceBinaryData SequenceBinary { get; set; }
         public int PreviousSlot { get; set; } = -1;
