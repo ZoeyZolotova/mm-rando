@@ -6,6 +6,9 @@ using YamlDotNet.Serialization.NamingConventions;
 
 namespace MMR.Common.Utils
 {
+    /// <summary>
+    /// A YAML serializer and deserializer.
+    /// </summary>
     public static class YamlSerializer
     {
         // Make lists emit in flow style instead of block style
@@ -31,7 +34,9 @@ namespace MMR.Common.Utils
             .WithIndentedSequences()
             .Build();
 
-        // Serialize with flow style lists instead of block style
+        /// <summary>
+        /// ISerializer that uses flow style lists instead of block style lists.
+        /// </summary>
         private static readonly ISerializer _flowListserializer = new SerializerBuilder()
             .WithNamingConvention(CamelCaseNamingConvention.Instance)
             .ConfigureDefaultValuesHandling(DefaultValuesHandling.OmitNull)
@@ -49,7 +54,9 @@ namespace MMR.Common.Utils
             return _serializer.Serialize(value);
         }
 
-        // Serialize with flow style lists instead of block style
+        /// <summary>
+        /// Serializes a YAML file with flow style lists instead of block style lists.
+        /// </summary>
         public static string FlowListSerialize<T>(T value)
         {
             return _flowListserializer.Serialize(value);
