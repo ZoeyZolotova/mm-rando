@@ -84,6 +84,16 @@ namespace MMR.Randomizer.Utils
             CurrentFreeBank = 0x29;
         }
 
+        public static bool IsMMRSFile(string filepath)
+        {
+            return Path.GetExtension(filepath) == ".mmrs";
+        }
+
+        public static bool IsOOTRSFile(string filepath)
+        {
+            return Path.GetExtension(filepath) == ".ootrs";
+        }
+
         #region Audiobin Utilities
         /// <summary>
         /// Stores the Majora's Mask audio binary files (Audiobank, Audiobank Index, Audiotable, Audiotable Index) into an AudiobankUtils.Audiobin class.
@@ -170,7 +180,7 @@ namespace MMR.Randomizer.Utils
 
             // Load the music cache, if it doesn't exist it returns an empty MusicCache object
             var cache = MusicCacheUtils.Load();
-            var updatedHashes = new Dictionary<string, string>();
+            var updatedHashes = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
             var validFiles = cache.FileHashes
                 .AsParallel()
@@ -535,7 +545,7 @@ namespace MMR.Randomizer.Utils
                     var metadata = ReadMusicMetaYaml(currentSong.Name, musicArchive.MetaFile);
 
                     // If game is OOT, but the OOT audiobin wasn't loaded already, load the OOT audiobin
-                    if (metadata.Game == "oot")
+                    if (metadata.Game == "oot" && !IsMMRSFile(currentSong.Filepath))
                         LoadOOTAudiobin();
 
                     currentSong.Game = metadata.Game;
@@ -832,7 +842,7 @@ namespace MMR.Randomizer.Utils
 
                 // Modify OOT samples, checking if MM contains their data to update their sample addresses
                 // or if the sample data needs to be used as a custom audio sample
-                if (song.Game == "oot")
+                if (song.Game == "oot" && !IsMMRSFile(song.Filepath))
                     bankData = ProcessOOTSampleData(song, bankData, bankmetaData);
 
                 // The audiotable should be 1, and the audiobin should correct all sample data to use AT1
@@ -850,7 +860,7 @@ namespace MMR.Randomizer.Utils
 
                 return true; // The music file uses a custom bank
             }
-            else if (song.Game == "oot" && song.Instrument < 0x25) // Vanilla OOTR files require a custom bank
+            else if (song.Game == "oot" && !IsMMRSFile(song.Filepath) && song.Instrument < 0x25) // Vanilla OOTR files require a custom bank
             {
                 // Extract the bank's bankmeta from the audiobank index
                 // The first line is the number of banks, so skip that and start on line 2
@@ -1265,7 +1275,14 @@ namespace MMR.Randomizer.Utils
 
                         // This might check if the sequence type is correct for MM
                         // DB ripped sequences from SF64/SM64/MK64 without modifying them
-                        if (data[1] != 0x20)
+                        //
+                        // 2025-05-08: Pretty sure this actually does nothing, don't know how mute flags work,
+                        //             but making the second byte of sequence data 0x20 without checking if the
+                        //             first byte is the proper instruction is risky and can completely ruin a
+                        //             sequence if the first byte isn't 0xD3 and the first byte is a single byte
+                        //             sequence instruction. It's a very, very, very low chance to happen, but you
+                        //             can never discount the possibility that it will happen.
+                        if (data[0] == 0xD3 && data[1] != 0x20)
                         {
                             data[1] = 0x20;
                         }
@@ -1379,21 +1396,6 @@ namespace MMR.Randomizer.Utils
                     ReadWriteUtils.Arr_Insert(nameBytes, 0, MusicConfig.SEQUENCE_NAME_MAX_SIZE, RomData.MMFileList[sequenceNamesFileIndex.Value].Data, i * MusicConfig.SEQUENCE_NAME_MAX_SIZE);
                 }
             }
-
-            //// DEBUG spoiler log output
-            //String dir = Path.GetDirectoryName(_settings.OutputROMFilename);
-            //String path = $"{Path.GetFileNameWithoutExtension(_settings.OutputROMFilename)}";
-            //// spoiler log should already be written by the time we reach this far
-            //if (File.Exists(Path.Combine(dir, path + "_SpoilerLog.txt")))
-            //    path += "_SpoilerLog.txt";
-            //else // TODO add HTML log compatibility
-            //    path += "_SongLog.txt";
-
-            //using (StreamWriter sw = new StreamWriter(Path.Combine(dir, path), append: true))
-            //{
-            //    sw.WriteLine(""); // spacer
-            //    sw.Write(log);
-            //}
         }
 
         /// <summary>
@@ -1757,18 +1759,12 @@ namespace MMR.Randomizer.Utils
                 //    continue;
 
                 // Check if the current song still has available instrument banks or sequences, if not remove the song and continue
-                var songNotStarved = TestIfAvailableBanks(testSeq, rng);
-                if (songNotStarved == false)
-                {
+                if (!TestIfAvailableBanks(testSeq, rng))
                     continue; // The song is unacceptable
-                }
 
                 var maxSize = targetSlot.Replaces == SMALL_ENEMY_BATTLE ? MAX_COMBAT_BUDGET : MAX_BGM_BUDGET;
-                var seqSize = GetSequenceSize(testSeq);
-                if (seqSize > maxSize)
-                {
+                if (GetSequenceSize(testSeq) > maxSize)
                     continue; // The song is too big
-                }
 
                 // Check if the target and the possible match share a category
                 if (testSeq.Categories.Intersect(targetSlot.Categories).Any())
@@ -1781,7 +1777,8 @@ namespace MMR.Randomizer.Utils
                 // did not want to mix BGM and fanfares — or vice versa
                 else if (unassignedSequences.Count > 30
                     && testSeq.Categories.Count > targetSlot.Categories.Count
-                    && cosmeticSettings.MusicLuckRollChance > 0 && (decimal)(rng.NextDouble() * 100.0) < cosmeticSettings.MusicLuckRollChance
+                    && cosmeticSettings.MusicLuckRollChance > 0
+                    && (decimal)(rng.NextDouble() * 100.0) < cosmeticSettings.MusicLuckRollChance
                     && targetSlot.Categories[0] <= (int)MusicGroups.Category.Cutscenes
                     && testSeq.Categories[0] <= (int)MusicGroups.Category.Cutscenes
                     && (testSeq.Categories[0] & (int)MusicGroups.Category.ItemFanfares) == (targetSlot.Categories[0] & (int)MusicGroups.Category.ItemFanfares)
