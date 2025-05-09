@@ -24,10 +24,13 @@ using System.Threading;
 using MMR.UI.Controls;
 using System.Linq.Expressions;
 using MMR.Randomizer.Attributes.Setting;
+using System.Runtime.Versioning;
 
 namespace MMR.UI.Forms
 {
     using Randomizer = Randomizer.Randomizer;
+
+    [SupportedOSPlatform("windows")]
     public partial class MainForm : Form
     {
         private bool _isUpdating = false;
