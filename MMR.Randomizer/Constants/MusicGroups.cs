@@ -5,11 +5,17 @@ namespace MMR.Randomizer.Constants
 {
     // Alignment is intentional, please don't remove it, it's easier to read and the file is mostly enums and dictionaries ＜(´⌯ w ⌯`)＞
 
+    /// <summary>
+    /// Represents the possible named MusicGroups for Majora's Mask Randomizer.
+    /// </summary>
     public static class MusicGroups
     {
         // There's a few cases of alternative names being allowed, and quite a bit of special handling for spaces and proper punctuation
         // They could be removed to have a more standardized list... After all, why not? Why shouldn't I keep it?
 
+        /// <summary>
+        /// A list containing default BGM categories for songs.
+        /// </summary>
         public static readonly List<int> DEFAULT_BGM_CATEGORIES = new()
         {
             (int)Category.Fields,
@@ -22,6 +28,9 @@ namespace MMR.Randomizer.Constants
             (int)Category.Fights
         };
 
+        /// <summary>
+        /// A list containing default fanfare categories for songs.
+        /// </summary>
         public static readonly List<int> DEFAULT_FANFARE_CATEGORIES = new()
         {
             (int)Category.ItemFanfares,
@@ -29,18 +38,27 @@ namespace MMR.Randomizer.Constants
             (int)Category.ClearFanfares
         };
 
+        /// <summary>
+        /// Represents the possible song types.
+        /// </summary>
         public enum Type
         {
             Bgm,
             Fanfare
         }
 
+        /// <summary>
+        /// A dictionary used to cross reference and check a category type with a metadata string type.
+        /// </summary>
         public static readonly Dictionary<Type, string> TypeCheck = new()
         {
             { Type.Bgm,     "bgm" },
             { Type.Fanfare, "fanfare" }
         };
 
+        /// <summary>
+        /// Represents all the possible song categories in Majora's Mask Randomizer.
+        /// </summary>
         public enum Category : int
         {
             // Group BGM Categories
@@ -161,7 +179,9 @@ namespace MMR.Randomizer.Constants
             TitleDemo            = 0x176,
         }
 
-        // Stores the type for each category
+        /// <summary>
+        /// Dictionary used to store the type for each category.
+        /// </summary>
         public static readonly Dictionary<Category, Type> CategoryTypes = new()
         {
             // Group BGM Category
@@ -275,7 +295,12 @@ namespace MMR.Randomizer.Constants
             { Category.TitleDemo,            Type.Bgm },
         };
 
-        // Allow people to utilize display names
+        /// <summary>
+        /// Dictionary used to assign incorrect string values to its corresponding category.
+        /// <para>
+        /// Also holds OOTR music group strings and assigns an appropriate MMR category.
+        /// </para>
+        /// </summary>
         public static readonly Dictionary<string, Category> CategoryDisplayNames = new(StringComparer.OrdinalIgnoreCase)
         {
             // Group Categories
@@ -524,6 +549,10 @@ namespace MMR.Randomizer.Constants
             { "SongOfStorms",      Category.EventFanfares },
         };
 
+        /// <summary>
+        /// Attempts to returnt the given type for the input category.
+        /// </summary>
+        /// <returns>The input category's corresponding type.</returns>
         public static Type GetCategoryType(int categoryValue)
         {
             if (Enum.IsDefined(typeof(Category), categoryValue))
@@ -538,11 +567,17 @@ namespace MMR.Randomizer.Constants
             return Type.Bgm;
         }
 
+        /// <summary>
+        /// Checks if the input category is a BGM category.
+        /// </summary>
         public static bool IsBgmCategory(int categoryValue)
         {
             return GetCategoryType(categoryValue) == Type.Bgm;
         }
 
+        /// <summary>
+        /// Checks if the input category is a fanfare category.
+        /// </summary>
         public static bool IsFanfareCategory(int categoryValue)
         {
             return GetCategoryType(categoryValue) == Type.Fanfare;
