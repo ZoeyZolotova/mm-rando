@@ -94,7 +94,7 @@ namespace MMR.Randomizer
 
                 if (foundValidReplacement == false) // no available songs fit in this slot category
                 {
-                    WriteOutput($"No song fits in [{targetSlot.Name}] slot, with categories: " + String.Join(", ", targetSlot.Categories.Select(x => "0x" + x.ToString("X2"))));
+                    WriteOutput($"No song fits in [{targetSlot.Name}] slot, with categories: " + string.Join(", ", targetSlot.Categories.Select(x => "0x" + x.ToString("X2"))));
                     // loosen song restrictions and re-attempt
                     SequenceUtils.TryBackupSongPlacement(targetSlot, log, unassigned, settings);
                 }
@@ -890,7 +890,7 @@ namespace MMR.Randomizer
                     }
                     if (shortenCutsceneGroup.HasFlag(value))
                     {
-                        Debug.WriteLine($"Applying Shortened Cutscene: {value}");
+                        //Debug.WriteLine($"Applying Shortened Cutscene: {value}");
                         var hackContentAttributes = value.GetAttributes<HackContentAttribute>();
                         foreach (var hackContent in hackContentAttributes.Select(h => h.HackContent))
                         {
@@ -1490,7 +1490,7 @@ namespace MMR.Randomizer
 
                 oldSound.TryReplaceWith(newSound);
 
-                Debug.WriteLine($"Writing SFX {newSound} --> {oldSound}");
+                //Debug.WriteLine($"Writing SFX {newSound} --> {oldSound}");
             }
 
             messageTable.ApplyRandomSoundEffects(shuffledSoundEffects);
@@ -6352,7 +6352,6 @@ namespace MMR.Randomizer
             RomData.SceneList = null;
 
             var originalMMFileList = RomData.MMFileList.Select(file => file.Clone()).ToList();
-            List<MMFile> cosmeticMMFileList;
 
             byte[] hash;
             AsmContext asm;
@@ -6363,8 +6362,6 @@ namespace MMR.Randomizer
 
                 // Parse Symbols data from the ROM (specific MMFile)
                 asm = AsmContext.LoadFromROM();
-
-                cosmeticMMFileList = RomData.MMFileList.Select(file => file.Clone()).ToList();
 
                 // Apply Asm configuration post-patch
                 WriteAsmConfigPostPatch(asm, hash);
@@ -6484,8 +6481,6 @@ namespace MMR.Randomizer
                     false => Patch.Patcher.CreatePatch(originalMMFileList),
                 };
 
-                cosmeticMMFileList = RomData.MMFileList.Select(file => file.Clone()).ToList();
-
                 // Write subset of Asm config post-patch
                 WriteAsmConfig(asm, hash);
 
@@ -6503,31 +6498,27 @@ namespace MMR.Randomizer
                     }
                 }
             }
-
             WriteMiscellaneousChanges();
 
             progressReporter.ReportProgress(72, "Writing cosmetics...");
             WriteTatlColour(new Random(BitConverter.ToInt32(hash, 0)));
+            //WriteTunicColor();
             WriteInstruments(new Random(BitConverter.ToInt32(hash, 0)));
 
-            progressReporter.ReportProgress(73, "Writing sound effects...");
-            WriteSoundEffects(new Random(BitConverter.ToInt32(hash, 0)));
-            WriteLowHealthSound(new Random(BitConverter.ToInt32(hash, 0)));
-
-            // Music conversion process
+            // Back up the music folder, check for old music files, then convert any old music files
             if (Directory.Exists(Values.MusicDirectory))
             {
                 // Check for old music files
-                progressReporter.ReportProgress(74, "Checking for old music files...");
+                progressReporter.ReportProgress(73, "Checking for old music files...");
                 MusicConversionUtils.CheckForOldFiles(Values.MusicDirectory);
 
-                // Backup and convert if any old music files were found
-                if (MusicConversionUtils.OLD_MUSIC_FILES.Any())
+                // Back up folder and convert if any are found
+                if (MusicConversionUtils.OLD_MUSIC_FILES.Count > 0)
                 {
-                    progressReporter.ReportProgress(75, "Backing up music folder to 'music.old'...");
+                    progressReporter.ReportProgress(74, "Backing up music folder...");
                     MusicConversionUtils.BackupMusicFolder(Values.MusicDirectory);
-                    
-                    progressReporter.ReportProgress(76, "Converting old music files...");
+
+                    progressReporter.ReportProgress(75, "Converting old music files...");
                     MusicConversionUtils.ConvertMusicFiles();
 
                     // Clear the list for secondary checks during WriteAudioSeq()
@@ -6536,22 +6527,17 @@ namespace MMR.Randomizer
                 }
             }
 
-            progressReporter.ReportProgress(77, "Writing music...");
+            progressReporter.ReportProgress(76, "Writing music...");
             SequenceUtils.MoveAudioBankTable();
+            WriteAudioSeq(new Random(BitConverter.ToInt32(hash, 0)), outputSettings);
             WriteMuteMusic();
             WriteEnemyCombatMusicMute();
             WriteRemoveMinorMusic();
             WriteDisableFanfares();
 
-            if (outputSettings.GenerateCosmeticsPatch)
-            {
-                var directory = Path.GetDirectoryName(outputSettings.OutputROMFilename);
-                var filename = Path.GetFileNameWithoutExtension(outputSettings.OutputROMFilename);
-
-                Patch.Patcher.CreatePatch(Path.Combine(directory, filename + "_Cosmetics.mmr"), cosmeticMMFileList);
-            }
-
-            WriteAudioSeq(new Random(BitConverter.ToInt32(hash, 0)), outputSettings);
+            progressReporter.ReportProgress(77, "Writing sound effects...");
+            WriteSoundEffects(new Random(BitConverter.ToInt32(hash, 0)));
+            WriteLowHealthSound(new Random(BitConverter.ToInt32(hash, 0)));
 
             if (outputSettings.GenerateROM || outputSettings.OutputVC)
             {
