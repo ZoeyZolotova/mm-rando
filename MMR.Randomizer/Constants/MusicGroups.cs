@@ -16,8 +16,8 @@ namespace MMR.Randomizer.Constants
         /// <summary>
         /// A list containing default BGM categories for songs.
         /// </summary>
-        public static readonly List<int> DEFAULT_BGM_CATEGORIES = new()
-        {
+        public static readonly List<int> DEFAULT_BGM_CATEGORIES =
+        [
             (int)Category.Fields,
             (int)Category.Towns,
             (int)Category.Dungeons,
@@ -26,17 +26,17 @@ namespace MMR.Randomizer.Constants
             (int)Category.ActionThemes,
             (int)Category.CalmThemes,
             (int)Category.Fights
-        };
+        ];
 
         /// <summary>
         /// A list containing default fanfare categories for songs.
         /// </summary>
-        public static readonly List<int> DEFAULT_FANFARE_CATEGORIES = new()
-        {
+        public static readonly List<int> DEFAULT_FANFARE_CATEGORIES =
+        [
             (int)Category.ItemFanfares,
             (int)Category.EventFanfares,
             (int)Category.ClearFanfares
-        };
+        ];
 
         /// <summary>
         /// Represents the possible song types.
