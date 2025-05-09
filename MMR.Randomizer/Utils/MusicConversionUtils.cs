@@ -102,9 +102,14 @@ namespace MMR.Randomizer.Utils
             var mmrsFiles = Directory.GetFiles(baseFolder, "*.mmrs", SearchOption.AllDirectories);
             var seqsFile = Directory.GetFiles(baseFolder, "SEQS.txt", SearchOption.AllDirectories).FirstOrDefault();
 
-            if (File.Exists(Path.Combine(Values.MusicDirectory, "music.cache")))
+            var cachedHashes = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+            // Cached files should have already beed converted,
+            // so there's no need to check unless their hash changed
+            if (File.Exists(MusicCacheUtils.CachePath))
             {
-                // cached files should have already been converted, so maybe use the cache to remove files from list
+                var cache = MusicCacheUtils.Load();
+                cachedHashes = cache.FileHashes;
             }
 
             bool seqsTxtFound = seqsFile != null;
@@ -116,6 +121,13 @@ namespace MMR.Randomizer.Utils
 
             foreach (var f in mmrsFiles)
             {
+                if (cachedHashes.TryGetValue(f, out var cachedHash))
+                {
+                    var currentHash = MusicCacheUtils.GetFileHash(f);
+                    if (string.Equals(currentHash, cachedHash, StringComparison.OrdinalIgnoreCase))
+                        continue;
+                }
+
                 using ZipArchive zip = ZipFile.OpenRead(f);
                 bool hasCategoriesTxt = zip.Entries.Any(e => e.FullName.Equals("categories.txt", StringComparison.OrdinalIgnoreCase));
 
