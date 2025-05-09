@@ -12,6 +12,9 @@ using System.Threading.Tasks;
 
 namespace MMR.Randomizer.Utils
 {
+    /// <summary>
+    /// Stores classes and functions that convert old format Majora's Mask Randomizer music files into metadata YAML '.mmrs' formatted music files.
+    /// </summary>
     public class MusicConversionUtils
     {
         // Process outline:
@@ -19,9 +22,14 @@ namespace MMR.Randomizer.Utils
         // Step 2: Create backup of music folder
         // Step 3: Convert music files
 
+        /// <summary>
+        /// Stores a list of old format music files.
+        /// </summary>
         public static List<string> OLD_MUSIC_FILES = new();
 
-        // fanfare categories to ensure correct song type
+        /// <summary>
+        /// Stores a list of named music groups for fanfare.
+        /// </summary>
         private static readonly string[] FANFARE_CATEGORIES =
         {   //groups
             "ItemFanfares",
@@ -50,6 +58,9 @@ namespace MMR.Randomizer.Utils
             "MoonDestroyed",
         };
 
+        /// <summary>
+        /// Backs up the current state of the music folder into a 'music.old' zip archive.
+        /// </summary>
         public static void BackupMusicFolder(string folder)
         {
             // backs up the music folder into a zip file with the .old extension
@@ -78,6 +89,9 @@ namespace MMR.Randomizer.Utils
             }
         }
 
+        /// <summary>
+        /// Runs through the music folder to check for old format music files.
+        /// </summary>
         public static void CheckForOldFiles(string baseFolder)
         {
             if (OLD_MUSIC_FILES.Any())
@@ -87,6 +101,11 @@ namespace MMR.Randomizer.Utils
             var zseqFiles = Directory.GetFiles(baseFolder, "*.zseq", SearchOption.AllDirectories);
             var mmrsFiles = Directory.GetFiles(baseFolder, "*.mmrs", SearchOption.AllDirectories);
             var seqsFile = Directory.GetFiles(baseFolder, "SEQS.txt", SearchOption.AllDirectories).FirstOrDefault();
+
+            if (File.Exists(Path.Combine(Values.MusicDirectory, "music.cache")))
+            {
+                // cached files should have already been converted, so maybe use the cache to remove files from list
+            }
 
             bool seqsTxtFound = seqsFile != null;
 
@@ -110,6 +129,9 @@ namespace MMR.Randomizer.Utils
             }
         }
 
+        /// <summary>
+        /// Creates the music conversion folder, then begins the conversion process.
+        /// </summary>
         public static void ConvertMusicFiles()
         {
             // backup the music folder, convert files, delete the original directory, rename converted
@@ -130,6 +152,9 @@ namespace MMR.Randomizer.Utils
             }
         }
 
+        /// <summary>
+        /// Represents a standalone sequence ('.zseq') file used in previous versions of Majora's Mask Randomizer.
+        /// </summary>
         public class StandaloneSequence
         {
             public string Filename { get; set; }
@@ -145,6 +170,9 @@ namespace MMR.Randomizer.Utils
                 ParseFilename(filename);
             }
 
+            /// <summary>
+            /// Parses and extracts metadata from the standalone sequence file's filename.
+            /// </summary>
             public void ParseFilename(string filename)
             {
                 string basename = Path.GetFileName(filename);
@@ -160,6 +188,9 @@ namespace MMR.Randomizer.Utils
                 Categories = parts[2].Split('-');
             }
 
+            /// <summary>
+            /// Copies the sequence file into a temp folder and changes its file extension to '.seq'.
+            /// </summary>
             public void Copy(string filepath)
             {
                 // copies the sequence into its temp directory
@@ -176,6 +207,9 @@ namespace MMR.Randomizer.Utils
                     File.Delete(filepath);
             }
 
+            /// <summary>
+            /// Packs the music file into an '.mmrs' archive.
+            /// </summary>
             public void Pack(string filename, string destinationDir)
             {
                 // packs the sequence into a new archive
@@ -192,6 +226,9 @@ namespace MMR.Randomizer.Utils
             }
         }
 
+        /// <summary>
+        /// Represents an old format '.mmrs' file used by Majora's Mask Randomizer.
+        /// </summary>
         public class MusicArchive
         {
             public List<(string Base, string Extension)> Sequences { get; set; } = new();
@@ -212,10 +249,11 @@ namespace MMR.Randomizer.Utils
                 }
             }
 
+            /// <summary>
+            /// Unpacks the music file into a temp folder.
+            /// </summary>
             public void Unpack(string filename, string filePath)
             {
-                // unpacks the music file into its temp directory
-                
                 if (Directory.Exists(TempFolder))
                     Directory.Delete(TempFolder, recursive: true);
 
@@ -291,10 +329,11 @@ namespace MMR.Randomizer.Utils
                     throw new FileNotFoundException("No categories.txt file found!");
             }
 
+            /// <summary>
+            /// Packs the music file into an '.mmrs' archive.
+            /// </summary>
             public void Pack(string filename, string destinationDir)
             {
-                // packs the music file into a new archive
-                
                 string archivePath = Path.Combine(destinationDir, filename);
 
                 ZipFile.CreateFromDirectory(TempFolder, $"{archivePath}.zip", CompressionLevel.Optimal, false);
@@ -307,6 +346,9 @@ namespace MMR.Randomizer.Utils
             }
         }
 
+        /// <summary>
+        /// Begins the process of converting old format music files into the metadata YAML '.mmrs' file format.
+        /// </summary>
         public static void ProcessFiles(string baseFolder, string convFolder)
         {
             // creates conversion folder, then copies and converts every file in the original music folder
@@ -367,6 +409,9 @@ namespace MMR.Randomizer.Utils
             }   
         }
 
+        /// <summary>
+        /// Writes the YAML metadata file for the new metadata YAML '.mmrs' file format.
+        /// </summary>
         public static void WriteMetadata(string folder, string baseName, string cosmeticName, string metaBank, string songType, List<object> categories, Dictionary<string, uint> zsounds = null)
         {
             // Prepare the YAML object
@@ -413,6 +458,9 @@ namespace MMR.Randomizer.Utils
             File.WriteAllText(Path.Combine(folder, $"{baseName}.meta"), yamlOutput);
         }
 
+        /// <summary>
+        /// Converts a standalone sequence ('.zseq') file to the new metadata YAML '.mmrs' file format.
+        /// </summary>
         public static void ConvertStandalone(string destinationFile, string destinationDir)
         {
             // converts a zseq into the new mmrs file
@@ -479,6 +527,9 @@ namespace MMR.Randomizer.Utils
             }
         }
 
+        /// <summary>
+        /// Converts an old format '.mmrs' file to the new metadata YAML '.mmrs' file format.
+        /// </summary>
         public static void ConvertArchive(string destinationFile, string destinationDir)
         {
             // converts an old mmrs file into a new mmrs file
@@ -610,6 +661,9 @@ namespace MMR.Randomizer.Utils
             }
         }
 
+        /// <summary>
+        /// Converts a SEQS plaintext file to a SEQS YAML file.
+        /// </summary>
         public static void ConvertSEQSToYAML(string seqsTxtFile, string seqsYamlFile)
         {
             var lines = File.ReadAllLines(seqsTxtFile).Where(l => !string.IsNullOrWhiteSpace(l)).ToList();
