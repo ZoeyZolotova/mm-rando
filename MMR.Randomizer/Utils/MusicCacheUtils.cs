@@ -28,14 +28,14 @@ namespace MMR.Randomizer.Utils
                 return new MusicCache
                 {
                     FileHashes = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase),
-                    SequenceList = new List<SequenceInfo>()
+                    SequenceList = []
                 };
 
             var json = File.ReadAllText(CachePath);
             return JsonSerializer.Deserialize<MusicCache>(json) ?? new MusicCache
             {
                 FileHashes = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase),
-                SequenceList = new List<SequenceInfo>()
+                SequenceList = []
             };
         }
 
@@ -69,7 +69,7 @@ namespace MMR.Randomizer.Utils
             // changes to the music folder, the randomizer can just load the cached list and skip looking through
             // the music directory
             public Dictionary<string, string> FileHashes { get; set; } = new(StringComparer.OrdinalIgnoreCase);
-            public List<SequenceInfo> SequenceList { get; set; } = new();
+            public List<SequenceInfo> SequenceList { get; set; } = [];
         }
     }
 }
