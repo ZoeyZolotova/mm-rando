@@ -25,7 +25,7 @@ namespace MMR.Randomizer.Utils
         /// <summary>
         /// Stores a list of old format music files.
         /// </summary>
-        public static List<string> OLD_MUSIC_FILES = new();
+        public static List<string> OLD_MUSIC_FILES = [];
 
         /// <summary>
         /// Stores a list of named music groups for fanfare.
@@ -94,7 +94,7 @@ namespace MMR.Randomizer.Utils
         /// </summary>
         public static void CheckForOldFiles(string baseFolder)
         {
-            if (OLD_MUSIC_FILES.Count != 0)
+            if (OLD_MUSIC_FILES.Count > 0)
                 OLD_MUSIC_FILES.Clear(); // Clear out the list if it's populated
 
             // These are the only files that need to be checked
@@ -185,7 +185,7 @@ namespace MMR.Randomizer.Utils
             /// <summary>
             /// Parses and extracts metadata from the standalone sequence file's filename.
             /// </summary>
-            public (string filename, string instrumentSet, string[] categories) ParseFilename(string filename)
+            public static (string filename, string instrumentSet, string[] categories) ParseFilename(string filename)
             {
                 string[] parts = Path.GetFileNameWithoutExtension(filename).Split('_');
 
@@ -218,11 +218,11 @@ namespace MMR.Randomizer.Utils
         /// </summary>
         public class MusicArchive
         {
-            public List<(string Base, string Extension)> Sequences { get; set; } = new();
+            public List<(string Base, string Extension)> Sequences { get; set; } = [];
             public string Categories { get; set; }
-            public Dictionary<string, (string ZBank, string BankMeta)> Banks { get; set; } = new();
-            public Dictionary<string, string> Formmasks { get; set; } = new();
-            public Dictionary<string, uint> ZSounds { get; set; } = new();
+            public Dictionary<string, (string ZBank, string BankMeta)> Banks { get; set; } = [];
+            public Dictionary<string, string> Formmasks { get; set; } = [];
+            public Dictionary<string, uint> ZSounds { get; set; } = [];
             public string TempFolder { get; set; }
 
             private static readonly string[] SEQ_EXTS = [".seq", ".zseq", ".aseq"];
@@ -442,7 +442,7 @@ namespace MMR.Randomizer.Utils
 
         private static void ProcessArchiveSequences(MusicArchive archive, string destinationDir, string filename, string cosmeticName, List<object> categories, string songType, string originalTemp)
         {
-            Dictionary<string, uint> zsounds = new();
+            Dictionary<string, uint> zsounds = [];
 
             foreach (var (baseName, ext) in archive.Sequences)
             {
@@ -510,8 +510,8 @@ namespace MMR.Randomizer.Utils
         /// </summary>
         private static void ConvertSEQSToYAML(string seqsTxtFile, string seqsYamlFile)
         {
-            var lines = File.ReadAllLines(seqsTxtFile).Where(l => !string.IsNullOrWhiteSpace(l)).ToList();
-            var output = new Dictionary<string, SequenceUtils.SEQSYaml>();
+            List<string> lines = [.. File.ReadAllLines(seqsTxtFile).Where(l => !string.IsNullOrWhiteSpace(l))];
+            Dictionary<string, SequenceUtils.SEQSYaml> output = [];
 
             for (int i = 0; i < lines.Count;)
             {
@@ -593,7 +593,7 @@ namespace MMR.Randomizer.Utils
             // Optional audio sample info from zsounds
             if (zsounds != null && zsounds.Count != 0)
             {
-                yaml.Metadata.AudioSamples = new Dictionary<string, MusicMetadataYaml.Sample>();
+                yaml.Metadata.AudioSamples = [];
 
                 var index = 0;
                 foreach (var kvp in zsounds)
@@ -629,7 +629,7 @@ namespace MMR.Randomizer.Utils
 
         private static List<object> ParseCategories(IEnumerable<string> rawCategories)
         {
-            var categories = new List<object>();
+            List<object> categories = [];
 
             foreach (var c in rawCategories)
             {
