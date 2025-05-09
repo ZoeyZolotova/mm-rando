@@ -302,7 +302,9 @@ namespace MMR.Randomizer.Utils
                     sourceSequence.SeqId = seqId;
 
                     if (seqData.NoRecycle)
+                    {
                         sourceSequence.Name = "drop";
+                    }
 
                     //if (RomData.TargetSequences.Find(u => u.Name == SEQUENCE_ID_MAP[seqId].Name) != null)
                     if (RomData.TargetSequences.Find(u => u.Replaces == seqId) != null)
@@ -312,7 +314,9 @@ namespace MMR.Randomizer.Utils
                 }
 
                 if (sourceSequence.SeqId != FILE_SELECT && sourceSequence.Name != "drop")
+                {
                     RomData.SequenceList.Add(sourceSequence);
+                }
             }
 
             // MMR shortens the Song of Time cutscene and uses a custom sequence
@@ -516,7 +520,9 @@ namespace MMR.Randomizer.Utils
 
                         string ext = Path.GetExtension(entry.Name).ToLowerInvariant();
                         if (handlers.TryGetValue(ext, out var handler))
+                        {
                             handler(entry);
+                        }
                     }
 
                     // Verify all required files are present
@@ -524,7 +530,9 @@ namespace MMR.Randomizer.Utils
                     {
                         // If the file is an old file, it will have categories and no meta file
                         if (musicArchive.CategoriesFile != null)
+                        {
                             MusicConversionUtils.OLD_MUSIC_FILES.Add(Path.GetFileName(filePath));
+                        }
 
                         return;
                     }
@@ -1305,10 +1313,9 @@ namespace MMR.Randomizer.Utils
                 }
 
                 newSeq.Add(newentry);
-                // TODO is there not a better way to write this?
-                if (newentry.Data != null)
+                if (newentry.Data != null) // TODO is there not a better way to write this?
                 {
-                    newAudioSeq = newAudioSeq.Concat(newentry.Data).ToArray();
+                    newAudioSeq = newAudioSeq.Concat(newentry.Data).ToArray(); 
                 }
 
                 addr += newentry.Size;
@@ -1477,9 +1484,7 @@ namespace MMR.Randomizer.Utils
             if (testSeq.SequenceBinary != null && testSeq.SequenceBinary.InstrumentSet != null)
             {
                 if (CurrentFreeBank > 0x0080)
-                {
                     return false; // Can't overwrite any more entries
-                }
 
                 testSeq.SequenceBinary.InstrumentSet.BankSlot = CurrentFreeBank;
             }
@@ -1534,17 +1539,20 @@ namespace MMR.Randomizer.Utils
 
                 log.AppendLine(" * double dipping with song " + replacementSong.Name + ", with categories: " + string.Join(", ", replacementSong.Categories.Select(x => "0x" + x.ToString("X2"))));
                 log.AppendLine($"{targetSlot.Name,-40} {"COPY",+10} -> " + replacementSong.Name);
+
                 return;
             }
 
             // should not make it this far, throw error
             log.AppendLine(" out of remaining songs:");
+
             foreach (SequenceInfo RemainingSong in unassignedSequences)
             {
                 log.AppendLine(" * [" + RemainingSong.Name + "] with categories [" + string.Join(",", RemainingSong.Categories) + "]");
             }
 
             WriteSongLog(log, settings);
+
             throw new Exception($"TryBackupSongPlacement Error: Cannot randomize music for current seed with available music: \nSlot Name:[{targetSlot.Name}] PreviousSlot: [{targetSlot.Replaces:X}]");
         }
 
@@ -1583,10 +1591,9 @@ namespace MMR.Randomizer.Utils
             if (bank != null)
             {
                 var searchResult = RomData.InstrumentSetList.FindIndex(match => match.BankBinary == bank);
+
                 if (searchResult != -1)
-                {
                     return (0, searchResult);
-                }
             }
 
             return (-1, -1);
@@ -1639,9 +1646,7 @@ namespace MMR.Randomizer.Utils
 
             SequenceInfo songtestSequence = RomData.SequenceList.Find(u => u.Name.Contains("songtest") == true);
             if (songtestSequence == null)
-            {
                 return;
-            }
 
             // Songtest always replaces the following: "File Select", "Title Demo", "Clock Town (Day 1)", and "Small Enemy Battle"
             SequenceInfo fileselectSlot = RomData.TargetSequences.Find(u => u.Replaces == FILE_SELECT); // Don't rely on the name in the SEQS.txt, rely on the sequence ID instead
@@ -1656,8 +1661,10 @@ namespace MMR.Randomizer.Utils
             }
             // else if Not Fanfare or Cutscene
             // This doesn't account for individual Fanfare categories
-            else if (!(songtestSequence.Categories.Contains((int)MusicGroups.Category.ItemFanfares) || songtestSequence.Categories.Contains((int)MusicGroups.Category.EventFanfares)
-                        || songtestSequence.Categories.Contains((int)MusicGroups.Category.ClearFanfares) || songtestSequence.Categories.Contains((int)MusicGroups.Category.Cutscenes)))
+            else if (!(songtestSequence.Categories.Contains((int)MusicGroups.Category.ItemFanfares)
+                    || songtestSequence.Categories.Contains((int)MusicGroups.Category.EventFanfares)
+                    || songtestSequence.Categories.Contains((int)MusicGroups.Category.ClearFanfares)
+                    || songtestSequence.Categories.Contains((int)MusicGroups.Category.Cutscenes)))
             {
                 MAX_BGM_BUDGET = songtestSize;
                 MAX_COMBAT_BUDGET = MAX_TYPE2_MUSIC_BUDGET - MAX_BGM_BUDGET;
@@ -1669,6 +1676,7 @@ namespace MMR.Randomizer.Utils
             // Additionally, every song that shares a category with the song should be added
             var allMatchingSlots = RomData.TargetSequences.FindAll(u => u.Categories.Intersect(songtestSequence.Categories).Any());
             allMatchingSlots.Remove(fileselectSlot); // Don't re-pointerize it
+
             foreach (SequenceInfo songslot in allMatchingSlots)
             {
                 ConvertSequenceSlotToPointer(songslot.Replaces, FILE_SELECT); // Point replacement to "File Select"
@@ -1683,9 +1691,7 @@ namespace MMR.Randomizer.Utils
             // sequence's instrument bank.
 
             if (songtestSequence.SequenceBinary == null)
-            {
                 return; // The song doesn't have a custom instrument bank, no need to continue
-            }
 
             void ConvertRoomForSongTest(int sceneFID, int roomFID, int actorIDOffset, int musicOffset, List<SequenceInfo> replacementSequences)
             {
@@ -1810,6 +1816,7 @@ namespace MMR.Randomizer.Utils
             foreach (var slot in BGMSlots)
             {
                 var searchResult = RomData.SequenceList.Find(u => u.Replaces == slot.Replaces);
+
                 if (searchResult != null)
                 {
                     usedBGMSequences.Add(searchResult);
@@ -1843,9 +1850,8 @@ namespace MMR.Randomizer.Utils
             if (combatVsBGMCoinToss) // Combat chosen
             {
                 if (!usedBGMSequences.Any())
-                {
                     return;
-                }
+
                 // Get new BGM budget from combat sequence
                 var newBGMBudget = MAX_BGM_BUDGET = MAX_TYPE2_MUSIC_BUDGET - combatSize;
                 log.AppendLine($" new BGM budget: {MAX_BGM_BUDGET:X}, from combat size: {combatSize:X}");
@@ -1858,13 +1864,13 @@ namespace MMR.Randomizer.Utils
                     {
                         var seqName = seq.Name;
                         log.AppendLine($"BGM sequence {seqName} was too big to match your combat music, replacing ... ");
+
                         var bgmSlot = RomData.TargetSequences.Find(u => u.Replaces == seq.Replaces);
                         seq.Replaces = -1; // Cancel using this song
-                        bool status = SearchForValidSongReplacement(cosmeticSettings, unassignedSequences, bgmSlot, rng, log);
-                        if (status == false)
+
+                        if (!SearchForValidSongReplacement(cosmeticSettings, unassignedSequences, bgmSlot, rng, log))
                         {
-                            throw new Exception("CheckBGMCombatMusicBudget Error: Current seed cannot find acceptable music for the combat slot\n" +
-                                "Try a different seed!");
+                            throw new Exception("CheckBGMCombatMusicBudget Error: Current seed cannot find acceptable music for the combat slot\n" + "Try a different seed!");
                         }
                     }
                 }
@@ -1882,10 +1888,11 @@ namespace MMR.Randomizer.Utils
                 {
                     var seqName = usedCombatSequence.Name;
                     log.AppendLine($"Combat sequence {seqName} was too big to match your BGM music, replacing ... ");
+
                     var combatSlot = RomData.TargetSequences.Find(u => u.Replaces == SMALL_ENEMY_BATTLE); // TargetSequences has SeqId as -1, use Replaces (u.Name == "mm-combat")
                     usedCombatSequence.Replaces = -1; // Cancel using this song
-                    bool status = SearchForValidSongReplacement(cosmeticSettings, unassignedSequences, combatSlot, rng, log);
-                    if (status == false)
+
+                    if (!SearchForValidSongReplacement(cosmeticSettings, unassignedSequences, combatSlot, rng, log))
                     {
                         throw new Exception("CheckBGMCombatMusicBudget Error: Current seed cannot find acceptable music for the combat slot\n" + "Try a different seed!");
                     }
@@ -1955,9 +1962,7 @@ namespace MMR.Randomizer.Utils
             // using the stored index in the parent's struct.
             //
             if (RomData.InstrumentSetList == null)
-            {
                 return;
-            }
 
             int soundbankAddr = RomData.MMFileList[5].Cmp_Addr; // In vanilla it's 0x97F70, but it can be shifted because MMR changes AudioSeq's location
             int audiobankInstSetAddr = RomData.MMFileList[3].Cmp_Addr; // Point to a specific instrument set, starting with 0 and updating per loop
@@ -2033,7 +2038,9 @@ namespace MMR.Randomizer.Utils
                         // Replace the sample struct's address with the correct address
                         // The first 4 bytes are a bitfield, so add 4 to the index
                         for (int i = 0; i < 4; i++)
+                        {
                             ROM[audiobankInstSetAddr + sampleBankAddress + i + 4] = newAddressBytes[i];
+                        } 
                     }
                 }
 
