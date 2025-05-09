@@ -16,7 +16,7 @@ namespace MMR.Randomizer.Utils
         /// <summary>
         /// The path to the 'music.cache' JSON file.
         /// </summary>
-        private static readonly string CachePath = Path.Combine(Values.MusicDirectory, "music.cache");
+        public static readonly string CachePath = Path.Combine(Values.MusicDirectory, "music.cache");
 
         /// <summary>
         /// Loads the 'music.cache' file into a dictionary.
@@ -68,7 +68,7 @@ namespace MMR.Randomizer.Utils
             // The sequence list containing all the sequence info added is also stored, that way if there are no
             // changes to the music folder, the randomizer can just load the cached list and skip looking through
             // the music directory
-            public Dictionary<string, string> FileHashes { get; set; } = new();
+            public Dictionary<string, string> FileHashes { get; set; } = new(StringComparer.OrdinalIgnoreCase);
             public List<SequenceInfo> SequenceList { get; set; } = new();
         }
     }
