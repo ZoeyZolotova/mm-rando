@@ -31,7 +31,7 @@ namespace MMR.Randomizer.Utils
         /// Stores a list of named music groups for fanfare.
         /// </summary>
         private static readonly string[] FANFARE_CATEGORIES =
-        {   //groups
+        [   //groups
             "ItemFanfares",
             "EventFanfares",
             "ClearFanfares",
@@ -56,7 +56,7 @@ namespace MMR.Randomizer.Utils
             "TempleClearLong",
             "GiantsLeave",
             "MoonDestroyed",
-        };
+        ];
 
         /// <summary>
         /// Backs up the current state of the music folder into a 'music.old' zip archive.
@@ -94,7 +94,7 @@ namespace MMR.Randomizer.Utils
         /// </summary>
         public static void CheckForOldFiles(string baseFolder)
         {
-            if (OLD_MUSIC_FILES.Any())
+            if (OLD_MUSIC_FILES.Count != 0)
                 OLD_MUSIC_FILES.Clear(); // Clear out the list if it's populated
 
             // These are the only files that need to be checked
@@ -179,25 +179,20 @@ namespace MMR.Randomizer.Utils
                 TempFolder = Path.Combine(Path.GetTempPath(), $"zseq_conversion_{Guid.NewGuid()}");
                 Directory.CreateDirectory(TempFolder);
 
-                ParseFilename(filename);
+                (Filename, InstrumentSet, Categories) = ParseFilename(filename);
             }
 
             /// <summary>
             /// Parses and extracts metadata from the standalone sequence file's filename.
             /// </summary>
-            public void ParseFilename(string filename)
+            public (string filename, string instrumentSet, string[] categories) ParseFilename(string filename)
             {
-                string basename = Path.GetFileName(filename);
-                string nameNoExt = basename.Replace(".zseq", "");
-
-                string[] parts = nameNoExt.Split('_');
+                string[] parts = Path.GetFileNameWithoutExtension(filename).Split('_');
 
                 if (parts.Length != 3)
                     throw new Exception("Invalid filename format.");
 
-                Filename = parts[0];
-                InstrumentSet = parts[1];
-                Categories = parts[2].Split('-');
+                return (parts[0], parts[1], parts[2].Split('-'));
             }
 
             /// <summary>
@@ -211,30 +206,10 @@ namespace MMR.Randomizer.Utils
 
                 using (var src = new FileStream(filepath, FileMode.Open, FileAccess.Read))
                 using (var dst = new FileStream(tempSeqFilePath, FileMode.Create, FileAccess.Write))
-                {
-                    src.CopyTo(dst);
-                }
+                src.CopyTo(dst);
 
                 if (File.Exists(filepath))
                     File.Delete(filepath);
-            }
-
-            /// <summary>
-            /// Packs the music file into an '.mmrs' archive.
-            /// </summary>
-            public void Pack(string filename, string destinationDir)
-            {
-                // packs the sequence into a new archive
-                
-                string archivePath = Path.Combine(destinationDir, filename);
-
-                ZipFile.CreateFromDirectory(TempFolder, $"{archivePath}.zip", CompressionLevel.Optimal, false);
-
-                string zipFilePath = $"{archivePath}.zip";
-                string mmrsFilePath = $"{archivePath}.mmrs";
-
-                if (File.Exists(zipFilePath))
-                    File.Move(zipFilePath, mmrsFilePath);
             }
         }
 
@@ -246,11 +221,11 @@ namespace MMR.Randomizer.Utils
             public List<(string Base, string Extension)> Sequences { get; set; } = new();
             public string Categories { get; set; }
             public Dictionary<string, (string ZBank, string BankMeta)> Banks { get; set; } = new();
-            public Dictionary<string, string> FormMasks { get; set; } = new();
+            public Dictionary<string, string> Formmasks { get; set; } = new();
             public Dictionary<string, uint> ZSounds { get; set; } = new();
             public string TempFolder { get; set; }
 
-            private static readonly string[] SEQ_EXTS = new[] { ".seq", ".zseq", ".aseq" };
+            private static readonly string[] SEQ_EXTS = [".seq", ".zseq", ".aseq"];
 
             public MusicArchive(bool skipTempCreate = false)
             {
@@ -264,7 +239,7 @@ namespace MMR.Randomizer.Utils
             /// <summary>
             /// Unpacks the music file into a temp folder.
             /// </summary>
-            public void Unpack(string filename, string filePath)
+            public void Unpack(string filePath)
             {
                 if (Directory.Exists(TempFolder))
                     Directory.Delete(TempFolder, recursive: true);
@@ -273,88 +248,64 @@ namespace MMR.Randomizer.Utils
 
                 foreach (var f in Directory.GetFiles(TempFolder))
                 {
-                    var fileName = Path.GetFileName(f);
-                    var ext = Path.GetExtension(fileName).ToLowerInvariant();
+                    var filename = Path.GetFileName(f);
+                    var ext = Path.GetExtension(filename).ToLowerInvariant();
+                    var baseName = Path.GetFileNameWithoutExtension(filename);
 
-                    if (SEQ_EXTS.Contains(ext))
+                    switch (ext)
                     {
-                        var baseName = Path.GetFileNameWithoutExtension(f);
-                        Sequences.Add((baseName, ext));
-                        continue;
-                    }
+                        case var _ when SEQ_EXTS.Contains(f):
+                            Sequences.Add((baseName, ext));
+                            break;
 
-                    if (ext == ".zbank")
-                    {
-                        var baseName = Path.GetFileNameWithoutExtension(fileName);
-                        var zbankPath = fileName;
-                        var bankMetaPath = $"{baseName}.bankmeta";
+                        case ".zbank":
+                            var bankmetaPath = $"";
+                            if (!File.Exists(Path.Combine(TempFolder, bankmetaPath)))
+                                throw new FileNotFoundException($"Missing bankmeta for {filePath}!");
+                            Banks[baseName] = (filename, bankmetaPath);
+                            break;
 
-                        if (File.Exists(Path.Combine(TempFolder, bankMetaPath)))
-                        {
-                            Banks[baseName] = (zbankPath, bankMetaPath);
-                        }
-                        else
-                        {
-                            throw new FileNotFoundException($"Missing bankmeta for {zbankPath}!");
-                        }
-                        continue;
-                    }
+                        case ".bankmeta":
+                            break;
 
-                    if (ext == ".bankmeta")
-                        continue;
+                        case ".formmask":
+                            Formmasks[baseName] = filename;
+                            break;
 
-                    if (fileName == "categories.txt")
-                    {
-                        Categories = fileName;
-                        continue;
-                    }
+                        case ".zsound":
+                            ProcessZSound(filename);
+                            break;
 
-                    if (ext == ".formmask")
-                    {
-                        var baseName = Path.GetFileNameWithoutExtension(fileName);
-                        FormMasks[baseName] = fileName;
-                        continue;
-                    }
-
-                    if (ext == ".zsound")
-                    {
-                        var split = fileName.Split(new[] { ".zsound" }, StringSplitOptions.None)[0];
-                        var parts = split.Split('_');
-
-                        if (parts.Length != 2)
-                            throw new Exception($"ERROR: An exception occurred while processing a zsound file: {fileName} — wrong format!");
-
-                        var name = parts[0];
-                        var tempAddr = Convert.ToUInt32(parts[1], 16);
-
-                        var oldPath = Path.Combine(TempFolder, fileName);
-                        var newPath = Path.Combine(TempFolder, $"{name}.zsound");
-
-                        File.Move(oldPath, newPath);
-                        ZSounds[name] = tempAddr;
+                        default:
+                            if (filename.Equals("categories.txt", StringComparison.OrdinalIgnoreCase))
+                                Categories = filename;
+                            break;
                     }
                 }
 
-                if (!Sequences.Any())
+                if (Sequences.Count == 0)
                     throw new FileNotFoundException("No sequence file found!");
                 if (Categories == null)
                     throw new FileNotFoundException("No categories.txt file found!");
             }
 
-            /// <summary>
-            /// Packs the music file into an '.mmrs' archive.
-            /// </summary>
-            public void Pack(string filename, string destinationDir)
+            private void ProcessZSound(string filename)
             {
-                string archivePath = Path.Combine(destinationDir, filename);
+                string split = filename.Split(".zsound")[0];
+                string[] parts = split.Split("_");
 
-                ZipFile.CreateFromDirectory(TempFolder, $"{archivePath}.zip", CompressionLevel.Optimal, false);
+                if (parts.Length != 2)
+                    throw new Exception($"ERROR: An exception occurred while processing a zsound file: {filename} — wrong format!");
 
-                string zipFilePath = $"{archivePath}.zip";
-                string mmrsFilePath = $"{archivePath}.mmrs";
+                string name = parts[0];
+                if (!uint.TryParse(parts[1], NumberStyles.HexNumber, null, out uint tempaddr))
+                    throw new Exception($"ERROR: Invalid address in zsound filename: {filename}");
 
-                if (File.Exists(zipFilePath))
-                    File.Move(zipFilePath, mmrsFilePath);
+                string oldPath = Path.Combine(TempFolder, filename);
+                string newPath = Path.Combine(TempFolder, $"{name}.zsound");
+
+                File.Move(oldPath, newPath);
+                ZSounds[name] = tempaddr;
             }
         }
 
@@ -410,7 +361,7 @@ namespace MMR.Randomizer.Utils
                 }
                 catch (Exception)
                 {
-                    //
+                    // maybe log errors?
                 }
             });
 
@@ -422,66 +373,10 @@ namespace MMR.Randomizer.Utils
         }
 
         /// <summary>
-        /// Writes the YAML metadata file for the new metadata YAML '.mmrs' file format.
-        /// </summary>
-        private static void WriteMetadata(string folder, string baseName, string cosmeticName, string metaBank, string songType, List<object> categories, Dictionary<string, uint> zsounds = null)
-        {
-            // Prepare the YAML object
-            var yaml = new MusicMetadataYaml
-            {
-                Game = "mm",
-                Metadata = new MusicMetadataYaml.Meta
-                {
-                    DisplayName = cosmeticName,
-                    InstrumentSet = metaBank,
-                    SongType = songType,
-                    MusicGroups = categories,
-                    AudioSamples = null
-                }
-            };
-
-            // Optional audio sample info from zsounds
-            if (zsounds != null && zsounds.Any())
-            {
-                yaml.Metadata.AudioSamples = new Dictionary<string, MusicMetadataYaml.Sample>();
-
-                var index = 0;
-                foreach (var kvp in zsounds)
-                {
-                    string filename = $"{kvp.Key}.zsound"; // don't know if the extension is needed, but just in case...
-                    uint tempAddr = kvp.Value;
-
-                    // Since old data doesn't use the new format, the type, index, and keyregion can be left null
-                    yaml.Metadata.AudioSamples[$"{filename}"] = new MusicMetadataYaml.Sample
-                    {
-                        // Type = "~",
-                        // Index = -1,
-                        // KeyRegion = "~",
-                        TempAddress = tempAddr
-                    };
-
-                    index++;
-                }
-            }
-
-            // Serialize to YAML
-            string yamlOutput = YamlSerializer.FlowListSerialize(yaml);
-
-            File.WriteAllText(Path.Combine(folder, $"{baseName}.meta"), yamlOutput);
-        }
-
-        /// <summary>
         /// Converts a standalone sequence ('.zseq') file to the new metadata YAML '.mmrs' file format.
         /// </summary>
         private static void ConvertStandalone(string destinationFile, string destinationDir)
         {
-            // converts a zseq into the new mmrs file
-            
-            string cosmeticName = "";
-            string metaBank = "";
-            string songType = "";
-            string[] categories;
-
             string filename = Path.GetFileNameWithoutExtension(destinationFile);
             string filepath = Path.GetFullPath(destinationFile);
 
@@ -491,42 +386,15 @@ namespace MMR.Randomizer.Utils
             {
                 standaloneSeq.Copy(filepath);
 
-                cosmeticName = Regex.Replace(standaloneSeq.Filename, @"(^|\W)(songforce|songtest)(?=\W|$)", " ", RegexOptions.IgnoreCase);
-                cosmeticName = Regex.Replace(cosmeticName, @"\s+", " ").Trim();
-                cosmeticName = string.IsNullOrWhiteSpace(cosmeticName) ? "???" : cosmeticName;
+                string cosmeticName = CleanCosmeticName(standaloneSeq.Filename);
+                string metaBank = standaloneSeq.InstrumentSet;
 
-                metaBank = standaloneSeq.InstrumentSet;
-                var rawCategories = standaloneSeq.Categories;
-                List<object> cleanedCategories = new();
-                foreach (var category in rawCategories)
-                {
-                    string cleaned = category.Trim();
+                List<object> categories = ParseCategories(standaloneSeq.Categories);
+                string songType = GetSongType(categories);
 
-                    if (cleaned.StartsWith("0x", StringComparison.OrdinalIgnoreCase))
-                        cleaned = cleaned.Substring(2);
+                WriteMetadata(standaloneSeq.TempFolder, standaloneSeq.Filename, cosmeticName, metaBank, songType, categories);
 
-                    int value = Convert.ToInt32(cleaned, 16);
-
-                    if (Enum.IsDefined(typeof(MusicGroups.Category), value))
-                        cleanedCategories.Add(Enum.GetName(typeof(MusicGroups.Category), value));
-                }
-
-                categories = cleanedCategories.OfType<string>().ToArray();
-
-                bool[] ffOrBgm = new bool[categories.Length];
-                for (int i = 0; i < categories.Length; i++)
-                    ffOrBgm[i] = FANFARE_CATEGORIES.Contains(categories[i].ToUpper());
-
-                if (Array.TrueForAll(ffOrBgm, x => x))
-                    songType = "fanfare";
-                else if (Array.Exists(ffOrBgm, x => !x) && Array.Exists(ffOrBgm, x => x))
-                    throw new Exception($"ERROR: Mixed categories for categories.txt in .mmrs file: {filename}.mmrs!");
-                else
-                    songType = "bgm";
-
-                WriteMetadata(standaloneSeq.TempFolder, standaloneSeq.Filename, cosmeticName, metaBank, songType, cleanedCategories);
-
-                standaloneSeq.Pack(standaloneSeq.Filename, destinationDir);
+                Pack(standaloneSeq.Filename, standaloneSeq.TempFolder, destinationDir);
             }
             catch (Exception)
             {
@@ -544,13 +412,6 @@ namespace MMR.Randomizer.Utils
         /// </summary>
         private static void ConvertArchive(string destinationFile, string destinationDir)
         {
-            // converts an old mmrs file into a new mmrs file
-            string cosmeticName = "";
-            string metaBank = "";
-            string songType = "";
-            List<object> categories = new();
-            Dictionary<string, uint> zsounds = new();
-
             string filename = Path.GetFileNameWithoutExtension(destinationFile);
             string filepath = Path.GetFullPath(destinationFile);
 
@@ -559,108 +420,14 @@ namespace MMR.Randomizer.Utils
 
             try
             {
-                archive.Unpack(filename, filepath);
+                archive.Unpack(filepath);
                 File.Delete(filepath);
 
-                cosmeticName = Regex.Replace(filename, @"(^|\W)(songforce|songtest)(?=\W|$)", " ", RegexOptions.IgnoreCase);
-                cosmeticName = Regex.Replace(cosmeticName, @"\s+", " ").Trim();
-                cosmeticName = string.IsNullOrWhiteSpace(cosmeticName) ? "???" : cosmeticName;
+                string cosmeticName = CleanCosmeticName(filename);
 
-                using (var reader = new StreamReader(Path.Combine(originalTemp, archive.Categories)))
-                {
-                    string raw = reader.ReadLine();
-                    string[] categoriesList;
+                (var categories, string songType) = ParseCategoriesAndSongType(Path.Combine(originalTemp, archive.Categories));
 
-                    if (raw.Contains("-"))
-                        categoriesList = raw.Split('-');
-                    else
-                        categoriesList = raw.Split(',');
-
-                    foreach (var category in categoriesList)
-                    {
-                        var cleanedCategory = category.Trim();
-                        if (cleanedCategory.StartsWith("0x", StringComparison.OrdinalIgnoreCase))
-                            cleanedCategory = cleanedCategory.Substring(2);
-
-                        // Convert to a string value
-                        var value = Convert.ToInt32(cleanedCategory, 16);
-
-                        if (Enum.IsDefined(typeof(MusicGroups.Category), value))
-                            categories.Add(Enum.GetName(typeof(MusicGroups.Category), value));
-                    }
-
-                    bool[] ffOrBgm = new bool[categories.Count];
-                    for (int i = 0; i < categories.Count; i++)
-                        ffOrBgm[i] = FANFARE_CATEGORIES.Contains(categories[i]);
-
-                    if (Array.TrueForAll(ffOrBgm, x => x))
-                        songType = "fanfare";
-                    else if (Array.Exists(ffOrBgm, x => !x) && Array.Exists(ffOrBgm, x => x))
-                        throw new Exception($"ERROR: Mixed categories for categories.txt in .mmrs file: {filename}.mmrs!");
-                    else
-                        songType = "bgm";
-                }
-
-                foreach (var (baseName, ext) in archive.Sequences)
-                {
-                    string songFolder = Path.Combine(originalTemp, $"{baseName}");
-                    Directory.CreateDirectory(songFolder);
-
-                    metaBank = baseName;
-
-                    string originalSeq = Path.Combine(originalTemp, $"{baseName}{ext}");
-                    string newSeqPath = Path.Combine(songFolder, $"{baseName}.seq");
-                    File.Copy(originalSeq, newSeqPath, true);
-
-                    if (archive.Banks.ContainsKey(baseName))
-                    {
-                        var zbank = archive.Banks[baseName].Item1;
-                        var bankmeta = archive.Banks[baseName].Item2;
-
-                        File.Copy(Path.Combine(originalTemp, zbank), Path.Combine(songFolder, zbank), true);
-                        File.Copy(Path.Combine(originalTemp, bankmeta), Path.Combine(songFolder, bankmeta), true);
-
-                        metaBank = "custom";
-
-                        foreach (var item in Directory.GetFiles(originalTemp, "*.zsound"))
-                            File.Copy(item, Path.Combine(songFolder, Path.GetFileName(item)), true);
-
-                        foreach (var z in archive.ZSounds)
-                            zsounds[z.Key] = z.Value;
-                    }
-
-                    if (archive.FormMasks.ContainsKey(baseName))
-                    {
-                        string formmask = archive.FormMasks[baseName];
-                        File.Copy(Path.Combine(originalTemp, formmask), Path.Combine(songFolder, formmask), true);
-                    }
-
-                    // Copy extra non-processed files
-                    foreach (var item in Directory.GetFiles(originalTemp))
-                    {
-                        if (item.EndsWith(".seq") || item.EndsWith(".zseq") || item.EndsWith(".aseq") ||
-                            item.EndsWith(".zbank") || item.EndsWith(".bankmeta") || item.EndsWith(".zsound") ||
-                            item.EndsWith(".formmask") || Path.GetFileName(item).Equals("categories.txt", StringComparison.OrdinalIgnoreCase))
-                            continue;
-
-                        File.Copy(item, Path.Combine(songFolder, Path.GetFileName(item)), true);
-                    }
-
-                    WriteMetadata(songFolder, baseName, cosmeticName, metaBank, songType, categories, zsounds);
-
-                    var tempArchive = new MusicArchive(skipTempCreate: true)
-                    {
-                        TempFolder = songFolder
-                    };
-
-                    if (archive.Sequences.Count > 1)
-                        tempArchive.Pack($"{filename}_{baseName}", destinationDir);
-                    else
-                        tempArchive.Pack($"{filename}", destinationDir);
-
-                    if (Directory.Exists(songFolder))
-                        Directory.Delete(songFolder, true);
-                }
+                ProcessArchiveSequences(archive, destinationDir, filename, cosmeticName, categories, songType, originalTemp);
             }
             catch (Exception)
             {
@@ -670,6 +437,71 @@ namespace MMR.Randomizer.Utils
             {
                 if (Directory.Exists(originalTemp))
                     Directory.Delete(originalTemp, true);
+            }
+        }
+
+        private static void ProcessArchiveSequences(MusicArchive archive, string destinationDir, string filename, string cosmeticName, List<object> categories, string songType, string originalTemp)
+        {
+            Dictionary<string, uint> zsounds = new();
+
+            foreach (var (baseName, ext) in archive.Sequences)
+            {
+                string songFolder = Path.Combine(originalTemp, $"{baseName}");
+                Directory.CreateDirectory(songFolder);
+
+                string metaBank = baseName;
+
+                string originalSeq = Path.Combine(originalTemp, $"{baseName}{ext}");
+                string newSeqPath = Path.Combine(songFolder, $"{baseName}.seq");
+                File.Copy(originalSeq, newSeqPath, true);
+
+                if (archive.Banks.ContainsKey(baseName))
+                {
+                    var zbank = archive.Banks[baseName].ZBank;
+                    var bankmeta = archive.Banks[baseName].BankMeta;
+
+                    File.Copy(Path.Combine(originalTemp, zbank), Path.Combine(songFolder, zbank), true);
+                    File.Copy(Path.Combine(originalTemp, bankmeta), Path.Combine(songFolder, bankmeta), true);
+
+                    metaBank = "custom";
+
+                    foreach (var item in Directory.GetFiles(originalTemp, "*.zsound"))
+                    {
+                        File.Copy(item, Path.Combine(songFolder, Path.GetFileName(item)), true);
+                    }
+
+                    foreach (var z in archive.ZSounds)
+                    {
+                        zsounds[z.Key] = z.Value;
+                    }
+                }
+
+                if (archive.Formmasks.ContainsKey(baseName))
+                {
+                    string formmask = archive.Formmasks[baseName];
+                    File.Copy(Path.Combine(originalTemp, formmask), Path.Combine(songFolder, formmask), true);
+                }
+
+                CopyUnprocessedFiles(originalTemp, songFolder);
+
+                WriteMetadata(songFolder, baseName, cosmeticName, metaBank, songType, categories, zsounds);
+
+                var tempArchive = new MusicArchive(skipTempCreate: true)
+                {
+                    TempFolder = songFolder
+                };
+
+                if (archive.Sequences.Count > 1)
+                {
+                    Pack($"{filename}_{baseName}", tempArchive.TempFolder, destinationDir);
+                }
+                else
+                {
+                    Pack($"{filename}", tempArchive.TempFolder, destinationDir);
+                }
+
+                if (Directory.Exists(songFolder))
+                    Directory.Delete(songFolder, true);
             }
         }
 
@@ -691,22 +523,24 @@ namespace MMR.Randomizer.Utils
 
                 // Convert instrument set to int
                 if (instrumentSetStr.StartsWith("0x", StringComparison.OrdinalIgnoreCase))
-                    instrumentSetStr = instrumentSetStr.Substring(2);
+                {
+                    instrumentSetStr = instrumentSetStr[2..];
+                }
 
                 int instrumentSet = int.Parse(instrumentSetStr, NumberStyles.HexNumber);
 
                 // Convert sequence id to int
                 if (seqIdStr.StartsWith("0x", StringComparison.OrdinalIgnoreCase))
-                    seqIdStr = seqIdStr.Substring(2);
+                {
+                    seqIdStr = seqIdStr[2..];
+                }
 
                 int seqId = int.Parse(seqIdStr, NumberStyles.HexNumber);
 
                 if (!AudioSequenceIds.SEQUENCE_ID_MAP.TryGetValue(seqId, out var def))
-                {
                     continue;
-                }
 
-                var musicGroupList = musicGroups.Split(new[] { ',', '-' }, StringSplitOptions.RemoveEmptyEntries)
+                var musicGroupList = musicGroups.Split([',', '-'], StringSplitOptions.RemoveEmptyEntries)
                     .Select(s =>
                     {
                         bool parsed = int.TryParse(s.Trim(), NumberStyles.HexNumber, null, out int val);
@@ -735,6 +569,144 @@ namespace MMR.Randomizer.Utils
             }
 
             File.WriteAllText(seqsYamlFile, YamlSerializer.FlowListSerialize(output));
+        }
+
+        /// <summary>
+        /// Writes the YAML metadata file for the new metadata YAML '.mmrs' file format.
+        /// </summary>
+        private static void WriteMetadata(string folder, string baseName, string cosmeticName, string metaBank, string songType, List<object> categories, Dictionary<string, uint> zsounds = null)
+        {
+            // Prepare the YAML object
+            var yaml = new MusicMetadataYaml
+            {
+                Game = "mm",
+                Metadata = new MusicMetadataYaml.Meta
+                {
+                    DisplayName = cosmeticName,
+                    InstrumentSet = metaBank,
+                    SongType = songType,
+                    MusicGroups = categories,
+                    AudioSamples = null
+                }
+            };
+
+            // Optional audio sample info from zsounds
+            if (zsounds != null && zsounds.Count != 0)
+            {
+                yaml.Metadata.AudioSamples = new Dictionary<string, MusicMetadataYaml.Sample>();
+
+                var index = 0;
+                foreach (var kvp in zsounds)
+                {
+                    string filename = $"{kvp.Key}.zsound"; // don't know if the extension is needed, but just in case...
+                    uint tempAddr = kvp.Value;
+
+                    // Since old data doesn't use the new format, the type, index, and keyregion can be left null
+                    yaml.Metadata.AudioSamples[$"{filename}"] = new MusicMetadataYaml.Sample
+                    {
+                        // Type = "~",
+                        // Index = -1,
+                        // KeyRegion = "~",
+                        TempAddress = tempAddr
+                    };
+
+                    index++;
+                }
+            }
+
+            // Serialize to YAML
+            string yamlOutput = YamlSerializer.FlowListSerialize(yaml);
+
+            File.WriteAllText(Path.Combine(folder, $"{baseName}.meta"), yamlOutput);
+        }
+
+        private static string CleanCosmeticName(string name)
+        {
+            name = Regex.Replace(name, @"(^|\W)(songforce|songtest)(?=\W|$)", " ", RegexOptions.IgnoreCase);
+            name = Regex.Replace(name, @"\s+", " ").Trim();
+            return string.IsNullOrWhiteSpace(name) ? "???" : name;
+        }
+
+        private static List<object> ParseCategories(IEnumerable<string> rawCategories)
+        {
+            var categories = new List<object>();
+
+            foreach (var c in rawCategories)
+            {
+                var cleanedCategory = c.Trim();
+
+                if (cleanedCategory.StartsWith("0x", StringComparison.OrdinalIgnoreCase))
+                {
+                    cleanedCategory = cleanedCategory[2..];
+                }
+
+                // Convert to a string value
+                if (int.TryParse(cleanedCategory, NumberStyles.HexNumber, null, out int value)
+                    && Enum.IsDefined(typeof(MusicGroups.Category), value))
+                {
+                    categories.Add(Enum.GetName(typeof(MusicGroups.Category), value));
+                }
+            }
+
+            return categories;
+        }
+
+        private static string GetSongType(IEnumerable<object> categories)
+        {
+            var flags = categories.Select(c => FANFARE_CATEGORIES.Contains(c)).ToArray();
+
+            if (flags.All(f => f))
+                return "fanfare";
+
+            if (flags.Any(f => f) && flags.Any(f => !f))
+                throw new Exception();
+
+            return "bgm";
+        }
+
+        private static (List<object> Categories, string SongType) ParseCategoriesAndSongType(string categoryFile)
+        {
+            string raw = File.ReadLines(categoryFile).FirstOrDefault()?.Trim() ?? "";
+            string[] list = raw.Contains('-') ? raw.Split('-') : raw.Split(',');
+
+            var categories = ParseCategories(list);
+            var songType = GetSongType(categories);
+
+            return (categories, songType);
+        }
+
+        private static void CopyUnprocessedFiles(string sourceDir, string destinationDir)
+        {
+            string[] skipExts = [".seq", ".zseq", ".aseq", ".zbank", ".bankmeta", ".zsound", ".formmask"];
+            string skipFile = "categories.txt";
+
+            foreach (var file in Directory.GetFiles(sourceDir))
+            {
+                string name = Path.GetFileName(file);
+                string ext = Path.GetExtension(file);
+
+                if (skipExts.Contains(ext, StringComparer.OrdinalIgnoreCase) || name.Equals(skipFile, StringComparison.OrdinalIgnoreCase))
+                    continue;
+
+                File.Copy(file, Path.Combine(destinationDir, name), true);
+            }
+
+        }
+
+        /// <summary>
+        /// Packs the music file into an '.mmrs' archive.
+        /// </summary>
+        public static void Pack(string filename, string tempFolder, string destinationDir)
+        {
+            string archivePath = Path.Combine(destinationDir, filename);
+
+            ZipFile.CreateFromDirectory(tempFolder, $"{archivePath}.zip", CompressionLevel.Fastest, false);
+
+            string zipFilePath = $"{archivePath}.zip";
+            string mmrsFilePath = $"{archivePath}.mmrs";
+
+            if (File.Exists(zipFilePath))
+                File.Move(zipFilePath, mmrsFilePath);
         }
     }
 }
