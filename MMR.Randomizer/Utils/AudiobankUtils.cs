@@ -276,7 +276,7 @@ namespace MMR.Randomizer.Utils
             public uint Size { get; set; } // Size of the binary ADPCM audio sample
             public uint? Address {  get; set; } // Sample address if it was in audiotable 0 or 1
             public uint? AudiotableAddress { get; set; } // Sample address in the bank's corresponding audiotable
-            public byte[] Data { get; set; }
+            public byte[] Data { get; set; } // Binary ADPCM audio sample data
 
             public Sample(byte[] bankData, byte[] audiotable, byte[] audiotableIndex, uint sampleOffset, int audiotableId, TParent parent, int parentId, string keyRegion = null)
             {
