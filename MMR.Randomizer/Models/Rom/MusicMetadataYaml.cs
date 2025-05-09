@@ -3,17 +3,29 @@ using YamlDotNet.Serialization;
 
 namespace MMR.Randomizer.Models.Rom
 {
-    public class MMRSMetadataYAML
+    /// <summary>
+    /// Represents the '.meta' YAML formatted metadata file used in Zelda64 music files.
+    /// </summary>
+    public class MusicMetadataYaml
     {
+        /// <summary>
+        /// Represents the "game" field in the root YAML dictionary.
+        /// </summary>
         [YamlMember(Alias = "game")]
         public string Game { get; set; }
 
         [YamlMember(Alias = "metadata")]
         public Meta Metadata { get; set; }
 
+        /// <summary>
+        /// Represents a formmask array in the root YAML dictionary.
+        /// </summary>
         [YamlMember(Alias = "formmask")]
         public SequencePlayState[] Formmask { get; set; }
 
+        /// <summary>
+        /// Represents the "metadata" YAML dictionary.
+        /// </summary>
         public class Meta
         {
             [YamlMember(Alias = "display name")]
@@ -32,6 +44,9 @@ namespace MMR.Randomizer.Models.Rom
             public Dictionary<string, Sample> AudioSamples { get; set; }
         }
 
+        /// <summary>
+        /// Represents the "audio sample" YAML dictionary.
+        /// </summary>
         public class Sample
         {
             [YamlMember(Alias = "instrument type")]
