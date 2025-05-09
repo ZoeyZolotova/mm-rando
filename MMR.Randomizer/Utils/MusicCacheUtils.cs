@@ -8,12 +8,20 @@ using MMR.Common.Utils;
 
 namespace MMR.Randomizer.Utils
 {
+    /// <summary>
+    /// Handles caching of the files in the music folder and the sequence list.
+    /// </summary>
     public static class MusicCacheUtils
     {
-        // Caches the user's music folder, so only files not currently cached need to be processed and added to the sequence list
-
+        /// <summary>
+        /// The path to the 'music.cache' JSON file.
+        /// </summary>
         private static readonly string CachePath = Path.Combine(Values.MusicDirectory, "music.cache");
 
+        /// <summary>
+        /// Loads the 'music.cache' file into a dictionary.
+        /// </summary>
+        /// <returns>Empty music cache if there's no cache.</returns>
         public static MusicCache Load()
         {
             if (!File.Exists(CachePath))
@@ -31,12 +39,19 @@ namespace MMR.Randomizer.Utils
             };
         }
 
+        /// <summary>
+        /// Saves a MusicCache object to a 'music.cache' JSON file.
+        /// </summary>
         public static void Save(MusicCache cache)
         {
             var content = JsonSerializer.Serialize(cache);
             File.WriteAllText(CachePath, content);
         }
 
+        /// <summary>
+        /// Calculates the SHA256 for a given file.
+        /// </summary>
+        /// <returns>SHA256 hash string.</returns>
         public static string GetFileHash(string filePath)
         {
             using var hash = SHA256.Create();
@@ -44,6 +59,9 @@ namespace MMR.Randomizer.Utils
             return BitConverter.ToString(hash.ComputeHash(stream)).Replace("-", "").ToLowerInvariant();
         }
 
+        /// <summary>
+        /// Represents a 'music.cache' JSON file storing a dictionary of filepaths and SHA256 hash strings, and the sequence list.
+        /// </summary>
         public class MusicCache
         {
             // The music cache stores the filename and SHA256 of every custom music file
