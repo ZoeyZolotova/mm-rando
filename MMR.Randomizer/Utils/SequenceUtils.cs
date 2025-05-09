@@ -172,6 +172,10 @@ namespace MMR.Randomizer.Utils
         /// </summary>
         public static void ReadSequenceInfo()
         {
+            // If the music directory doesn't exist, create it because it's required still
+            if (!Directory.Exists(Values.MusicDirectory))
+                Directory.CreateDirectory(Values.MusicDirectory);
+
             md5lib = MD5.Create();
 
             // Initialize the list of sequences and targets
@@ -214,10 +218,6 @@ namespace MMR.Randomizer.Utils
             }
 
             var sequenceEntries = YamlSerializer.Deserialize<Dictionary<string, SEQSYaml>>(seqsContent);
-
-            // If the music directory doesn't exist, create it because it's required still
-            if (!Directory.Exists(Values.MusicDirectory))
-                Directory.CreateDirectory(Values.MusicDirectory);
 
             // Loop through each entry in the SEQS file
             // Entries are a YAML dictionary, for example:
