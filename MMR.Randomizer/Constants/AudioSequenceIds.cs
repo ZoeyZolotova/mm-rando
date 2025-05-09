@@ -4,6 +4,9 @@ namespace MMR.Randomizer.Constants
 {
     // Alignment is intentional, please don't remove it, it's easier to read and the file is just constants ＜(´⌯ w ⌯`)＞
 
+    /// <summary>
+    /// Stores sequence ID magic numbers to named constant values and a dictionary of sequence that can be used as song slots.
+    /// </summary>
     public static class AudioSequenceIds
     {
         // Store AudioSeq indices to a name
@@ -139,6 +142,9 @@ namespace MMR.Randomizer.Constants
         // Store the sequences that can currently be randomized, their internal name, their display name, and their type
         // This is used during SEQS plaintext to YAML conversion, as well as ensuring the sequence ID from a SEQS file
         // matches a vanilla ID if it's an available vanilla sequence slot
+        /// <summary>
+        /// A dictionary of sequence IDs that can be used as song slots and a tuple for its internal name, display name, and song type.
+        /// </summary>
         public static readonly Dictionary<int, (string Name, string DisplayName, string Type)> SEQUENCE_ID_MAP = new()
         {
             // Sequence ID for matching, then tuple of data
