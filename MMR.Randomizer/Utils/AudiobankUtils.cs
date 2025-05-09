@@ -1,15 +1,18 @@
 using System;
 using System.Buffers.Binary;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 
 namespace MMR.Randomizer.Utils
 {
+    /// <summary>
+    /// Stores classes that parse Zelda64 binary audio file and instrument bank data.
+    /// </summary>
     public class AudiobankUtils
     {
-        // Parses through a binary instrument bank (.zbank, decompressed) file and stores data
-
+        /// <summary>
+        /// Represents the possible Zelda64 audio sample codecs.
+        /// </summary>
         public enum AudioSampleCodec : int
         {
             CODEC_ADPCM,
@@ -20,6 +23,9 @@ namespace MMR.Randomizer.Utils
             CODEC_S16
         }
 
+        /// <summary>
+        /// Represents the possible Zelda64 audio sample storage mediums.
+        /// </summary>
         public enum AudioStorageMedium: int
         {
             MEDIUM_RAM,
@@ -28,6 +34,9 @@ namespace MMR.Randomizer.Utils
             MEDIUM_DISK_DRIVE
         }
 
+        /// <summary>
+        /// Interface to return data from a sample that requires a parent object.
+        /// </summary>
         public interface ISample
         {
             string ParentString { get; }
@@ -38,9 +47,9 @@ namespace MMR.Randomizer.Utils
             byte[] Data { get; }
         }
 
-        // Should only need the sample offsets, and int should be fine for bank addresses
-        // because there shouldn't be a bank out there longer than 0x7FFFFFFF bytes
-
+        /// <summary>
+        /// Represents the audiobank, audiobank index, audiotable, and audiotable index Zelda64 binary files.
+        /// </summary>
         public class Audiobin
         {
             public byte[] AudiobankTable { get; set; }
@@ -67,6 +76,12 @@ namespace MMR.Randomizer.Utils
                 }
             }
 
+            /// <summary>
+            /// Runs through each audiobank in the audio binary to find a sample with matching data.
+            /// </summary>
+            /// <returns>
+            /// Returns the matched sample, otherwise returns 'null'.
+            /// </returns>
             public ISample FindSampleInBanks(byte[] sampleData)
             {
                 foreach (var bank in Audiobanks)
@@ -100,6 +115,9 @@ namespace MMR.Randomizer.Utils
             }
         }
 
+        /// <summary>
+        /// Represents a Zelda64 binary instrument bank.
+        /// </summary>
         public class Audiobank {
 
             public uint BankOffset { get; set; }
@@ -201,11 +219,16 @@ namespace MMR.Randomizer.Utils
                 }
             }
 
+            /// <summary>
+            /// Runs through all the instruments, drums, and effects in the instrument bank,
+            /// then adds any sample objects it finds to a list so their addresses can be
+            /// searched when updating custom audio sample pointers.
+            /// </summary>
+            /// <returns>
+            /// List of all samples in the instrument bank.
+            /// </returns>
             public List<ISample> GetBankSamples()
             {
-                // This runs through all the instruments, drums, and effects and adds any
-                // sample structs it finds to a list so the addresses can be searched
-
                 List<ISample> allSamples = new();
 
                 foreach (var instrument in Instruments)
@@ -239,10 +262,12 @@ namespace MMR.Randomizer.Utils
             }
         }
 
+        /// <summary>
+        /// Represents a Sample struct for a Zelda64 binary instrument bank.
+        /// </summary>
         public class Sample<TParent> : ISample
         {
             // The parent object is stored for fallback to get the index value in Instruments, Drums, or Effects
-            // The bitfield is ignored because it is unneeded currently
 
             public TParent Parent;
             public string ParentString { get; set; }
@@ -333,10 +358,11 @@ namespace MMR.Randomizer.Utils
             }
         }
 
+        /// <summary>
+        /// Represents a Drum struct for a Zelda64 binary instrument bank.
+        /// </summary>
         public class Drum
         {
-            // Gets data from a Drum struct in an instrument bank
-
             public int DrumId { get; set; }
             public int DecayIndex { get; set; }
             public int Pan {  get; set; }
@@ -363,10 +389,11 @@ namespace MMR.Randomizer.Utils
             }
         }
 
+        /// <summary>
+        /// Represents a TunedSample struct in the effect list for a Zelda64 binary instrument bank.
+        /// </summary>
         public class Effect
         {
-            // Gets data from a TunedSample struct in the Effects list in an instrument bank
-
             public int EffectId { get; set; }
             public uint SampleAddress { get; set; }
             public float SampleTuning { get; set; }
@@ -386,10 +413,11 @@ namespace MMR.Randomizer.Utils
             }
         }
 
+        /// <summary>
+        /// Represents an Instrument struct for a Zelda64 binary instrument bank.
+        /// </summary>
         public class Instrument
         {
-            // Gets data from an Instrument struct in an instrument bank
-
             public int InstrumentId {  get; set; }
             public int LowKeyRegion { get; set; }
             public int HighKeyRegion { get; set; }
