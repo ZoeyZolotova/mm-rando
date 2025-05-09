@@ -349,7 +349,7 @@ namespace MMR.Randomizer.Utils
         /// <summary>
         /// Begins the process of converting old format music files into the metadata YAML '.mmrs' file format.
         /// </summary>
-        public static void ProcessFiles(string baseFolder, string convFolder)
+        private static void ProcessFiles(string baseFolder, string convFolder)
         {
             // creates conversion folder, then copies and converts every file in the original music folder
             // into the new music folder
@@ -412,7 +412,7 @@ namespace MMR.Randomizer.Utils
         /// <summary>
         /// Writes the YAML metadata file for the new metadata YAML '.mmrs' file format.
         /// </summary>
-        public static void WriteMetadata(string folder, string baseName, string cosmeticName, string metaBank, string songType, List<object> categories, Dictionary<string, uint> zsounds = null)
+        private static void WriteMetadata(string folder, string baseName, string cosmeticName, string metaBank, string songType, List<object> categories, Dictionary<string, uint> zsounds = null)
         {
             // Prepare the YAML object
             var yaml = new MusicMetadataYaml
@@ -461,7 +461,7 @@ namespace MMR.Randomizer.Utils
         /// <summary>
         /// Converts a standalone sequence ('.zseq') file to the new metadata YAML '.mmrs' file format.
         /// </summary>
-        public static void ConvertStandalone(string destinationFile, string destinationDir)
+        private static void ConvertStandalone(string destinationFile, string destinationDir)
         {
             // converts a zseq into the new mmrs file
             
@@ -530,7 +530,7 @@ namespace MMR.Randomizer.Utils
         /// <summary>
         /// Converts an old format '.mmrs' file to the new metadata YAML '.mmrs' file format.
         /// </summary>
-        public static void ConvertArchive(string destinationFile, string destinationDir)
+        private static void ConvertArchive(string destinationFile, string destinationDir)
         {
             // converts an old mmrs file into a new mmrs file
             string cosmeticName = "";
@@ -664,7 +664,7 @@ namespace MMR.Randomizer.Utils
         /// <summary>
         /// Converts a SEQS plaintext file to a SEQS YAML file.
         /// </summary>
-        public static void ConvertSEQSToYAML(string seqsTxtFile, string seqsYamlFile)
+        private static void ConvertSEQSToYAML(string seqsTxtFile, string seqsYamlFile)
         {
             var lines = File.ReadAllLines(seqsTxtFile).Where(l => !string.IsNullOrWhiteSpace(l)).ToList();
             var output = new Dictionary<string, SequenceUtils.SEQSYaml>();
