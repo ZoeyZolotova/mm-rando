@@ -415,10 +415,10 @@ namespace MMR.Randomizer.Utils
         public static void WriteMetadata(string folder, string baseName, string cosmeticName, string metaBank, string songType, List<object> categories, Dictionary<string, uint> zsounds = null)
         {
             // Prepare the YAML object
-            var yaml = new MMRSMetadataYAML
+            var yaml = new MusicMetadataYaml
             {
                 Game = "mm",
-                Metadata = new MMRSMetadataYAML.Meta
+                Metadata = new MusicMetadataYaml.Meta
                 {
                     DisplayName = cosmeticName,
                     InstrumentSet = metaBank,
@@ -431,7 +431,7 @@ namespace MMR.Randomizer.Utils
             // Optional audio sample info from zsounds
             if (zsounds != null && zsounds.Any())
             {
-                yaml.Metadata.AudioSamples = new Dictionary<string, MMRSMetadataYAML.Sample>();
+                yaml.Metadata.AudioSamples = new Dictionary<string, MusicMetadataYaml.Sample>();
 
                 var index = 0;
                 foreach (var kvp in zsounds)
@@ -440,7 +440,7 @@ namespace MMR.Randomizer.Utils
                     uint tempAddr = kvp.Value;
 
                     // Since old data doesn't use the new format, the type, index, and keyregion can be left null
-                    yaml.Metadata.AudioSamples[$"{filename}"] = new MMRSMetadataYAML.Sample
+                    yaml.Metadata.AudioSamples[$"{filename}"] = new MusicMetadataYaml.Sample
                     {
                         // Type = "~",
                         // Index = -1,
