@@ -1,4 +1,4 @@
-﻿using Be.IO;
+using Be.IO;
 using MMR.Common.Extensions;
 using MMR.Randomizer.Models.Rom;
 using MMR.Randomizer.Utils;
@@ -91,7 +91,7 @@ namespace MMR.Randomizer.Patch
             try
             {
                 var aes = Aes.Create();
-                var hashAlg = new SHA256Managed();
+                var hashAlg = SHA256.Create();
                 using (var cryptoStream = new CryptoStream(inStream, aes.CreateDecryptor(key, iv), CryptoStreamMode.Read))
                 using (var hashStream = new CryptoStream(cryptoStream, hashAlg, CryptoStreamMode.Read))
                 using (var decompressStream = new GZipStream(hashStream, CompressionMode.Decompress))
@@ -155,7 +155,7 @@ namespace MMR.Randomizer.Patch
         public static byte[] CreatePatch(Stream outStream, List<MMFile> originalMMFiles)
         {
             var aes = Aes.Create();
-            var hashAlg = new SHA256Managed();
+            var hashAlg = SHA256.Create();
             using (var cryptoStream = new CryptoStream(outStream, aes.CreateEncryptor(key, iv), CryptoStreamMode.Write))
             using (var hashStream = new CryptoStream(cryptoStream, hashAlg, CryptoStreamMode.Write))
             using (var compressStream = new GZipStream(hashStream, CompressionMode.Compress))
