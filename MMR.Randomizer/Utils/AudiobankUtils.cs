@@ -57,7 +57,7 @@ namespace MMR.Randomizer.Utils
             public byte[] AudiobankIndex { get; set; } // Audiobank index data
             public byte[] Audiotable { get; set; } // Audiotable data
             public byte[] AudiotableIndex { get; set; } // Audiotable index data
-            public List<Audiobank> Audiobanks { get; set; } = new(); // A list of all audiobanks in the audio binary
+            public List<Audiobank> Audiobanks { get; set; } = []; // A list of all audiobanks in the audio binary
 
             public Audiobin(byte[] audiobankTable, byte[] audiobankIndex, byte[] audiotable, byte[] audiotableIndex)
             {
@@ -133,9 +133,9 @@ namespace MMR.Randomizer.Utils
             public byte[] BankData { get; set; } // The bank's binary data
             public byte[] Bankmeta { get; set; } // 8 byte long bytearray, not 16 bytes
 
-            public List<Instrument> Instruments = new();
-            public List<Drum> Drums = new();
-            public List<Effect> Effects = new();
+            public List<Instrument> Instruments = [];
+            public List<Drum> Drums = [];
+            public List<Effect> Effects = [];
 
             public Audiobank(byte[] tableEntry, byte[] audiobankFile, byte[] audiotableFile, byte[] audiotableIndex)
             {
@@ -222,7 +222,7 @@ namespace MMR.Randomizer.Utils
             /// </returns>
             public List<ISample> GetBankSamples()
             {
-                List<ISample> allSamples = new();
+                List<ISample> allSamples = [];
 
                 foreach (var instrument in Instruments)
                 {
