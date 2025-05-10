@@ -1015,7 +1015,7 @@ namespace MMR.Randomizer.Utils
                     throw new Exception($"ReadMusicFormmask Error: Music file's Formmask file is invalid: {e.Message}", e);
                 }
             }
-            else if (formmaskFile != null && formmaskMetaArray != null)
+            else if (formmaskFile == null && formmaskMetaArray != null)
             {
                 ProcessFormmaskData(formmaskMetaArray, combo);
             }
