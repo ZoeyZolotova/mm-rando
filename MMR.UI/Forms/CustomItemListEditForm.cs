@@ -7,9 +7,11 @@ using System.Data;
 using System.Linq;
 using System.Windows.Forms;
 using MMR.Randomizer.Extensions;
+using System.Runtime.Versioning;
 
 namespace MMR.UI.Forms
 {
+    [SupportedOSPlatform("windows")]
     public partial class CustomItemListEditForm : Form
     {
         public List<Item> BaseItemList { get; private set; }
