@@ -9,6 +9,7 @@ using System.Text.RegularExpressions;
 using System.Globalization;
 using MMR.Common.Utils;
 using System.Threading.Tasks;
+using System.Threading;
 
 namespace MMR.Randomizer.Utils
 {
@@ -78,9 +79,9 @@ namespace MMR.Randomizer.Utils
             
                 File.Move(tempZipFolder, finalBackupPath);
             }
-            catch
+            catch (Exception e)
             {
-                //
+                throw new Exception($"BackupMusicFolder Error: Could not back up the music folder: {e.Message}");
             }
             finally
             {
@@ -157,7 +158,13 @@ namespace MMR.Randomizer.Utils
                 Directory.Delete(Values.MusicDirectory, true);
                 Directory.Move(convFolder, Values.MusicDirectory);
             }
-            catch (Exception)
+            catch (Exception e)
+            {
+#if DEBUG
+                throw new Exception($"ConvertMusicFiles Error: {e.Message}");
+#endif
+            }
+            finally
             {
                 if (Directory.Exists(convFolder))
                     Directory.Delete(convFolder, true);
@@ -190,7 +197,7 @@ namespace MMR.Randomizer.Utils
                 string[] parts = Path.GetFileNameWithoutExtension(filename).Split('_');
 
                 if (parts.Length != 3)
-                    throw new Exception("Invalid filename format.");
+                    throw new Exception("StandaloneSeqeunce Error: Invalid filename format.");
 
                 return (parts[0], parts[1], parts[2].Split('-'));
             }
@@ -284,9 +291,9 @@ namespace MMR.Randomizer.Utils
                 }
 
                 if (Sequences.Count == 0)
-                    throw new FileNotFoundException("No sequence file found!");
+                    throw new FileNotFoundException("MusicArchive Error: No sequence file found!");
                 if (Categories == null)
-                    throw new FileNotFoundException("No categories.txt file found!");
+                    throw new FileNotFoundException("MusicArchive Error: No categories.txt file found!");
             }
 
             private void ProcessZSound(string filename)
@@ -295,11 +302,11 @@ namespace MMR.Randomizer.Utils
                 string[] parts = split.Split("_");
 
                 if (parts.Length != 2)
-                    throw new Exception($"ERROR: An exception occurred while processing a zsound file: {filename} — wrong format!");
+                    throw new Exception($"ProcessZSound Error: An exception occurred while processing a zsound file: {filename} — wrong format!");
 
                 string name = parts[0];
                 if (!uint.TryParse(parts[1], NumberStyles.HexNumber, null, out uint tempaddr))
-                    throw new Exception($"ERROR: Invalid address in zsound filename: {filename}");
+                    throw new Exception($"ProcessZSound Error: Invalid address in zsound filename: {filename}");
 
                 string oldPath = Path.Combine(TempFolder, filename);
                 string newPath = Path.Combine(TempFolder, $"{name}.zsound");
@@ -359,9 +366,11 @@ namespace MMR.Randomizer.Utils
                             break;
                     }
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
-                    // maybe log errors?
+#if DEBUG
+                    throw new Exception($"ProcessFiles Error: {e.Message}");
+#endif
                 }
             });
 
@@ -396,9 +405,13 @@ namespace MMR.Randomizer.Utils
 
                 Pack(standaloneSeq.Filename, standaloneSeq.TempFolder, destinationDir);
             }
-            catch (Exception)
+            catch (Exception e)
             {
+#if DEBUG
+                throw new Exception($"ConvertStandalone Error: {e.Message}");
+#else
                 return;
+#endif
             }
             finally
             {
@@ -429,9 +442,13 @@ namespace MMR.Randomizer.Utils
 
                 ProcessArchiveSequences(archive, destinationDir, filename, cosmeticName, categories, songType, originalTemp);
             }
-            catch (Exception)
+            catch (Exception e)
             {
+#if DEBUG
+                throw new Exception($"ConvertStandalone Error: {e.Message}");
+#else
                 return;
+#endif
             }
             finally
             {
@@ -476,9 +493,9 @@ namespace MMR.Randomizer.Utils
                     }
                 }
 
-                if (archive.Formmasks.ContainsKey(baseName))
+                if (archive.Formmasks.TryGetValue(baseName, out string value))
                 {
-                    string formmask = archive.Formmasks[baseName];
+                    string formmask = value;
                     File.Copy(Path.Combine(originalTemp, formmask), Path.Combine(songFolder, formmask), true);
                 }
 
