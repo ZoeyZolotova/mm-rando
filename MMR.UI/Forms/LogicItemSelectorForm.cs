@@ -5,9 +5,11 @@ using System.Windows.Forms;
 using MMR.Randomizer.GameObjects;
 using MMR.Randomizer.Extensions;
 using MMR.Randomizer.Models;
+using System.Runtime.Versioning;
 
 namespace MMR.UI.Forms
 {
+    [SupportedOSPlatform("windows")]
     public partial class LogicItemSelectorForm : Form
     {
         public List<string> ReturnItems;
