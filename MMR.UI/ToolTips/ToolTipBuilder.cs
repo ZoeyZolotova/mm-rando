@@ -1,7 +1,9 @@
-﻿using System.Windows.Forms;
+using System.Runtime.Versioning;
+using System.Windows.Forms;
 
 namespace MMR.UI.Forms.Tooltips
 {
+    [SupportedOSPlatform("windows")]
     public static class TooltipBuilder
     {
         public static void SetTooltip(Control control, string text)
