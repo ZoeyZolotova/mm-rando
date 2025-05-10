@@ -9,9 +9,11 @@ using System.Windows.Forms;
 using MMR.Randomizer.Extensions;
 using MMR.Common.Extensions;
 using MMR.Randomizer.Attributes.Setting;
+using System.Runtime.Versioning;
 
 namespace MMR.UI.Forms
 {
+    [SupportedOSPlatform("windows")]
     public partial class StartingItemEditForm : Form
     {
         private readonly List<Item> _startingItems;
