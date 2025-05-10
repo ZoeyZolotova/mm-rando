@@ -13,9 +13,11 @@ using MMR.Randomizer.Models;
 using MMR.Common.Utils;
 using MMR.Randomizer.Utils;
 using DynamicExpresso.Exceptions;
+using System.Runtime.Versioning;
 
 namespace MMR.UI.Forms
 {
+    [SupportedOSPlatform("windows")]
     public partial class LogicEditorForm : Form
     {
         bool updating = false;
