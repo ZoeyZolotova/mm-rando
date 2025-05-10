@@ -1,5 +1,6 @@
 ﻿using MMR.Randomizer.Asm;
 using System;
+using System.Runtime.Versioning;
 using System.Windows.Forms;
 
 namespace MMR.UI.Forms
@@ -7,6 +8,7 @@ namespace MMR.UI.Forms
     /// <summary>
     /// <see cref="Form"/> for configuring the <see cref="DPad"/>.
     /// </summary>
+    [SupportedOSPlatform("windows")]
     public partial class DPadForm : Form
     {
         private DPadValue[] _custom;
