@@ -14,6 +14,7 @@ using MMR.Randomizer.Models;
 using MMR.Common.Utils;
 using MMR.Randomizer.Asm;
 using YamlDotNet.Serialization;
+using MMR.Common.Extensions;
 
 namespace MMR.Randomizer.Utils
 {
@@ -150,7 +151,7 @@ namespace MMR.Randomizer.Utils
                         {
                             byte[] data = new byte[entry.Length];
                             using var stream = entry.Open();
-                            stream.ReadExactly(data); // NET 8 fix
+                            stream.ReadExactly(data);
                             action(data);
                         }
                     }
@@ -559,7 +560,7 @@ namespace MMR.Randomizer.Utils
                     currentSong.Categories = metadata.Categories;
 
                     // Handle custom audio samples
-                    List<SequenceSoundSampleBinaryData> samplesList = new();
+                    List<SequenceSoundSampleBinaryData> samplesList = [];
                     foreach (var command in metadata.Commands)
                     {
                         var zsoundName = command.TryGetValue("file", out var nameVal) ? nameVal as string : null;
@@ -568,7 +569,8 @@ namespace MMR.Randomizer.Utils
                         if (zsoundFile != null)
                         {
                             byte[] sampleData = new byte[zsoundFile.Length];
-                            zsoundFile.Open().Read(sampleData, 0, sampleData.Length);
+                            using var zsoundStream = zsoundFile.Open();
+                            zsoundStream.ReadExactly(sampleData, 0, sampleData.Length);
 
                             var zsoundType = command.TryGetValue("type", out var typeVal) ? typeVal as string : null;
                             var zsoundIndex = command.TryGetValue("index", out var indexVal) ? indexVal as int? : null;
@@ -767,7 +769,7 @@ namespace MMR.Randomizer.Utils
             byte[] rawSeqData = new byte[sequenceFile.Length];
 
             using var stream = sequenceFile.Open();
-            stream.Read(rawSeqData, 0, rawSeqData.Length);
+            stream.ReadExactly(rawSeqData, 0, rawSeqData.Length);
 
             SequenceBinaryData sequence = new() { SequenceData = rawSeqData };
 
@@ -833,7 +835,7 @@ namespace MMR.Randomizer.Utils
                 byte[] bankmetaData = new byte[8];
 
                 using var bankmetaReader = bankmetaFile.Open();
-                bankmetaReader.Read(bankmetaData, 0, 8);
+                bankmetaReader.ReadExactly(bankmetaData, 0, 8);
 
                 int minLen = 0x08 + (bankmetaData[4] * 0x04) + (bankmetaData[5] * 0x04);
 
@@ -844,7 +846,7 @@ namespace MMR.Randomizer.Utils
                 byte[] bankData = new byte[bankFile.Length];
 
                 using var bankStream = bankFile.Open();
-                bankStream.Read(bankData, 0, bankData.Length);
+                bankStream.ReadExactly(bankData, 0, bankData.Length);
 
                 // Modify OOT samples, checking if MM contains their data to update their sample addresses
                 // or if the sample data needs to be used as a custom audio sample
@@ -1267,8 +1269,16 @@ namespace MMR.Randomizer.Utils
                         if (File.Exists(sequenceList[j].Filename))
                         {
                             using var reader = new BinaryReader(File.OpenRead(sequenceList[j].Filename));
-                            data = new byte[(int)reader.BaseStream.Length];
-                            reader.Read(data, 0, data.Length);
+                            data = new byte[reader.BaseStream.Length];
+                            reader.ReadExact(data);
+
+                            //using var reader = File.OpenRead(sequenceList[j].Filename);
+                            //data = new byte[reader.Length];
+                            //reader.ReadExactly(data, 0, (int)data.Length);
+
+                            //using var reader = new BinaryReader(File.OpenRead(sequenceList[j].Filename));
+                            //data = new byte[(int)reader.BaseStream.Length];
+                            //reader.Read(data, 0, data.Length);
                         }
                         else if (sequenceList[j].Name == nameof(Properties.Resources.mmr_f_sot))
                         {
@@ -1677,6 +1687,11 @@ namespace MMR.Randomizer.Utils
 
             foreach (SequenceInfo songslot in allMatchingSlots)
             {
+                // targetSlot will encounter a null value if combat is removed from RomData.TargetSequences
+                // So combat can't be pointerized unless something changes with how song slots work....
+                if (songslot.Replaces == SMALL_ENEMY_BATTLE)
+                    continue;
+
                 ConvertSequenceSlotToPointer(songslot.Replaces, FILE_SELECT); // Point replacement to "File Select"
             }
 
