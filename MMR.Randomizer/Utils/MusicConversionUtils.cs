@@ -261,12 +261,12 @@ namespace MMR.Randomizer.Utils
 
                     switch (ext)
                     {
-                        case var _ when SEQ_EXTS.Contains(f):
+                        case var _ when SEQ_EXTS.Contains(ext):
                             Sequences.Add((baseName, ext));
                             break;
 
                         case ".zbank":
-                            var bankmetaPath = $"";
+                            var bankmetaPath = $"{baseName}.bankmeta";
                             if (!File.Exists(Path.Combine(TempFolder, bankmetaPath)))
                                 throw new FileNotFoundException($"Missing bankmeta for {filePath}!");
                             Banks[baseName] = (filename, bankmetaPath);
@@ -445,7 +445,7 @@ namespace MMR.Randomizer.Utils
             catch (Exception e)
             {
 #if DEBUG
-                throw new Exception($"ConvertStandalone Error: {e.Message}");
+                throw new Exception($"ConvertArchive Error: {e.Message}");
 #else
                 return;
 #endif
