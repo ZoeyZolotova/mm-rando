@@ -150,7 +150,7 @@ namespace MMR.Randomizer.Utils
                         {
                             byte[] data = new byte[entry.Length];
                             using var stream = entry.Open();
-                            stream.Read(data, 0, (int)entry.Length);
+                            stream.ReadExactly(data); // NET 8 fix
                             action(data);
                         }
                     }
