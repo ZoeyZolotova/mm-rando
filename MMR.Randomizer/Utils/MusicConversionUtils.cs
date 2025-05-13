@@ -9,7 +9,6 @@ using System.Text.RegularExpressions;
 using System.Globalization;
 using MMR.Common.Utils;
 using System.Threading.Tasks;
-using System.Threading;
 
 namespace MMR.Randomizer.Utils
 {
@@ -266,7 +265,7 @@ namespace MMR.Randomizer.Utils
                             break;
 
                         case ".zbank":
-                            var bankmetaPath = $"{baseName}.bankmeta";
+                            var bankmetaPath = $"{baseName}.bankmeta"; // The bankmeta should have the same name as the zbank and sequence it's tied to
                             if (!File.Exists(Path.Combine(TempFolder, bankmetaPath)))
                                 throw new FileNotFoundException($"Missing bankmeta for {filePath}!");
                             Banks[baseName] = (filename, bankmetaPath);
@@ -399,7 +398,7 @@ namespace MMR.Randomizer.Utils
                 string metaBank = standaloneSeq.InstrumentSet;
 
                 List<object> categories = ParseCategories(standaloneSeq.Categories);
-                string songType = GetSongType(categories);
+                string songType = GetSongType(categories, filename);
 
                 WriteMetadata(standaloneSeq.TempFolder, standaloneSeq.Filename, cosmeticName, metaBank, songType, categories);
 
@@ -438,7 +437,7 @@ namespace MMR.Randomizer.Utils
 
                 string cosmeticName = CleanCosmeticName(filename);
 
-                (var categories, string songType) = ParseCategoriesAndSongType(Path.Combine(originalTemp, archive.Categories));
+                (var categories, string songType) = ParseCategoriesAndSongType(Path.Combine(originalTemp, archive.Categories), filename);
 
                 ProcessArchiveSequences(archive, destinationDir, filename, cosmeticName, categories, songType, originalTemp);
             }
@@ -668,7 +667,7 @@ namespace MMR.Randomizer.Utils
             return categories;
         }
 
-        private static string GetSongType(IEnumerable<object> categories)
+        private static string GetSongType(IEnumerable<object> categories, string filename)
         {
             var flags = categories.Select(c => FANFARE_CATEGORIES.Contains(c)).ToArray();
 
@@ -676,18 +675,18 @@ namespace MMR.Randomizer.Utils
                 return "fanfare";
 
             if (flags.Any(f => f) && flags.Any(f => !f))
-                throw new Exception();
+                throw new Exception($"GetSongType Error: Mismatched categories for file: '{filename}'");
 
             return "bgm";
         }
 
-        private static (List<object> Categories, string SongType) ParseCategoriesAndSongType(string categoryFile)
+        private static (List<object> Categories, string SongType) ParseCategoriesAndSongType(string categoryFile, string filename)
         {
             string raw = File.ReadLines(categoryFile).FirstOrDefault()?.Trim() ?? "";
             string[] list = raw.Contains('-') ? raw.Split('-') : raw.Split(',');
 
             var categories = ParseCategories(list);
-            var songType = GetSongType(categories);
+            var songType = GetSongType(categories, filename);
 
             return (categories, songType);
         }
