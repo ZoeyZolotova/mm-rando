@@ -801,7 +801,7 @@ namespace MMR.Randomizer.Utils
 #if DEBUG
                 throw new Exception($"ReadMusicSequence Error: Bad instrument set ('{metadata.InstrumentSet}') for song: '{song.Name}'");
 #else
-                continue;
+                return;
 #endif
 
             if (customBankIncluded)
