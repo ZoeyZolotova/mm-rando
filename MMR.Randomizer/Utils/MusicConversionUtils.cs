@@ -471,10 +471,10 @@ namespace MMR.Randomizer.Utils
                 string newSeqPath = Path.Combine(songFolder, $"{baseName}.seq");
                 File.Copy(originalSeq, newSeqPath, true);
 
-                if (archive.Banks.ContainsKey(baseName))
+                if (archive.Banks.TryGetValue(baseName, out (string ZBank, string BankMeta) bv))
                 {
-                    var zbank = archive.Banks[baseName].ZBank;
-                    var bankmeta = archive.Banks[baseName].BankMeta;
+                    var zbank = bv.ZBank;
+                    var bankmeta = bv.BankMeta;
 
                     File.Copy(Path.Combine(originalTemp, zbank), Path.Combine(songFolder, zbank), true);
                     File.Copy(Path.Combine(originalTemp, bankmeta), Path.Combine(songFolder, bankmeta), true);
@@ -492,9 +492,9 @@ namespace MMR.Randomizer.Utils
                     }
                 }
 
-                if (archive.Formmasks.TryGetValue(baseName, out string value))
+                if (archive.Formmasks.TryGetValue(baseName, out string fv))
                 {
-                    string formmask = value;
+                    string formmask = fv;
                     File.Copy(Path.Combine(originalTemp, formmask), Path.Combine(songFolder, formmask), true);
                 }
 
