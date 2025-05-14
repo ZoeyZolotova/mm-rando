@@ -24,7 +24,7 @@ namespace MMR.Randomizer
 {
     public class Randomizer
     {
-        public static readonly string AssemblyVersion = typeof(Randomizer).Assembly.GetName().Version.ToString() + "-net8";
+        public static readonly string AssemblyVersion = typeof(Randomizer).Assembly.GetName().Version.ToString();
 
         private Random Random { get; set; }
 
