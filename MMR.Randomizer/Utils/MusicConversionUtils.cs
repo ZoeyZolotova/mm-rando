@@ -132,7 +132,7 @@ namespace MMR.Randomizer.Utils
                 bool hasCategoriesTxt = zip.Entries.Any(e => e.FullName.Equals("categories.txt", StringComparison.OrdinalIgnoreCase));
 
                 if (hasCategoriesTxt)
-                    OLD_MUSIC_FILES.Add(f); // Add to the list if a .meta file doesn't exist
+                    OLD_MUSIC_FILES.Add(f); // Add to the list if a .metadata file doesn't exist
             }
 
             if (seqsTxtFound && seqsFile != null)
@@ -633,7 +633,7 @@ namespace MMR.Randomizer.Utils
             // Serialize to YAML
             string yamlOutput = YamlSerializer.FlowListSerialize(yaml);
 
-            File.WriteAllText(Path.Combine(folder, $"{baseName}.meta"), yamlOutput);
+            File.WriteAllText(Path.Combine(folder, $"{baseName}.metadata"), yamlOutput);
         }
 
         private static string CleanCosmeticName(string name)
