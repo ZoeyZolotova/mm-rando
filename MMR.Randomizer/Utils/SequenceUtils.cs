@@ -420,11 +420,11 @@ namespace MMR.Randomizer.Utils
             // MMRS and OOTRS are zip files with a custom file extension ".mmrs" and ".ootrs" respectively
             // They can contain the following music-related files:
             //   - Sequence file (.seq; required)
-            //   - Metadata file (.meta; required)
+            //   - Metadata file (.metadata; required)
             //   - Instrument bank file (.zbank)
             //   - Instrument bank metadata file (.bankmeta)
             //   - Custom audio sample file (.zsound)
-            //   - Formmask array file (.formmask; may be present in .meta file)
+            //   - Formmask array file (.formmask; may be present in .metadata file)
             //
             // Only one file for each file type is allowed except custom audio sample files
             // an instrument bank may contain multiple sounds, so multiple may be required
@@ -498,7 +498,7 @@ namespace MMR.Randomizer.Utils
                     {
                         // Only allow a single file type for each file, except zsounds which may require multiple
                         { ".seq",      CreateSetter(() => musicArchive.SequenceFile,     e => musicArchive.SequenceFile = e, "sequence") },
-                        { ".meta",     CreateSetter(() => musicArchive.MetaFile,         e => musicArchive.MetaFile = e,     "meta") },
+                        { ".metadata", CreateSetter(() => musicArchive.MetaFile,         e => musicArchive.MetaFile = e,     "metadata") },
                         { ".zbank",    CreateSetter(() => musicArchive.BankFile,         e => musicArchive.BankFile = e,     "zbank") },
                         { ".bankmeta", CreateSetter(() => musicArchive.BankmetaFile,     e => musicArchive.BankmetaFile = e, "bankmeta") },
                         { ".formmask", CreateSetter(() => musicArchive.FormmaskFile,     e => musicArchive.FormmaskFile = e, "formmask") },
@@ -527,7 +527,7 @@ namespace MMR.Randomizer.Utils
                     // Verify all required files are present
                     if (musicArchive.SequenceFile == null || musicArchive.MetaFile == null)
                     {
-                        // If the file is an old file, it will have categories and no meta file
+                        // If the file is an old file, it will have categories and no metadata file
                         if (musicArchive.CategoriesFile != null)
                         {
                             MusicConversionUtils.OLD_MUSIC_FILES.Add(Path.GetFileName(filePath));
@@ -549,7 +549,7 @@ namespace MMR.Randomizer.Utils
                         Filepath = filePath // Store the filepath for the music cache
                     };
 
-                    var metadata = ReadMusicMetaYaml(currentSong.Name, musicArchive.MetaFile);
+                    var metadata = ReadMusicMetadataYaml(currentSong.Name, musicArchive.MetaFile);
 
                     // If game is OOT, but the OOT audiobin wasn't loaded already, load the OOT audiobin
                     if (metadata.Game == "oot" && !IsMMRSFile(currentSong.Filepath) ||
@@ -612,9 +612,9 @@ namespace MMR.Randomizer.Utils
         }
 
         /// <summary>
-        /// Reads and stores the data from a music file's '.meta' metadata YAML file.
+        /// Reads and stores the data from a music file's '.metadata' metadata YAML file.
         /// </summary>
-        private static MusicMetadata ReadMusicMetaYaml(string songname, ZipArchiveEntry metaFile)
+        private static MusicMetadata ReadMusicMetadataYaml(string songname, ZipArchiveEntry metaFile)
         {
             if (metaFile == null)
                 throw new Exception($"ReadMusicMetaYaml Error: No metadata file available for song: '{songname}'");
@@ -636,7 +636,7 @@ namespace MMR.Randomizer.Utils
             }
 
             if (yamlData == null || yamlData.Metadata == null)
-                throw new Exception($"ReadMusicMetaYaml Error: Invalid or empty YAML metadata for song: '{songname}'");
+                throw new Exception($"ReadMusicMetadataYaml Error: Invalid or empty YAML metadata for song: '{songname}'");
 
             string songType = validTypes.Contains(yamlData.Metadata.SongType?.ToLower()) ? yamlData.Metadata.SongType.ToLower() : "bgm";
             string songGame = validGames.Contains(yamlData.Game?.ToLower()) ? yamlData.Game.ToLower() : "mm"; // Default to MM if no game
@@ -657,7 +657,7 @@ namespace MMR.Randomizer.Utils
 
                         // Ensure at least the first type matches the given song type, otherwise throw an error
                         if (firstType == null && !string.Equals(songType, MusicGroups.TypeCheck[currentType], StringComparison.OrdinalIgnoreCase))
-                            throw new Exception($"ReadMusicMetaYaml Error: Category ('{category}') does not match given song type ('{songType}') for song: {songname}");
+                            throw new Exception($"ReadMusicMetadataYaml Error: Category ('{category}') does not match given song type ('{songType}') for song: {songname}");
 
                         // After the first category, if any categories are mismatched then drop them entirely
                         // Might be good to throw an error or log the file... but this is fine for now
@@ -680,7 +680,7 @@ namespace MMR.Randomizer.Utils
                 }
             }
 
-            // Handle META commands
+            // Handle extra metadata
             List<Dictionary<string, object>> commands = [];
             if (yamlData.Metadata.AudioSamples != null)
             {
@@ -695,28 +695,28 @@ namespace MMR.Randomizer.Utils
 
                     if (type == null && listIndex != null && sample.KeyRegion != null)
                     {
-                        throw new InvalidOperationException($"ReadMusicMetaYaml Error: If type is null, index and ke region must also be null for audio sample ('{entry.Key}') in song: '{songname}'");
+                        throw new InvalidOperationException($"ReadMusicMetadataYaml Error: If type is null, index and ke region must also be null for audio sample ('{entry.Key}') in song: '{songname}'");
                     }
                     else
                     {
                         if (!validTypes.Contains(type) && type != null)
-                            throw new InvalidOperationException($"ReadMusicMetaYaml Error: Invalid instrument type ('{type}') for audio sample ('{entry.Key}'): '{songname}'");
+                            throw new InvalidOperationException($"ReadMusicMetadataYaml Error: Invalid instrument type ('{type}') for audio sample ('{entry.Key}'): '{songname}'");
 
                         if (validTypes.Contains(type) && listIndex == null)
-                            throw new InvalidOperationException($"ReadMusicMetaYaml Error: Index must not be null with given type ('{type}') for audio sample ('{entry.Key}') in song: '{songname}'");
+                            throw new InvalidOperationException($"ReadMusicMetadataYaml Error: Index must not be null with given type ('{type}') for audio sample ('{entry.Key}') in song: '{songname}'");
 
                         if (type != null && tempAddr != null)
-                            throw new InvalidOperationException($"ReadMusicMetaYaml Error: Temp address must be null with new format for audio sample ('{entry.Key}') in song: '{songname}'");
+                            throw new InvalidOperationException($"ReadMusicMetadataYaml Error: Temp address must be null with new format for audio sample ('{entry.Key}') in song: '{songname}'");
 
                         if (type == "INST")
                         {
                             if (string.IsNullOrEmpty(keyRegion) || !validKeyRegions.Contains(keyRegion))
-                                throw new InvalidOperationException($"ReadMusicMetaYaml Error: Key region must be LOW, PRIM, or HIGH with given type ('{type}') for audio sample ('{entry.Key}') in song: '{songname}'");
+                                throw new InvalidOperationException($"ReadMusicMetadataYaml Error: Key region must be LOW, PRIM, or HIGH with given type ('{type}') for audio sample ('{entry.Key}') in song: '{songname}'");
                         }
                         else // DRUM or SFX
                         {
                             if (!string.IsNullOrEmpty(keyRegion))
-                                throw new InvalidOperationException($"ReadMusicMetaYaml Error: Key region must not be null or empty with given type ('{type}') for audio sample ('{entry.Key}') in song: '{songname}'");
+                                throw new InvalidOperationException($"ReadMusicMetadataYaml Error: Key region must not be null or empty with given type ('{type}') for audio sample ('{entry.Key}') in song: '{songname}'");
                         }
                     }
 
@@ -966,7 +966,7 @@ namespace MMR.Randomizer.Utils
 
         #region Formmask Data Processing
         /// <summary>
-        /// Reads the formmask data from a '.formmask' file or the music files '.meta' metadata file and creates a bitfield array that reflects the formmask conditions.
+        /// Reads the formmask data from a '.formmask' file or the music files '.metadata' metadata file and creates a bitfield array that reflects the formmask conditions.
         /// </summary>
         private static void ReadMusicFormmask(SequenceBinaryData combo, ZipArchiveEntry formmaskFile, SequencePlayState[] formmaskMetaArray = null)
         {
@@ -2185,11 +2185,11 @@ namespace MMR.Randomizer.Utils
             public ZipArchiveEntry BankmetaFile { get; set; }
             public ZipArchiveEntry FormmaskFile { get; set; }
             public ZipArchiveEntry CategoriesFile { get; set; }
-            public List<ZipArchiveEntry> AudioSamples { get; set; } = new();
+            public List<ZipArchiveEntry> AudioSamples { get; set; } = [];
         }
 
         /// <summary>
-        /// Represents the data contained within a music file's '.meta' metadata YAML file.
+        /// Represents the data contained within a music file's '.metadata' metadata YAML file.
         /// </summary>
         private class MusicMetadata
         {
@@ -2197,8 +2197,8 @@ namespace MMR.Randomizer.Utils
             public string CosmeticName { get; set; }
             public string InstrumentSet { get; set; }
             public string SongType { get; set; }
-            public List<int> Categories { get; set; } = new();
-            public List<Dictionary<string, object>> Commands { get; set; } = new();
+            public List<int> Categories { get; set; } = [];
+            public List<Dictionary<string, object>> Commands { get; set; } = [];
             public SequencePlayState[] Formmask { get; set; }
         }
 
