@@ -492,15 +492,18 @@ namespace MMR.Randomizer.Utils
                     }
                 }
 
+                List<string> formmaskList = [];
+
                 if (archive.Formmasks.TryGetValue(baseName, out string fv))
                 {
-                    string formmask = fv;
-                    File.Copy(Path.Combine(originalTemp, formmask), Path.Combine(songFolder, formmask), true);
+                    string formmaskPath = Path.Combine(originalTemp, fv);
+                    string formmaskContent = File.ReadAllText(formmaskPath);
+                    formmaskList = YamlSerializer.Deserialize<List<string>>(formmaskContent);
                 }
 
                 CopyUnprocessedFiles(originalTemp, songFolder);
 
-                WriteMetadata(songFolder, baseName, cosmeticName, metaBank, songType, categories, zsounds);
+                WriteMetadata(songFolder, baseName, cosmeticName, metaBank, songType, categories, zsounds, formmaskList);
 
                 var tempArchive = new MusicArchive(skipTempCreate: true)
                 {
@@ -590,7 +593,7 @@ namespace MMR.Randomizer.Utils
         /// <summary>
         /// Writes the YAML metadata file for the new metadata YAML '.mmrs' file format.
         /// </summary>
-        private static void WriteMetadata(string folder, string baseName, string cosmeticName, string metaBank, string songType, List<object> categories, Dictionary<string, uint> zsounds = null)
+        private static void WriteMetadata(string folder, string baseName, string cosmeticName, string metaBank, string songType, List<object> categories, Dictionary<string, uint> zsounds = null, List<string> formmask = null)
         {
             // Prepare the YAML object
             var yaml = new MusicMetadataYaml
@@ -631,9 +634,28 @@ namespace MMR.Randomizer.Utils
             }
 
             // Serialize to YAML
+            string yamlPath = Path.Combine(folder, $"{baseName}.metadata");
             string yamlOutput = YamlSerializer.FlowListSerialize(yaml);
+            File.WriteAllText(yamlPath, yamlOutput);
 
-            File.WriteAllText(Path.Combine(folder, $"{baseName}.metadata"), yamlOutput);
+            if (formmask != null && formmask.Count > 0)
+            {
+                using (var writer = new StreamWriter(yamlPath, append: true))
+                {
+                    writer.WriteLine("formmask: [");
+                    for (int i = 0; i < formmask.Count; i++)
+                    {
+                        string value = formmask[i];
+                        string comment = i < 16 ? $"Channel {i}" : $"Cumulative States";
+
+                        writer.Write($"  \"{value}\"");
+                        if (i != formmask.Count - 1)
+                            writer.Write(",");
+                        writer.WriteLine($" # {comment}");
+                    }
+                    writer.WriteLine("]");
+                }
+            }
         }
 
         private static string CleanCosmeticName(string name)
