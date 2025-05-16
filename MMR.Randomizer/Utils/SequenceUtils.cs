@@ -501,7 +501,7 @@ namespace MMR.Randomizer.Utils
                         { ".metadata", CreateSetter(() => musicArchive.MetaFile,         e => musicArchive.MetaFile = e,     "metadata") },
                         { ".zbank",    CreateSetter(() => musicArchive.BankFile,         e => musicArchive.BankFile = e,     "zbank") },
                         { ".bankmeta", CreateSetter(() => musicArchive.BankmetaFile,     e => musicArchive.BankmetaFile = e, "bankmeta") },
-                        { ".formmask", CreateSetter(() => musicArchive.FormmaskFile,     e => musicArchive.FormmaskFile = e, "formmask") },
+                        //{ ".formmask", CreateSetter(() => musicArchive.FormmaskFile,     e => musicArchive.FormmaskFile = e, "formmask") },
                         { ".zsound",   entry => musicArchive.AudioSamples.Add(entry) },
                     };
 
@@ -807,7 +807,8 @@ namespace MMR.Randomizer.Utils
             if (customBankIncluded)
                 claimedBankCount++;
 
-            ReadMusicFormmask(sequence, musicArchive.FormmaskFile, metadata.Formmask);
+            //ReadMusicFormmask(sequence, musicArchive.FormmaskFile, metadata.Formmask);
+            ReadMusicFormmask(sequence, metadata.Formmask);
 
             song.SequenceBinary = sequence;
         }
@@ -968,7 +969,8 @@ namespace MMR.Randomizer.Utils
         /// <summary>
         /// Reads the formmask data from a '.formmask' file or the music files '.metadata' metadata file and creates a bitfield array that reflects the formmask conditions.
         /// </summary>
-        private static void ReadMusicFormmask(SequenceBinaryData combo, ZipArchiveEntry formmaskFile, SequencePlayState[] formmaskMetaArray = null)
+        //private static void ReadMusicFormmask(SequenceBinaryData combo, ZipArchiveEntry formmaskFile, SequencePlayState[] formmaskMetaArray = null)
+        private static void ReadMusicFormmask(SequenceBinaryData combo, SequencePlayState[] formmaskMetaArray = null)
         {
             // The formmask file is a single JSON/YAML list that determines which sequence channels
             // should be turned on and off for each of Link's forms and states
@@ -999,28 +1001,33 @@ namespace MMR.Randomizer.Utils
                 combo.Formmask = ConvertUtils.U16ArrayToBytes([.. states.Cast<ushort>()]);
             }
 
-            if (formmaskFile != null && formmaskMetaArray == null)
-            {
-                try
-                {
-                    using var reader = new StreamReader(formmaskFile.Open(), Encoding.Default);
-                    string formMaskData = reader.ReadToEnd();
-
-                    // playState is a boolean bitfield, in the file it's "play with these states",
-                    // but in the code it's "mute these states" so it needs to be reversed
-                    var playState = YamlSerializer.Deserialize<SequencePlayState[]>(formMaskData);
-
-                    ProcessFormmaskData(playState, combo);
-                }
-                catch (Exception e)
-                {
-                    throw new Exception($"ReadMusicFormmask Error: Music file's Formmask file is invalid: {e.Message}", e);
-                }
-            }
-            else if (formmaskFile == null && formmaskMetaArray != null)
+            if (formmaskMetaArray != null)
             {
                 ProcessFormmaskData(formmaskMetaArray, combo);
             }
+
+            //if (formmaskFile != null && formmaskMetaArray == null)
+            //{
+            //    try
+            //    {
+            //        using var reader = new StreamReader(formmaskFile.Open(), Encoding.Default);
+            //        string formMaskData = reader.ReadToEnd();
+
+            //        // playState is a boolean bitfield, in the file it's "play with these states",
+            //        // but in the code it's "mute these states" so it needs to be reversed
+            //        var playState = YamlSerializer.Deserialize<SequencePlayState[]>(formMaskData);
+
+            //        ProcessFormmaskData(playState, combo);
+            //    }
+            //    catch (Exception e)
+            //    {
+            //        throw new Exception($"ReadMusicFormmask Error: Music file's Formmask file is invalid: {e.Message}", e);
+            //    }
+            //}
+            //else if (formmaskFile == null && formmaskMetaArray != null)
+            //{
+            //    ProcessFormmaskData(formmaskMetaArray, combo);
+            //}
         }
         #endregion
 
