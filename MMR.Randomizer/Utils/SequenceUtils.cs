@@ -773,8 +773,8 @@ namespace MMR.Randomizer.Utils
 
             SequenceBinaryData sequence = new() { SequenceData = rawSeqData };
 
-            // If the value is "custom" or "-", then the music file uses a custom bank
-            if (metadata.InstrumentSet == "custom" || metadata.InstrumentSet == "-")
+            // If the value is "custom", then the music file uses a custom bank
+            if (metadata.InstrumentSet == "custom")
             {
                 song.Instrument = REQUIRES_NEW_BANK;
             }
