@@ -256,8 +256,8 @@ namespace MMR.Randomizer.Utils
                 foreach (var f in Directory.GetFiles(TempFolder))
                 {
                     var filename = Path.GetFileName(f);
-                    var ext = Path.GetExtension(filename).ToLowerInvariant();
                     var baseName = Path.GetFileNameWithoutExtension(filename);
+                    var ext = Path.GetExtension(filename).ToLowerInvariant();
 
                     switch (ext)
                     {
@@ -283,9 +283,11 @@ namespace MMR.Randomizer.Utils
                             ProcessZSound(filename, ref sampleCounter);
                             break;
 
+                        case ".txt" when filename.Equals("categories.txt", StringComparison.OrdinalIgnoreCase):
+                            Categories = filename;
+                            break;
+
                         default:
-                            if (filename.Equals("categories.txt", StringComparison.OrdinalIgnoreCase))
-                                Categories = filename;
                             break;
                     }
                 }
@@ -348,15 +350,15 @@ namespace MMR.Randomizer.Utils
         /// </summary>
         private static void ProcessFiles(string baseFolder, string convFolder)
         {
-            // creates conversion folder, then copies and converts every file in the original music folder
-            // into the new music folder
-            // copy instead of edit in place for extra safety
+            // Creates the conversion folder
+            // Gathers a list of all files in the directory
+            // Builds a hashset for old files that need to be processed and converted
+            // Attempts to convert files, if conversion fails copy the original file into the new directory
+            // If the file isn't a file that needs conversion, copy it into the new folder
             
             Directory.CreateDirectory(convFolder);
 
             var allFiles = Directory.GetFiles(baseFolder, "*", SearchOption.AllDirectories);
-            var seqsTxtFile = Directory.EnumerateFiles(baseFolder, "SEQS.txt", SearchOption.AllDirectories).FirstOrDefault();
-
             var oldFiles = new HashSet<string>(OLD_MUSIC_FILES, StringComparer.OrdinalIgnoreCase);
 
             Parallel.ForEach(allFiles, (inputFile) =>
@@ -370,26 +372,26 @@ namespace MMR.Randomizer.Utils
                     string destinationDir = Path.GetDirectoryName(destinationFile);
 
                     Directory.CreateDirectory(destinationDir);
-                    
-                    // Don't copy the SEQS file because it gets converted too
-                    if (filename.Equals("SEQS.txt", StringComparison.OrdinalIgnoreCase))
-                        return;
-
-                    File.Copy(inputFile, destinationFile, overwrite: true);
 
                     switch (extension)
                     {
                         case ".zseq":
-                            ConvertStandalone(destinationFile, destinationDir);
+                            if (!ConvertStandalone(inputFile, destinationDir))
+                                File.Copy(inputFile, destinationFile, true);
                             break;
 
                         case ".mmrs":
                             var originalPath = Path.Combine(baseFolder, relativePath);
-                            if (oldFiles.Contains(originalPath))
-                                ConvertArchive(destinationFile, destinationDir);
+                            if (oldFiles.Contains(originalPath) && !ConvertArchive(inputFile, destinationDir))
+                                File.Copy(inputFile, destinationFile, true);
+                            break;
+
+                        case ".txt" when filename.Equals("SEQS.txt", StringComparison.OrdinalIgnoreCase):
+                            ConvertSEQSToYAML(inputFile, Path.Combine(destinationDir, "SEQS.yaml"));
                             break;
 
                         default:
+                            File.Copy(inputFile, destinationFile);
                             break;
                     }
                 }
@@ -400,26 +402,22 @@ namespace MMR.Randomizer.Utils
 #endif
                 }
             });
-
-            if (seqsTxtFile != null)
-            {
-                string seqsYamlFile = Path.Combine(convFolder, "SEQS.yml");
-                ConvertSEQSToYAML(seqsTxtFile, seqsYamlFile);
-            }   
         }
 
         /// <summary>
         /// Converts a standalone sequence ('.zseq') file to the new metadata YAML '.mmrs' file format.
         /// </summary>
-        private static void ConvertStandalone(string destinationFile, string destinationDir)
+        private static bool ConvertStandalone(string inputFile, string destinationDir)
         {
-            string filename = Path.GetFileNameWithoutExtension(destinationFile);
-            string filepath = Path.GetFullPath(destinationFile);
+            string filename = Path.GetFileNameWithoutExtension(inputFile);
+            string filepath = Path.GetFullPath(inputFile);
 
-            var standaloneSeq = new StandaloneSequence(filename);
+            StandaloneSequence standaloneSeq = null;
 
             try
             {
+                standaloneSeq = new StandaloneSequence(filename);
+
                 standaloneSeq.Copy(filepath);
 
                 string cosmeticName = CleanCosmeticName(standaloneSeq.Filename);
@@ -431,29 +429,31 @@ namespace MMR.Randomizer.Utils
                 WriteMetadata(standaloneSeq.TempFolder, standaloneSeq.Filename, cosmeticName, metaBank, songType, categories);
 
                 Pack(standaloneSeq.Filename, standaloneSeq.TempFolder, destinationDir);
+
+                return true;
             }
             catch (Exception e)
             {
 #if DEBUG
                 throw new Exception($"ConvertStandalone Error: {e.Message}");
 #else
-                return;
+                return false;
 #endif
             }
             finally
             {
-                if (Directory.Exists(standaloneSeq.TempFolder))
-                    Directory.Delete(standaloneSeq.TempFolder, true);
+                if (standaloneSeq?.TempFolder is string standaloneTemp && Directory.Exists(standaloneTemp))
+                    Directory.Delete(standaloneTemp, true);
             }
         }
 
         /// <summary>
         /// Converts an old format '.mmrs' file to the new metadata YAML '.mmrs' file format.
         /// </summary>
-        private static void ConvertArchive(string destinationFile, string destinationDir)
+        private static bool ConvertArchive(string inputFile, string destinationDir)
         {
-            string filename = Path.GetFileNameWithoutExtension(destinationFile);
-            string filepath = Path.GetFullPath(destinationFile);
+            string filename = Path.GetFileNameWithoutExtension(inputFile);
+            string filepath = Path.GetFullPath(inputFile);
 
             var archive = new MusicArchive();
             string originalTemp = archive.TempFolder;
@@ -461,20 +461,21 @@ namespace MMR.Randomizer.Utils
             try
             {
                 archive.Unpack(filepath);
-                File.Delete(filepath);
 
                 string cosmeticName = CleanCosmeticName(filename);
 
                 (var categories, string songType) = ParseCategoriesAndSongType(Path.Combine(originalTemp, archive.Categories), filename);
 
                 ProcessArchiveSequences(archive, destinationDir, filename, cosmeticName, categories, songType, originalTemp);
+
+                return true;
             }
             catch (Exception e)
             {
 #if DEBUG
                 throw new Exception($"ConvertArchive Error: {e.Message}");
 #else
-                return;
+                return false;
 #endif
             }
             finally
