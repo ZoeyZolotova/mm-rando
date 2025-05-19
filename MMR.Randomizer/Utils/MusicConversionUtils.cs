@@ -461,7 +461,6 @@ namespace MMR.Randomizer.Utils
             try
             {
                 archive.Unpack(filepath);
-                var test = archive;
                 File.Delete(filepath);
 
                 string cosmeticName = CleanCosmeticName(filename);
