@@ -252,6 +252,7 @@ namespace MMR.Randomizer.Utils
 
                 ZipFile.ExtractToDirectory(filePath, TempFolder);
 
+                int sampleCounter = 1;
                 foreach (var f in Directory.GetFiles(TempFolder))
                 {
                     var filename = Path.GetFileName(f);
@@ -279,7 +280,7 @@ namespace MMR.Randomizer.Utils
                             break;
 
                         case ".zsound":
-                            ProcessZSound(filename);
+                            ProcessZSound(filename, ref sampleCounter);
                             break;
 
                         default:
@@ -295,23 +296,50 @@ namespace MMR.Randomizer.Utils
                     throw new FileNotFoundException("MusicArchive Error: No categories.txt file found!");
             }
 
-            private void ProcessZSound(string filename)
+            private void ProcessZSound(string filename, ref int sampleCounter)
             {
-                string split = filename.Split(".zsound")[0];
-                string[] parts = split.Split("_");
+                string baseName = filename.Split(".zsound")[0];
+                string[] parts = baseName.Split("_");
 
-                if (parts.Length != 2)
+                string sampleName = string.Empty;
+                uint tempAddress = 0xFFFFFFFF;
+
+                // The standard is "filename_address.zsound", but apparently some people just have the temp address
+                if (parts.Length == 2 && uint.TryParse(parts[1], NumberStyles.HexNumber, null, out tempAddress))
+                {
+                    sampleName = parts[0];
+                }
+                else if (parts.Length == 1 && uint.TryParse(parts[0], NumberStyles.HexNumber, null, out tempAddress))
+                {
+                    sampleName = $"Sample{sampleCounter++}"; // Give the sample a default name and increment for the next default name
+                }
+                else
+                {
+                    // There's more than 2 parts, so the address could theoretically be anywhere, throw an exception
                     throw new Exception($"ProcessZSound Error: An exception occurred while processing a zsound file: {filename} — wrong format!");
-
-                string name = parts[0];
-                if (!uint.TryParse(parts[1], NumberStyles.HexNumber, null, out uint tempaddr))
-                    throw new Exception($"ProcessZSound Error: Invalid address in zsound filename: {filename}");
+                }
 
                 string oldPath = Path.Combine(TempFolder, filename);
-                string newPath = Path.Combine(TempFolder, $"{name}.zsound");
+                string newPath = Path.Combine(TempFolder, $"{sampleName}.zsound");
 
-                File.Move(oldPath, newPath);
-                ZSounds[name] = tempaddr;
+                // If the filename already exists, just add 1 to suffix
+                int suffix = 1;
+                while (File.Exists(newPath))
+                {
+                    newPath = Path.Combine(TempFolder, $"{sampleName}{suffix}.zsound");
+                    suffix++;
+                }
+
+                try
+                {
+                    File.Move(oldPath, newPath);
+                }
+                catch
+                {
+                    return; // This should never happen, but just in case
+                }
+
+                ZSounds[Path.GetFileNameWithoutExtension(newPath)] = tempAddress;
             }
         }
 
@@ -433,6 +461,7 @@ namespace MMR.Randomizer.Utils
             try
             {
                 archive.Unpack(filepath);
+                var test = archive;
                 File.Delete(filepath);
 
                 string cosmeticName = CleanCosmeticName(filename);
