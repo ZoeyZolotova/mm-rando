@@ -642,7 +642,6 @@ namespace MMR.Randomizer.Utils
             string songGame = validGames.Contains(yamlData.Game?.ToLower()) ? yamlData.Game.ToLower() : "mm"; // Default to MM if no game
 
             List<int> categories = songType == "bgm" ? [.. MusicGroups.DEFAULT_BGM_CATEGORIES] : [.. MusicGroups.DEFAULT_FANFARE_CATEGORIES];
-            var test = categories;
             if (yamlData.Metadata.MusicGroups != null && yamlData.Metadata.MusicGroups.Count > 0)
             {
                 categories.Clear(); // Clear the defaults
