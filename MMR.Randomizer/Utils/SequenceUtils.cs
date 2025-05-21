@@ -502,7 +502,7 @@ namespace MMR.Randomizer.Utils
                         { ".zbank",    CreateSetter(() => musicArchive.BankFile,         e => musicArchive.BankFile = e,     "zbank") },
                         { ".bankmeta", CreateSetter(() => musicArchive.BankmetaFile,     e => musicArchive.BankmetaFile = e, "bankmeta") },
                         //{ ".formmask", CreateSetter(() => musicArchive.FormmaskFile,     e => musicArchive.FormmaskFile = e, "formmask") },
-                        { ".zsound",   entry => musicArchive.AudioSamples.Add(entry) },
+                        { ".zsound",   musicArchive.AudioSamples.Add },
                     };
 
                     foreach (var entry in zip.Entries)
@@ -641,8 +641,8 @@ namespace MMR.Randomizer.Utils
             string songType = validTypes.Contains(yamlData.Metadata.SongType?.ToLower()) ? yamlData.Metadata.SongType.ToLower() : "bgm";
             string songGame = validGames.Contains(yamlData.Game?.ToLower()) ? yamlData.Game.ToLower() : "mm"; // Default to MM if no game
 
-            //Handle the categories
-            List<int> categories = [.. MusicGroups.DEFAULT_BGM_CATEGORIES];
+            List<int> categories = songType == "bgm" ? [.. MusicGroups.DEFAULT_BGM_CATEGORIES] : [.. MusicGroups.DEFAULT_FANFARE_CATEGORIES];
+            var test = categories;
             if (yamlData.Metadata.MusicGroups != null && yamlData.Metadata.MusicGroups.Count > 0)
             {
                 categories.Clear(); // Clear the defaults
@@ -773,8 +773,8 @@ namespace MMR.Randomizer.Utils
 
             SequenceBinaryData sequence = new() { SequenceData = rawSeqData };
 
-            // If the value is "custom", then the music file uses a custom bank
-            if (metadata.InstrumentSet == "custom")
+            // If the value is "custom" or "-", then the music file uses a custom bank
+            if (metadata.InstrumentSet == "custom" || metadata.InstrumentSet == "-")
             {
                 song.Instrument = REQUIRES_NEW_BANK;
             }
