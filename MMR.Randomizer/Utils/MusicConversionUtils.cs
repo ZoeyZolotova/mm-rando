@@ -1,5 +1,3 @@
-using MMR.Randomizer.Constants;
-using MMR.Randomizer.Models.Rom;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -7,8 +5,10 @@ using System.IO.Compression;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Globalization;
-using MMR.Common.Utils;
 using System.Threading.Tasks;
+using MMR.Randomizer.Constants;
+using MMR.Randomizer.Models.Rom;
+using MMR.Common.Utils;
 
 namespace MMR.Randomizer.Utils
 {
@@ -487,7 +487,8 @@ namespace MMR.Randomizer.Utils
 
         private static void ProcessArchiveSequences(MusicArchive archive, string destinationDir, string filename, string cosmeticName, List<object> categories, string songType, string originalTemp)
         {
-            Dictionary<string, uint> zsounds = [];
+            //Dictionary<string, uint> zsounds = [];
+            Dictionary<string, Dictionary<string, object>> zsounds = [];
 
             foreach (var (baseName, ext) in archive.Sequences)
             {
@@ -515,10 +516,43 @@ namespace MMR.Randomizer.Utils
                         File.Copy(item, Path.Combine(songFolder, Path.GetFileName(item)), true);
                     }
 
+                    // Create an audiobank object so samples can use the new link type when converted :)
+                    var bankmetaPath = Path.Combine(originalTemp, bankmeta);
+                    byte[] bankmetaData = File.ReadAllBytes(bankmetaPath);
+
+                    var zbankPath = Path.Combine(originalTemp, zbank);
+                    byte[] bankData = File.ReadAllBytes(zbankPath);
+
+                    var audiobank = new AudiobankUtils.Audiobank(bankmetaData, bankData, null, null);
+
                     foreach (var z in archive.ZSounds)
                     {
-                        zsounds[z.Key] = z.Value;
+                        foreach (var s in audiobank.GetBankSamples())
+                        {
+                            if (z.Value == s.Address)
+                            {
+                                var entry = new Dictionary<string, object>
+                                {
+                                    ["instrument type"] = s.ParentString,
+                                    ["list index"] = s.ParentId
+                                };
+
+                                // Only instruments have a key region
+                                if (s.ParentString == "INST")
+                                {
+                                    entry["key region"] = s.KeyRegion;
+                                }
+
+                                zsounds[z.Key] = entry;
+                                break;
+                            }
+                        }
+
+                        //zsounds[z.Key] = z.Value;
                     }
+
+                    // Hope GC removes it from memory
+                    audiobank = null;
                 }
 
                 List<string> formmaskList = [];
@@ -622,7 +656,8 @@ namespace MMR.Randomizer.Utils
         /// <summary>
         /// Writes the YAML metadata file for the new metadata YAML '.mmrs' file format.
         /// </summary>
-        private static void WriteMetadata(string folder, string baseName, string cosmeticName, string metaBank, string songType, List<object> categories, Dictionary<string, uint> zsounds = null, List<string> formmask = null)
+        private static void WriteMetadata(string folder, string baseName, string cosmeticName, string metaBank, string songType, List<object> categories, Dictionary<string, Dictionary<string, object>> zsounds = null, List<string> formmask = null)
+        //private static void WriteMetadata(string folder, string baseName, string cosmeticName, string metaBank, string songType, List<object> categories, Dictionary<string, uint> zsounds = null, List<string> formmask = null)
         {
             // Prepare the YAML object
             var yaml = new MusicMetadataYaml
@@ -638,29 +673,49 @@ namespace MMR.Randomizer.Utils
                 }
             };
 
-            // Optional audio sample info from zsounds
             if (zsounds != null && zsounds.Count != 0)
             {
                 yaml.Metadata.AudioSamples = [];
 
-                var index = 0;
                 foreach (var kvp in zsounds)
                 {
-                    string filename = $"{kvp.Key}.zsound"; // don't know if the extension is needed, but just in case...
-                    uint tempAddr = kvp.Value;
+                    string filename = $"{kvp.Key}.zsound";
 
-                    // Since old data doesn't use the new format, the type, index, and keyregion can be left null
-                    yaml.Metadata.AudioSamples[$"{filename}"] = new MusicMetadataYaml.Sample
+                    var sampleData = kvp.Value;
+
+                    yaml.Metadata.AudioSamples[filename] = new MusicMetadataYaml.Sample
                     {
-                        // Type = "~",
-                        // Index = -1,
-                        // KeyRegion = "~",
-                        TempAddress = tempAddr
+                        Type = sampleData.TryGetValue("instrument type", out object it) ? it?.ToString() : null,
+                        Index = sampleData.TryGetValue("list index", out object li) ? Convert.ToInt32(li) : -1,
+                        KeyRegion = sampleData.TryGetValue("key region", out object kr) ? kr.ToString() : null,
                     };
-
-                    index++;
                 }
             }
+
+
+            // Optional audio sample info from zsounds
+            //if (zsounds != null && zsounds.Count != 0)
+            //{
+            //    yaml.Metadata.AudioSamples = [];
+
+            //    var index = 0;
+            //    foreach (var kvp in zsounds)
+            //    {
+            //        string filename = $"{kvp.Key}.zsound"; // don't know if the extension is needed, but just in case...
+            //        uint tempAddr = kvp.Value;
+
+            //        // Since old data doesn't use the new format, the type, index, and keyregion can be left null
+            //        yaml.Metadata.AudioSamples[$"{filename}"] = new MusicMetadataYaml.Sample
+            //        {
+            //            // Type = "~",
+            //            // Index = -1,
+            //            // KeyRegion = "~",
+            //            TempAddress = tempAddr
+            //        };
+
+            //        index++;
+            //    }
+            //}
 
             // Serialize to YAML
             string yamlPath = Path.Combine(folder, $"{baseName}.metadata");
