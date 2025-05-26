@@ -621,7 +621,7 @@ namespace MMR.Randomizer.Utils
 
             // Valid values for the game and song type fields
             var validGames = new HashSet<string> { "oot", "mm" };
-            var validTypes = new HashSet<string> { "bgm", "fanfare" };
+            var validSongTypes = new HashSet<string> { "bgm", "fanfare" };
 
             // Valid custom audio sample types and key regions
             var validSoundTypes = new HashSet<string> { "INST", "DRUM", "SFX" };
@@ -638,7 +638,7 @@ namespace MMR.Randomizer.Utils
             if (yamlData == null || yamlData.Metadata == null)
                 throw new Exception($"ReadMusicMetadataYaml Error: Invalid or empty YAML metadata for song: '{songname}'");
 
-            string songType = validTypes.Contains(yamlData.Metadata.SongType?.ToLower()) ? yamlData.Metadata.SongType.ToLower() : "bgm";
+            string songType = validSongTypes.Contains(yamlData.Metadata.SongType?.ToLower()) ? yamlData.Metadata.SongType.ToLower() : "bgm";
             string songGame = validGames.Contains(yamlData.Game?.ToLower()) ? yamlData.Game.ToLower() : "mm"; // Default to MM if no game
 
             List<int> categories = songType == "bgm" ? [.. MusicGroups.DEFAULT_BGM_CATEGORIES] : [.. MusicGroups.DEFAULT_FANFARE_CATEGORIES];
