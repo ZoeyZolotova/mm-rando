@@ -698,10 +698,10 @@ namespace MMR.Randomizer.Utils
                     }
                     else
                     {
-                        if (!validTypes.Contains(type) && type != null)
+                        if (!validSoundTypes.Contains(type) && type != null)
                             throw new InvalidOperationException($"ReadMusicMetadataYaml Error: Invalid instrument type ('{type}') for audio sample ('{entry.Key}'): '{songname}'");
 
-                        if (validTypes.Contains(type) && listIndex == null)
+                        if (validSoundTypes.Contains(type) && listIndex == null)
                             throw new InvalidOperationException($"ReadMusicMetadataYaml Error: Index must not be null with given type ('{type}') for audio sample ('{entry.Key}') in song: '{songname}'");
 
                         if (type != null && tempAddr != null)
