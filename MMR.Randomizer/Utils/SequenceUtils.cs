@@ -344,7 +344,7 @@ namespace MMR.Randomizer.Utils
                     throw new Exception($"Directory Error: Cannot access the following directory in the music folder: '{directory}'");
                 }
             }
-            
+
             // Secondary check for old music files returned some, so write the list of old files for users
             // This is contained within its own file because it could be hundreds of lines long
             if (MusicConversionUtils.OLD_MUSIC_FILES.Count > 0)
@@ -772,8 +772,8 @@ namespace MMR.Randomizer.Utils
 
             SequenceBinaryData sequence = new() { SequenceData = rawSeqData };
 
-            // If the value is "custom" or "-", then the music file uses a custom bank
-            if (metadata.InstrumentSet == "custom" || metadata.InstrumentSet == "-")
+            // If the value is "custom" then the music file uses a custom bank
+            if (metadata.InstrumentSet == "custom")
             {
                 song.Instrument = REQUIRES_NEW_BANK;
             }
@@ -2012,7 +2012,7 @@ namespace MMR.Randomizer.Utils
                         {
                             Debug.WriteLine(e);
                         }
-                        
+
                         uint sampleBankAddress = 0;
                         if (sample.InstrumentType != null && sample.ListIndex != -1 && sample.Marker == 0) // Key region can be null
                         {
@@ -2036,7 +2036,7 @@ namespace MMR.Randomizer.Utils
                         else // Fallback to sample marker matching
                         {
                             // Instead of searching byte by byte, collect all the samples, match the address, then get the offset to the matched address
-                            // With this, there should be no accidental overwrites of data in the instrument bank 
+                            // With this, there should be no accidental overwrites of data in the instrument bank
                             foreach (var s in instrumentBank.GetBankSamples())
                             {
                                 // The bank offset gets stored in the sample struct, there's no need to find the parent
@@ -2061,7 +2061,7 @@ namespace MMR.Randomizer.Utils
                         for (int i = 0; i < 4; i++)
                         {
                             ROM[audiobankInstSetAddr + sampleBankAddress + i + 4] = newAddressBytes[i];
-                        } 
+                        }
                     }
                 }
 
