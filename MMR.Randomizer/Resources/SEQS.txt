@@ -413,7 +413,7 @@ mm-gormanbros:
 
 mm-mysterywoods:
   display name: "Woods of Mystery"
-  music groups: ["Fields", "Towns", "Indoors", "Minigames", "CalmThemes", "WoodsOfMystery"]
+  music groups: ["Fields", "Towns", "Minigames", "WoodsOfMystery"]
   instrument set: 0x04
   sequence id: 0x3E
   song type: "bgm"
