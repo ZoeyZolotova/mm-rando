@@ -405,7 +405,7 @@ mm-witches:
 
 mm-gormanbros:
   display name: "Gorman Bros.' Theme"
-  music groups: ["Fields", "CalmThemes", "GormanBrosTheme"]
+  music groups: ["Indoors", "CalmThemes", "GormanBrosTheme"]
   instrument set: 0x08
   sequence id: 0x42
   song type: "bgm"
@@ -565,7 +565,7 @@ mm-f-smallitem:
 
 mm-f-meet:
   display name: "The Truth Revealed"
-  music groups: ["ItemFanfares", "TruthRevealed"]
+  music groups: ["EventFanfares", "ItemFanfares", "TruthRevealed"]
   instrument set: 0x03
   sequence id: 0x3D
   song type: "fanfare"
@@ -573,7 +573,7 @@ mm-f-meet:
 
 mm-f-goronwin:
   display name: "Goron Race Win"
-  music groups: ["ItemFanfares", "GoronRaceWin"]
+  music groups: ["ItemFanfares", "ClearFanfares", "GoronRaceWin"]
   instrument set: 0x26
   sequence id: 0x3F
   song type: "fanfare"
@@ -581,7 +581,7 @@ mm-f-goronwin:
 
 mm-f-horsewin:
   display name: "Horse Race Win"
-  music groups: ["ItemFanfares", "HorseRaceWin"]
+  music groups: ["ItemFanfares", "ClearFanfares", "HorseRaceWin"]
   instrument set: 0x08
   sequence id: 0x41
   song type: "fanfare"
@@ -676,7 +676,7 @@ mm-combat:
 
 mm-japas-basspractice:
   display name: "Japas' Room"
-  music groups: ["JapasRoom"]
+  music groups: ["Indoors", "JapasRoom"]
   instrument set: 0x13
   sequence id: 0x6C
   song type: "bgm"
@@ -684,7 +684,7 @@ mm-japas-basspractice:
 
 mm-tijo-drumpractice:
   display name: "Tijo's Room"
-  music groups: ["TijosRoom"]
+  music groups: ["Indoors", "TijosRoom"]
   instrument set: 0x13
   sequence id: 0x6D
   song type: "bgm"
@@ -692,7 +692,7 @@ mm-tijo-drumpractice:
 
 mm-evan-pianopractice:
   display name: "Evan's Room"
-  music groups: ["EvansRoom"]
+  music groups: ["Indoors", "EvansRoom"]
   instrument set: 0x13
   sequence id: 0x6E
   song type: "bgm"
@@ -708,7 +708,7 @@ mm-finalhours:
 
 mm-opening-a-chest:
   display name: "Opening Chest"
-  music groups: ["OpenChest"]
+  music groups: ["EventFanfares", "OpenChest"]
   instrument set: 0x03
   sequence id: 0x2B
   song type: "fanfare"
