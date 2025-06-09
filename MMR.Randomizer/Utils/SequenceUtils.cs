@@ -766,18 +766,22 @@ namespace MMR.Randomizer.Utils
                 if (states == null)
                     return;
 
+                SequencePlayState combinedState = SequencePlayState.None;
+
                 foreach (var statesStr in states)
                 {
                     if (Enum.TryParse<SequencePlayState>(statesStr, true, out var state))
                     {
-                        result[index] = state;
+                        combinedState |= state;
                     }
                 }
+
+                result[index] = combinedState;
             }
 
             // Get the states from each channel
             var type = typeof(MusicMetadataYaml.FormmaskLists);
-            for (int i = 0; i < MaxChannels; i ++)
+            for (int i = 0; i < MaxChannels; i++)
             {
                 var property = type.GetProperty($"Channel{i}");
                 var channelStates = property?.GetValue(formmaskLists) as List<string>;
@@ -1004,13 +1008,14 @@ namespace MMR.Randomizer.Utils
 
         #region Formmask Data Processing
         /// <summary>
-        /// Reads the formmask data from a '.formmask' file or the music files '.metadata' metadata file and creates a bitfield array that reflects the formmask conditions.
+        /// Reads the formmask data from a '.formmask' file or the music files '.metadata' metadata file and creates an array of bit-packed values that reflect the formmask conditions.
         /// </summary>
         //private static void ReadMusicFormmask(SequenceBinaryData combo, ZipArchiveEntry formmaskFile, SequencePlayState[] formmaskMetaArray = null)
-        private static void ReadMusicFormmask(SequenceBinaryData combo, SequencePlayState[] formmaskMetaArray = null)
+        private static void ReadMusicFormmask(SequenceBinaryData combo, SequencePlayState[] formmaskMetaData = null)
         {
-            // The formmask file is a single JSON/YAML list that determines which sequence channels
-            // should be turned on and off for each of Link's forms and states
+            // Formmask data contained in the metadata file is a dictionary of lists containing forms and states as strings
+            // This gets converted into a SequencePlayState array that determines which sequenc channels should be enabled
+            // and disabled for each of Link's forms and the current game state(s)
 
             static void ProcessFormmaskData(SequencePlayState[] states, SequenceBinaryData combo)
             {
@@ -1038,9 +1043,9 @@ namespace MMR.Randomizer.Utils
                 combo.Formmask = ConvertUtils.U16ArrayToBytes([.. states.Cast<ushort>()]);
             }
 
-            if (formmaskMetaArray != null)
+            if (formmaskMetaData != null)
             {
-                ProcessFormmaskData(formmaskMetaArray, combo);
+                ProcessFormmaskData(formmaskMetaData, combo);
             }
 
             //if (formmaskFile != null && formmaskMetaArray == null)
