@@ -722,22 +722,64 @@ namespace MMR.Randomizer.Utils
             string yamlOutput = YamlSerializer.FlowListSerialize(yaml);
             File.WriteAllText(yamlPath, yamlOutput);
 
+            //if (formmask != null && formmask.Count > 0)
+            //{
+            //    using (var writer = new StreamWriter(yamlPath, append: true))
+            //    {
+            //        writer.WriteLine("formmask: [");
+            //        for (int i = 0; i < formmask.Count; i++)
+            //        {
+            //            string value = formmask[i];
+            //            string comment = i < 16 ? $"Channel {i}" : $"Cumulative States";
+
+            //            writer.Write($"  \"{value}\"");
+            //            if (i != formmask.Count - 1)
+            //                writer.Write(",");
+            //            writer.WriteLine($" # {comment}");
+            //        }
+            //        writer.WriteLine("]");
+            //    }
+            //}
+
             if (formmask != null && formmask.Count > 0)
             {
                 using (var writer = new StreamWriter(yamlPath, append: true))
                 {
-                    writer.WriteLine("formmask: [");
-                    for (int i = 0; i < formmask.Count; i++)
-                    {
-                        string value = formmask[i];
-                        string comment = i < 16 ? $"Channel {i}" : $"Cumulative States";
+                    writer.WriteLine("formmask:");
 
-                        writer.Write($"  \"{value}\"");
-                        if (i != formmask.Count - 1)
-                            writer.Write(",");
-                        writer.WriteLine($" # {comment}");
+                    for (int i = 0; i < 16; i++)
+                    {
+                        string key = $"channel {i}";
+                        string value = i < formmask.Count ? formmask[i] : string.Empty;
+
+                        writer.Write($"  {key}: [");
+
+                        if (!string.IsNullOrWhiteSpace(value))
+                        {
+                            string[] states = value.Split(new[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                            writer.Write(string.Join(", ", states.Select(s => s.Trim())));
+                        }
+
+                        writer.WriteLine("]");
                     }
-                    writer.WriteLine("]");
+
+                    if (formmask.Count > 16)
+                    {
+                        string cumulativeValue = formmask[16];
+                        writer.Write("  cumulative states: [");
+
+                        if (!string.IsNullOrWhiteSpace(cumulativeValue))
+                        {
+                            string[] states = cumulativeValue.Split(new[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                            writer.Write(string.Join(", ", states.Select(s => s.Trim())));
+                        }
+
+                        writer.WriteLine("]");
+                    }
+                    else
+                    {
+                        writer.WriteLine("  cumulative states: []");
+                    }
                 }
             }
         }

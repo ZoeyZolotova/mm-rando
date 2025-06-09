@@ -9,6 +9,6 @@ namespace MMR.Randomizer.Models.Rom
         /// </summary>
         public byte[] SequenceData { get; set; } = null;
         public InstrumentSetInfo InstrumentSet { get; set; } = null;
-        public byte[] Formmask { get; internal set; }
+        public byte[] Formmask { get; set; } // Why was this internal? It needs to be public for it to write to the cache
     }
 }

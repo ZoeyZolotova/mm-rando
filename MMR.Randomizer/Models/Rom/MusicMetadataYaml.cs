@@ -18,10 +18,11 @@ namespace MMR.Randomizer.Models.Rom
         public Meta Metadata { get; set; }
 
         /// <summary>
-        /// Represents a formmask array in the root YAML dictionary.
+        /// Represents a formmask dictionary in the root YAML dictionary.
         /// </summary>
         [YamlMember(Alias = "formmask")]
-        public SequencePlayState[] Formmask { get; set; }
+        //public SequencePlayState[] Formmask { get; set; }
+        public FormmaskLists Formmask { get; set; }
 
         /// <summary>
         /// Represents the "metadata" YAML dictionary.
@@ -60,6 +61,63 @@ namespace MMR.Randomizer.Models.Rom
 
             [YamlMember(Alias = "temp address")]
             public uint? TempAddress { get; set; } = null;
+        }
+
+        /// <summary>
+        /// Represents the "formmask" dictionary's lists.
+        /// </summary>
+        public class FormmaskLists
+        {
+            [YamlMember(Alias = "channel 0")]
+            public List<string> Channel0 { get; set; } = [];
+
+            [YamlMember(Alias = "channel 1")]
+            public List<string> Channel1 { get; set; } = [];
+
+            [YamlMember(Alias = "channel 2")]
+            public List<string> Channel2 { get; set; } = [];
+
+            [YamlMember(Alias = "channel 3")]
+            public List<string> Channel3 { get; set; } = [];
+
+            [YamlMember(Alias = "channel 4")]
+            public List<string> Channel4 { get; set; } = [];
+
+            [YamlMember(Alias = "channel 5")]
+            public List<string> Channel5 { get; set; } = [];
+
+            [YamlMember(Alias = "channel 6")]
+            public List<string> Channel6 { get; set; } = [];
+
+            [YamlMember(Alias = "channel 7")]
+            public List<string> Channel7 { get; set; } = [];
+
+            [YamlMember(Alias = "channel 8")]
+            public List<string> Channel8 { get; set; } = [];
+
+            [YamlMember(Alias = "channel 9")]
+            public List<string> Channel9 { get; set; } = [];
+
+            [YamlMember(Alias = "channel 10")]
+            public List<string> Channel10 { get; set; } = [];
+
+            [YamlMember(Alias = "channel 11")]
+            public List<string> Channel11 { get; set; } = [];
+
+            [YamlMember(Alias = "channel 12")]
+            public List<string> Channel12 { get; set; } = [];
+
+            [YamlMember(Alias = "channel 13")]
+            public List<string> Channel13 { get; set; } = [];
+
+            [YamlMember(Alias = "channel 14")]
+            public List<string> Channel14 { get; set; } = [];
+
+            [YamlMember(Alias = "channel 15")]
+            public List<string> Channel15 { get; set; } = [];
+
+            [YamlMember(Alias = "cumulative states")]
+            public List<string> CumulativeStates { get; set; } = [];
         }
     }
 }

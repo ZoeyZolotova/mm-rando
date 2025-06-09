@@ -610,7 +610,9 @@ namespace MMR.Randomizer.Utils
                 Debug.WriteLine($"ProcessCustomMusicFile Error: An exception occured when attempting to read archive ('{Path.GetFileNameWithoutExtension(filePath)}'): {e}");
             }
         }
+        #endregion
 
+        #region Metadata Handling
         /// <summary>
         /// Reads and stores the data from a music file's '.metadata' metadata YAML file.
         /// </summary>
@@ -748,8 +750,44 @@ namespace MMR.Randomizer.Utils
                 SongType = songType,
                 Categories = categories,
                 Commands = commands,
-                Formmask = yamlData.Formmask
+                Formmask = ConvertFormmaskLists(yamlData.Formmask) // yamlData.Formmask
             };
+        }
+
+        private static SequencePlayState[] ConvertFormmaskLists(MusicMetadataYaml.FormmaskLists formmaskLists)
+        {
+            const int MaxChannels = 16;
+            const int CumulativeIndex = 16;
+
+            var result = new SequencePlayState[MaxChannels + 1]; // Indices 0–15 = Channels 0–15, Index 16 = Cumulative states
+
+            void ParseList(List<string> states, int index)
+            {
+                if (states == null)
+                    return;
+
+                foreach (var statesStr in states)
+                {
+                    if (Enum.TryParse<SequencePlayState>(statesStr, true, out var state))
+                    {
+                        result[index] = state;
+                    }
+                }
+            }
+
+            // Get the states from each channel
+            var type = typeof(MusicMetadataYaml.FormmaskLists);
+            for (int i = 0; i < MaxChannels; i ++)
+            {
+                var property = type.GetProperty($"Channel{i}");
+                var channelStates = property?.GetValue(formmaskLists) as List<string>;
+                ParseList(channelStates, i);
+            }
+
+            // Get the cumulative states
+            ParseList(formmaskLists?.CumulativeStates, CumulativeIndex);
+
+            return result;
         }
         #endregion
 
