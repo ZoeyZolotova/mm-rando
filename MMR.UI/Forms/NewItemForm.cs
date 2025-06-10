@@ -13,6 +13,7 @@ namespace MMR.UI.Forms
     [SupportedOSPlatform("windows")]
     public partial class NewItemForm : Form
     {
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public string ReturnValue { get; set; }
 
         public NewItemForm()

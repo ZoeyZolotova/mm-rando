@@ -35,14 +35,22 @@ namespace MMR.UI.Forms
     {
         private bool _isUpdating = false;
         private int _seedOld = 0;
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public Configuration _configuration { get; set; }
 
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public AboutForm About { get; private set; }
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public ManualForm Manual { get; private set; }
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public LogicEditorForm LogicEditor { get; private set; }
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public CustomItemListEditForm ItemEditor { get; }
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public StartingItemEditForm StartingItemEditor { get; private set; }
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public JunkLocationEditForm JunkLocationEditor { get; private set; }
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public HudConfigForm HudConfig { get; private set; }
 
 
@@ -502,6 +510,7 @@ namespace MMR.UI.Forms
 
         private class LocationCategoryLabel : Label
         {
+            [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
             public List<string> Lines { get; set; }
 
             protected override void OnPaint(PaintEventArgs e)

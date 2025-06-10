@@ -5,6 +5,7 @@ using MMR.UI.Controls;
 using MMR.UI.Forms.Tooltips;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
@@ -17,7 +18,9 @@ namespace MMR.UI.Forms
     [SupportedOSPlatform("windows")]
     public partial class ToggleTricksForm : Form
     {
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public HashSet<string> Result { get; private set; }
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public LogicFile LogicFile { get; private set; }
 
         public ToggleTricksForm(LogicMode logicMode, string userLogicFilename, IEnumerable<string> tricksEnabled)

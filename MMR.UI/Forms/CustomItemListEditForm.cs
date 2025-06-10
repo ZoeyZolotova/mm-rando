@@ -1,27 +1,32 @@
-﻿using MMR.Randomizer.Models.Settings;
-using MMR.Randomizer.Utils;
+﻿using MMR.Randomizer.Extensions;
 using MMR.Randomizer.GameObjects;
+using MMR.Randomizer.Models.Settings;
+using MMR.Randomizer.Utils;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data;
 using System.Linq;
-using System.Windows.Forms;
-using MMR.Randomizer.Extensions;
 using System.Runtime.Versioning;
+using System.Windows.Forms;
 
 namespace MMR.UI.Forms
 {
     [SupportedOSPlatform("windows")]
     public partial class CustomItemListEditForm : Form
     {
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public List<Item> BaseItemList { get; private set; }
         private bool updating = false;
         private readonly int _itemGroupCount;
         private readonly string _invalidErrorMessage;
         private readonly Func<Item, string> _labelSelector;
 
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public string ExternalLabel { get; private set; }
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public List<Item> ItemList { get; private set; } = new List<Item>();
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public string ItemListString { get; private set; }
 
         public CustomItemListEditForm(IEnumerable<Item> baseItemList, Func<Item, string> labelSelector, string invalidErrorMessage)

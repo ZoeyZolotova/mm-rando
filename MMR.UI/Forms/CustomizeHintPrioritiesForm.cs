@@ -18,8 +18,11 @@ namespace MMR.UI.Forms
     [SupportedOSPlatform("windows")]
     public partial class CustomizeHintPrioritiesForm : Form
     {
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public List<List<Item>> Result { get; private set; }
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public HashSet<int> ResultTiersIndicateImportance { get; private set; }
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public List<int> ResultTiersCap { get; private set; }
 
         public CustomizeHintPrioritiesForm(IEnumerable<List<Item>> overrideHintPriorities, IEnumerable<int> tiersIndicateImportance, IEnumerable<int> tiersCap)

@@ -75,7 +75,7 @@ To change your ROM file's byte ordering using Tool64 follow the steps below:
 
 In order to run the Majora's Mask Randomizer program on your PC, you will need to install a dependency known as the ".NET Desktop Runtime".
 
-Below are direct links to the .NET version 8.0 desktop runtime, for both the 64 bit (x64) and 32 bit (x86) installers:
+Below are direct links to the .NET version 9.0 desktop runtime, for both the 64 bit (x64) and 32 bit (x86) installers:
 
 <table>
   <tr>
@@ -84,19 +84,19 @@ Below are direct links to the .NET version 8.0 desktop runtime, for both the 64 
   </tr>
   <tr>
     <td>Windows (64 Bit)</td>
-    <td><a href="https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-desktop-8.0.15-windows-x64-installer" target="_blank">.NET version 8.0 Desktop Runtime (Windows x64) Installer</a></td>
+    <td><a href="https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-desktop-9.0.5-windows-x64-installer" target="_blank">.NET version 9.0 Desktop Runtime (Windows x64) Installer</a></td>
   </tr>
   <tr>
     <td>Windows (32 Bit)</td>
-    <td><a href="https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-desktop-8.0.15-windows-x86-installer" target="_blank">.NET version 8.0 Desktop Runtime (Windows x86) Installer</a></td>
+    <td><a href="https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-desktop-9.0.5-windows-x86-installer" target="_blank">.NET version 9.0 Desktop Runtime (Windows x86) Installer</a></td>
   </tr>
   <tr>
     <td>macOS (64 Bit)</td>
-    <td><a href="https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-8.0.15-macos-x64-installer" target="_blank">.NET Version 8.0 Desktop Runtime (macOS x64) Installer</a></td>
+    <td><a href="https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-9.0.5-macos-x64-installer" target="_blank">.NET Version 9.0 Desktop Runtime (macOS x64) Installer</a></td>
   </tr>
   <tr>
     <td>Other PC Systems</td>
-    <td><a href="https://dotnet.microsoft.com/en-us/download/dotnet/8.0" target="_blank">.NET Version 8.0 Installation Page</a></td>
+    <td><a href="https://dotnet.microsoft.com/en-us/download/dotnet/9.0" target="_blank">.NET Version 9.0 Installation Page</a></td>
   </tr>
 </table>
 
