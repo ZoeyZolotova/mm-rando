@@ -77,10 +77,28 @@ In order to run the Majora's Mask Randomizer program on your PC, you will need t
 
 Below are direct links to the .NET version 8.0 desktop runtime, for both the 64 bit (x64) and 32 bit (x86) installers:
 
-- 64 Bit Windows Systems: <a href="https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-desktop-8.0.15-windows-x64-installer" target="_blank">.NET version 8.0 Desktop Runtime (Windows x64) Installer</a>
-- 32 Bit Windows Systems: <a href="https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-desktop-8.0.15-windows-x86-installer" target="_blank">.NET version 8.0 Desktop Runtime (Windows x86) Installer</a>
-- 64 Bit macOS Systems: <a href="https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-8.0.15-macos-x64-installer" target="_blank">.NET Version 8.0 Desktop Runtime (macOS x64) Installer</a>
-- Other PC systems: <a href="https://dotnet.microsoft.com/en-us/download/dotnet/8.0" target="_blank">.NET Version 8.0 Installation Page</a>
+<table>
+  <tr>
+    <th>OS</th>
+    <th>Installers</th>
+  </tr>
+  <tr>
+    <td>Windows (64 Bit)</td>
+    <td><a href="https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-desktop-8.0.15-windows-x64-installer" target="_blank">.NET version 8.0 Desktop Runtime (Windows x64) Installer</a></td>
+  </tr>
+  <tr>
+    <td>Windows (32 Bit)</td>
+    <td><a href="https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-desktop-8.0.15-windows-x86-installer" target="_blank">.NET version 8.0 Desktop Runtime (Windows x86) Installer</a></td>
+  </tr>
+  <tr>
+    <td>macOS (64 Bit)</td>
+    <td><a href="https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-8.0.15-macos-x64-installer" target="_blank">.NET Version 8.0 Desktop Runtime (macOS x64) Installer</a></td>
+  </tr>
+  <tr>
+    <td>Other PC Systems</td>
+    <td><a href="https://dotnet.microsoft.com/en-us/download/dotnet/8.0" target="_blank">.NET Version 8.0 Installation Page</a></td>
+  </tr>
+</table>
 
 > [!NOTE]
 > When clicking either of the links above, the download for the .NET version 8.0 Desktop Runtime should begin automatically. If — for some reason — the download does not begin when the page finishes loading, there is a link in the middle of the page with the text, "click here to download manually", that will initiate the download manually.
