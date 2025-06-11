@@ -1119,12 +1119,15 @@ namespace MMR.UI.Forms
 
         private void bEnergy_Click(object sender, EventArgs e)
         {
-            var result = cEnergy.ShowDialog();
+            using ColorDialog dlg = new();
+            var button = (Button)sender;
+            dlg.Color = button.BackColor;
+
+            var result = dlg.ShowDialog();
             if (result == DialogResult.OK)
             {
                 _isUpdating = true;
 
-                var button = (Button)sender;
                 var form = (TransformationForm)button.Tag;
                 var index = int.Parse(button.Name.Substring(7));
                 _configuration.CosmeticSettings.EnergyColors[form][index] = cEnergy.Color;
@@ -1132,6 +1135,20 @@ namespace MMR.UI.Forms
 
                 _isUpdating = false;
             }
+
+            //var result = cEnergy.ShowDialog();
+            //if (result == DialogResult.OK)
+            //{
+            //    _isUpdating = true;
+
+            //    var button = (Button)sender;
+            //    var form = (TransformationForm)button.Tag;
+            //    var index = int.Parse(button.Name.Substring(7));
+            //    _configuration.CosmeticSettings.EnergyColors[form][index] = cEnergy.Color;
+            //    button.BackColor = cEnergy.Color;
+
+            //    _isUpdating = false;
+            //}
         }
 
         private void cEnergyRandomize_Click(object sender, EventArgs e)
@@ -1187,18 +1204,34 @@ namespace MMR.UI.Forms
 
         private void bTunic_Click(object sender, EventArgs e)
         {
+            using ColorDialog dlg = new();
+            var button = (Button)sender;
+            dlg.Color = button.BackColor;
+
             var result = cTunic.ShowDialog();
             if (result == DialogResult.OK)
             {
                 _isUpdating = true;
 
-                var button = (Button)sender;
                 var form = (TransformationForm)button.Tag;
                 _configuration.CosmeticSettings.TunicColors[form] = cTunic.Color;
                 button.BackColor = cTunic.Color;
 
                 _isUpdating = false;
             }
+
+            //var result = cTunic.ShowDialog();
+            //if (result == DialogResult.OK)
+            //{
+            //    _isUpdating = true;
+
+            //    var button = (Button)sender;
+            //    var form = (TransformationForm)button.Tag;
+            //    _configuration.CosmeticSettings.TunicColors[form] = cTunic.Color;
+            //    button.BackColor = cTunic.Color;
+
+            //    _isUpdating = false;
+            //}
         }
 
         private void bopen_Click(object sender, EventArgs e)
