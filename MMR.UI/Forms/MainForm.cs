@@ -1208,7 +1208,7 @@ namespace MMR.UI.Forms
             var button = (Button)sender;
             dlg.Color = button.BackColor;
 
-            var result = cTunic.ShowDialog();
+            var result = dlg.ShowDialog();
             if (result == DialogResult.OK)
             {
                 _isUpdating = true;
