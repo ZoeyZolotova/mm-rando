@@ -1130,8 +1130,8 @@ namespace MMR.UI.Forms
 
                 var form = (TransformationForm)button.Tag;
                 var index = int.Parse(button.Name.Substring(7));
-                _configuration.CosmeticSettings.EnergyColors[form][index] = cEnergy.Color;
-                button.BackColor = cEnergy.Color;
+                _configuration.CosmeticSettings.EnergyColors[form][index] = dlg.Color;
+                button.BackColor = dlg.Color;
 
                 _isUpdating = false;
             }
@@ -1214,8 +1214,8 @@ namespace MMR.UI.Forms
                 _isUpdating = true;
 
                 var form = (TransformationForm)button.Tag;
-                _configuration.CosmeticSettings.TunicColors[form] = cTunic.Color;
-                button.BackColor = cTunic.Color;
+                _configuration.CosmeticSettings.TunicColors[form] = dlg.Color;
+                button.BackColor = dlg.Color;
 
                 _isUpdating = false;
             }
