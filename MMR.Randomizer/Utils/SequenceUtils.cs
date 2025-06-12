@@ -424,7 +424,6 @@ namespace MMR.Randomizer.Utils
             //   - Instrument bank file (.zbank)
             //   - Instrument bank metadata file (.bankmeta)
             //   - Custom audio sample file (.zsound)
-            //   - Formmask array file (.formmask; may be present in .metadata file)
             //
             // Only one file for each file type is allowed except custom audio sample files
             // an instrument bank may contain multiple sounds, so multiple may be required
@@ -498,10 +497,9 @@ namespace MMR.Randomizer.Utils
                     {
                         // Only allow a single file type for each file, except zsounds which may require multiple
                         { ".seq",      CreateSetter(() => musicArchive.SequenceFile,     e => musicArchive.SequenceFile = e, "sequence") },
-                        { ".metadata", CreateSetter(() => musicArchive.MetaFile,         e => musicArchive.MetaFile = e,     "metadata") },
+                        { ".metadata", CreateSetter(() => musicArchive.MetadataFile,     e => musicArchive.MetadataFile = e, "metadata") },
                         { ".zbank",    CreateSetter(() => musicArchive.BankFile,         e => musicArchive.BankFile = e,     "zbank") },
                         { ".bankmeta", CreateSetter(() => musicArchive.BankmetaFile,     e => musicArchive.BankmetaFile = e, "bankmeta") },
-                        //{ ".formmask", CreateSetter(() => musicArchive.FormmaskFile,     e => musicArchive.FormmaskFile = e, "formmask") },
                         { ".zsound",   musicArchive.AudioSamples.Add },
                     };
 
@@ -525,7 +523,7 @@ namespace MMR.Randomizer.Utils
                     }
 
                     // Verify all required files are present
-                    if (musicArchive.SequenceFile == null || musicArchive.MetaFile == null)
+                    if (musicArchive.SequenceFile == null || musicArchive.MetadataFile == null)
                     {
                         // If the file is an old file, it will have categories and no metadata file
                         if (musicArchive.CategoriesFile != null)
@@ -549,7 +547,7 @@ namespace MMR.Randomizer.Utils
                         Filepath = filePath // Store the filepath for the music cache
                     };
 
-                    var metadata = ReadMusicMetadataYaml(currentSong.Name, musicArchive.MetaFile);
+                    var metadata = ReadMusicMetadataYaml(currentSong.Name, musicArchive.MetadataFile);
 
                     // If game is OOT, but the OOT audiobin wasn't loaded already, load the OOT audiobin
                     if (metadata.Game == "oot" && !IsMMRSFile(currentSong.Filepath) ||
@@ -750,46 +748,55 @@ namespace MMR.Randomizer.Utils
                 SongType = songType,
                 Categories = categories,
                 Commands = commands,
-                Formmask = ConvertFormmaskLists(yamlData.Formmask) // yamlData.Formmask
+                Formmask = ConvertFormmaskDict(yamlData.Formmask)
             };
         }
 
-        private static SequencePlayState[] ConvertFormmaskLists(MusicMetadataYaml.FormmaskLists formmaskLists)
+        /// <summary>
+        /// Creates the SequencePlayState array for the formmask data in the metadata file
+        /// </summary>
+        private static SequencePlayState[] ConvertFormmaskDict(Dictionary<string, List<string>> formmask)
         {
+            if (formmask == null)
+                return null;
+
             const int MaxChannels = 16;
             const int CumulativeIndex = 16;
 
-            var result = new SequencePlayState[MaxChannels + 1]; // Indices 0–15 = Channels 0–15, Index 16 = Cumulative states
-
-            void ParseList(List<string> states, int index)
+            var result = new SequencePlayState[MaxChannels + 1]; // Indices 0–15: Channels, Index 16: Cumulative states
+            static SequencePlayState ParseFormsAndStates(List<string> formsAndStates)
             {
-                if (states == null)
-                    return;
-
-                SequencePlayState combinedState = SequencePlayState.None;
-
-                foreach (var statesStr in states)
+                // Parses the forms and/or states from a formmask dictionary list and returns the correct SequencePlayState
+                SequencePlayState combined = SequencePlayState.None;
+                if (formsAndStates != null)
                 {
-                    if (Enum.TryParse<SequencePlayState>(statesStr, true, out var state))
+                    foreach (var item in formsAndStates)
                     {
-                        combinedState |= state;
+                        if (Enum.TryParse<SequencePlayState>(item, true, out var value))
+                        {
+                            combined |= value;
+                        }
                     }
                 }
 
-                result[index] = combinedState;
+                return combined;
             }
 
-            // Get the states from each channel
-            var type = typeof(MusicMetadataYaml.FormmaskLists);
+            // Get the forms and/or states from each channel
             for (int i = 0; i < MaxChannels; i++)
             {
-                var property = type.GetProperty($"Channel{i}");
-                var channelStates = property?.GetValue(formmaskLists) as List<string>;
-                ParseList(channelStates, i);
+                string key = $"channel {i}";
+                if (formmask.TryGetValue(key, out var formsAndStates))
+                {
+                    result[i] = ParseFormsAndStates(formsAndStates);
+                }
             }
 
             // Get the cumulative states
-            ParseList(formmaskLists?.CumulativeStates, CumulativeIndex);
+            if (formmask.TryGetValue("cumulative states", out var cumulativeStates))
+            {
+                result[CumulativeIndex] = ParseFormsAndStates(cumulativeStates);
+            }
 
             return result;
         }
@@ -1008,10 +1015,9 @@ namespace MMR.Randomizer.Utils
 
         #region Formmask Data Processing
         /// <summary>
-        /// Reads the formmask data from a '.formmask' file or the music files '.metadata' metadata file and creates an array of bit-packed values that reflect the formmask conditions.
+        /// Reads the formmask data from the music files '.metadata' metadata file and creates an array of bit-packed values that reflect the formmask conditions.
         /// </summary>
-        //private static void ReadMusicFormmask(SequenceBinaryData combo, ZipArchiveEntry formmaskFile, SequencePlayState[] formmaskMetaArray = null)
-        private static void ReadMusicFormmask(SequenceBinaryData combo, SequencePlayState[] formmaskMetaData = null)
+        private static void ReadMusicFormmask(SequenceBinaryData combo, SequencePlayState[] formmaskData = null)
         {
             // Formmask data contained in the metadata file is a dictionary of lists containing forms and states as strings
             // This gets converted into a SequencePlayState array that determines which sequenc channels should be enabled
@@ -1043,33 +1049,10 @@ namespace MMR.Randomizer.Utils
                 combo.Formmask = ConvertUtils.U16ArrayToBytes([.. states.Cast<ushort>()]);
             }
 
-            if (formmaskMetaData != null)
+            if (formmaskData != null)
             {
-                ProcessFormmaskData(formmaskMetaData, combo);
+                ProcessFormmaskData(formmaskData, combo);
             }
-
-            //if (formmaskFile != null && formmaskMetaArray == null)
-            //{
-            //    try
-            //    {
-            //        using var reader = new StreamReader(formmaskFile.Open(), Encoding.Default);
-            //        string formMaskData = reader.ReadToEnd();
-
-            //        // playState is a boolean bitfield, in the file it's "play with these states",
-            //        // but in the code it's "mute these states" so it needs to be reversed
-            //        var playState = YamlSerializer.Deserialize<SequencePlayState[]>(formMaskData);
-
-            //        ProcessFormmaskData(playState, combo);
-            //    }
-            //    catch (Exception e)
-            //    {
-            //        throw new Exception($"ReadMusicFormmask Error: Music file's Formmask file is invalid: {e.Message}", e);
-            //    }
-            //}
-            //else if (formmaskFile == null && formmaskMetaArray != null)
-            //{
-            //    ProcessFormmaskData(formmaskMetaArray, combo);
-            //}
         }
         #endregion
 
@@ -2228,11 +2211,10 @@ namespace MMR.Randomizer.Utils
         /// </summary>
         private class MusicArchiveContents
         {
-            public ZipArchiveEntry MetaFile { get; set; }
+            public ZipArchiveEntry MetadataFile { get; set; }
             public ZipArchiveEntry SequenceFile { get; set; }
             public ZipArchiveEntry BankFile { get; set; }
             public ZipArchiveEntry BankmetaFile { get; set; }
-            public ZipArchiveEntry FormmaskFile { get; set; }
             public ZipArchiveEntry CategoriesFile { get; set; }
             public List<ZipArchiveEntry> AudioSamples { get; set; } = [];
         }
