@@ -101,9 +101,9 @@ Below are direct links to the .NET version 9.0 desktop runtime, for both the 64 
 </table>
 
 > [!NOTE]
-> When clicking either of the links above, the download for the .NET version 8.0 Desktop Runtime should begin automatically. If — for some reason — the download does not begin when the page finishes loading, there is a link in the middle of the page with the text, "click here to download manually", that will initiate the download manually.
+> When clicking either of the links above, the download for the .NET version 9.0 Desktop Runtime should begin automatically. If — for some reason — the download does not begin when the page finishes loading, there is a link in the middle of the page with the text, "click here to download manually", that will initiate the download manually.
 
-Once you have downloaded the .NET version 8.0 Desktop Runtime, open the installer and click the "Install" button. If you already have the .NET version 8.0 Desktop Runtime, then an error will be displayed. Click "close" to exit the installer process if this occurs.
+Once you have downloaded the .NET version 9.0 Desktop Runtime, open the installer and click the "Install" button. If you already have the .NET version 9.0 Desktop Runtime, then an error will be displayed. Click "close" to exit the installer process if this occurs.
 
 #### Checking Your .NET Desktop Runtime Version
 If you want to ensure you have the correct version of the .NET Desktop Runtime, you can refer to the information below to check every version of the runtime that you have installed on Windows 10 or Windows 11.
@@ -113,20 +113,20 @@ To view the installed apps on your Windows 11 PC, follow the steps below:
 > 1. Select "Start > Settings > Apps > <a href="https://tinyurl.com/y99z55pr" title="Click to open Installed Apps in Windows">Installed Apps</a>"
 > 2. On the "Installed Apps" page, enter the text "runtime" in the search bar.
 > 3. The list of apps will repopulate with apps containing the text "runtime" in their name.
-> 4. In the repopulated list, find an entry of the "Micosoft Windows Desktop Runtime" with the following version number: "8.0.15".
+> 4. In the repopulated list, find an entry of the "Micosoft Windows Desktop Runtime" with the following version number: "9.0.5".
 
 #### Windows 10
 To view the installed apps on your Windows 10 PC, follow the steps below:
 > 1. Select "Start > Settings > <a href="https://tinyurl.com/y99z55pr" title="Click to open Apps &amp; Features in Windows">Apps</a>"
 > 2. On the "Apps & Features" page, enter the text "runtime" in the search bar.
 > 3. The list of apps will repopulate with apps containing the text "runtime" in their name.
-> 4. In the repopulated list, find an entry of the "Micosoft Windows Desktop Runtime" with the following version number: "8.0.15".
+> 4. In the repopulated list, find an entry of the "Micosoft Windows Desktop Runtime" with the following version number: "9.0.5".
 
 <h3>
   Downloading the Randomizer <a href="#table-of-contents" title="Return to Table of Contents">🔝</a>
 </h3>
 
-Please ensure you have installed the .NET version 8.0 Desktop Runtime using the instructions above before downloading the randomizer. Once your PC is prepared, you can follow the steps below.
+Please ensure you have installed the .NET version 9.0 Desktop Runtime using the instructions above before downloading the randomizer. Once your PC is prepared, you can follow the steps below.
 
 #### Downloading From GitHub
 To download the latest release of the Majora's Mask Randomizer, follow the steps below:
