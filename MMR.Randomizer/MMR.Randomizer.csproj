@@ -24,12 +24,12 @@
 
   <ItemGroup>
     <PackageReference Include="Be.IO-multi" Version="1.0.0" />
-    <PackageReference Include="DynamicExpresso.Core" Version="2.16.1" />
+    <PackageReference Include="DynamicExpresso.Core" Version="2.19.2" />
     <PackageReference Include="Microsoft.Toolkit.HighPerformance" Version="6.1.1" />
     <PackageReference Include="SixLabors.ImageSharp" Version="1.0.0-beta0007" />
     <PackageReference Include="SixLabors.ImageSharp.Drawing" Version="1.0.0-beta0007" />
-    <PackageReference Include="System.CodeDom" Version="4.7.0" />
-    <PackageReference Include="VCDiff" Version="3.2.7" />
+    <PackageReference Include="System.CodeDom" Version="9.0.6" />
+    <PackageReference Include="VCDiff" Version="4.0.1" />
   </ItemGroup>
 
   <ItemGroup>

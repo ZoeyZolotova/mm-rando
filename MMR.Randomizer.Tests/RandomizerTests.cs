@@ -5,6 +5,7 @@ using MMR.Randomizer.Models;
 using MMR.Randomizer.Models.Rom;
 using MMR.Randomizer.Models.Settings;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 namespace MMR.Randomizer.Tests
 {
@@ -29,7 +30,7 @@ namespace MMR.Randomizer.Tests
             var randomizer = new Randomizer(_settings, seed);
             var result = randomizer.Randomize(new NoProgressReporter());
 
-            Assert.AreEqual(MessageCost.MessageCosts.Length, result.MessageCosts.Count);
+            ClassicAssert.AreEqual(MessageCost.MessageCosts.Length, result.MessageCosts.Count);
         }
 
         [Test]
@@ -51,7 +52,7 @@ namespace MMR.Randomizer.Tests
 
             for (var i = 0; i < MessageCost.MessageCosts.Length; i++)
             {
-                Assert.AreEqual(priceMode.HasFlag(MessageCost.MessageCosts[i].Category), result.MessageCosts[i] != null);
+                ClassicAssert.AreEqual(priceMode.HasFlag(MessageCost.MessageCosts[i].Category), result.MessageCosts[i] != null);
             }
         }
 
@@ -93,7 +94,7 @@ namespace MMR.Randomizer.Tests
                 {
                     expectedCost = 999;
                 }
-                Assert.AreEqual(expectedCost, result.MessageCosts[i]);
+                ClassicAssert.AreEqual(expectedCost, result.MessageCosts[i]);
             }
         }
 
@@ -145,7 +146,7 @@ namespace MMR.Randomizer.Tests
                 {
                     expectedCost = 999;
                 }
-                Assert.AreEqual(expectedCost, result.MessageCosts[i], "Cost {0} was incorrect.", messageCost.Name);
+                ClassicAssert.AreEqual(expectedCost, result.MessageCosts[i], "Cost {0} was incorrect.", messageCost.Name);
             }
         }
     }

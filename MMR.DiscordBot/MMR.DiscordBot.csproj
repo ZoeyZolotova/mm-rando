@@ -7,9 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Discord.Net" Version="3.7.2" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.2" />
-    <PackageReference Include="ServiceStack.OrmLite.Sqlite.Core" Version="5.8.0" />
+    <PackageReference Include="Discord.Net" Version="3.17.4" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.6" />
+    <PackageReference Include="ServiceStack.OrmLite.Sqlite.Core" Version="8.8.0" />
   </ItemGroup>
 
   <ItemGroup>
