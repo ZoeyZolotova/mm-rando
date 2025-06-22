@@ -10,6 +10,7 @@ namespace MMR.Randomizer.Models.Rom
     {
         public string Name { get; set; }
         public string DisplayName { get; set; }
+        public string PlandoName { get; set; }
         public string Game { get; set; }
         public string Directory { get; set; } = Values.MusicDirectory;
         public string Filename => Path.Combine(Directory, Name);

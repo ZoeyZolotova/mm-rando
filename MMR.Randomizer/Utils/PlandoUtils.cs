@@ -30,8 +30,8 @@ namespace MMR.Randomizer.Utils
             return new PlandoItemCombo
             {
                 // to list makes a copy
-                ItemList = pic.ItemList.ToList(),
-                CheckList = pic.CheckList.ToList(),
+                ItemList = [.. pic.ItemList],
+                CheckList = [.. pic.CheckList],
                 SkipLogic = pic.SkipLogic,
                 ItemDrawCount = pic.ItemDrawCount,
                 Name = pic.Name,
@@ -90,7 +90,7 @@ namespace MMR.Randomizer.Utils
                             }
                         }
                     }
-                    itemPlandoList = itemPlandoList.Concat(workingList).ToList();
+                    itemPlandoList = [.. itemPlandoList, .. workingList];
                 }
                 catch (System.Text.Json.JsonException e)
                 {
@@ -123,10 +123,7 @@ namespace MMR.Randomizer.Utils
                 try
                 {
                     var fileText = File.ReadAllText(filePath);
-                    var workingList = JsonSerializer.Deserialize<List<PlandoMusicCombo>>(fileText);
-
-                    if (workingList == null)
-                        throw new Exception($"MusicPlando: Plando file [{filePath}] failed to parse"); // not sure this one isnt an exception
+                    var workingList = JsonSerializer.Deserialize<List<PlandoMusicCombo>>(fileText) ?? throw new Exception($"MusicPlando: Plando file [{filePath}] failed to parse");
                     foreach (var plandoEvent in workingList)
                     {
                         if (plandoEvent.SongsList == null)
@@ -142,7 +139,7 @@ namespace MMR.Randomizer.Utils
 
                     }
 
-                    musicPlandoList = musicPlandoList.Concat(workingList).ToList();
+                    musicPlandoList = [.. musicPlandoList, .. workingList];
                 }
                 catch (Exception ex)
                 {
@@ -169,8 +166,8 @@ namespace MMR.Randomizer.Utils
             foreach (PlandoMusicCombo musicCombo in allPlandoMusicCombos)
             {
                 // shuffle songs and slots based on our random seed
-                musicCombo.SongsList = musicCombo.SongsList.OrderBy(x => random.Next()).ToList();
-                musicCombo.SlotsList = musicCombo.SlotsList.OrderBy(x => random.Next()).ToList();
+                musicCombo.SongsList = [.. musicCombo.SongsList.OrderBy(x => random.Next())];
+                musicCombo.SlotsList = [.. musicCombo.SlotsList.OrderBy(x => random.Next())];
 
                 // clean combo of already placed items and checks
                 var previouslyUsedSongs = returnSongTupleList.Select(u => u.Item1.Name).ToList();
@@ -188,7 +185,7 @@ namespace MMR.Randomizer.Utils
                     }
                 }
 
-                var previouslyUsedSlots = returnSongTupleList.Select(u => u.Item2.Name).ToList();
+                var previouslyUsedSlots = returnSongTupleList.Select(u => u.Item2.PlandoName).ToList();
                 foreach (string i in musicCombo.SlotsList.ToList())
                 {
                     if (previouslyUsedSlots.Contains(i))
@@ -196,7 +193,7 @@ namespace MMR.Randomizer.Utils
                         DebugOut("Slot already used, removed from combo: " + i);
                         musicCombo.SlotsList.Remove(i);
                     }
-                    else if (!RomData.TargetSequences.Any(u => u.Name == i))
+                    else if (!RomData.TargetSequences.Any(u => u.PlandoName == i))
                     {
                         throw new Exception("Music Plando Error: " +
                             "Slot does not exist in slot pool, did you misspell the slot Name or forget to add it to seqs.txt? \n" + i);
@@ -220,7 +217,7 @@ namespace MMR.Randomizer.Utils
                 for (int i = 0; i < musicCombo.ItemDrawCount && i < musicCombo.SlotsList.Count; i++)
                 {
                     SequenceInfo song = RomData.SequenceList.Find(u => u.Name == musicCombo.SongsList[i]);
-                    SequenceInfo slot = RomData.TargetSequences.Find(u => u.Name == musicCombo.SlotsList[i]);
+                    SequenceInfo slot = RomData.TargetSequences.Find(u => u.PlandoName == musicCombo.SlotsList[i]);
 
                     returnSongTupleList.Add((song, slot));
                     DebugOut("* Song placed: " + song.Name + " placed in slot " + slot.Name);
@@ -233,10 +230,10 @@ namespace MMR.Randomizer.Utils
         // remove items and checks already taken
         public static PlandoItemCombo CleanItemCombo(PlandoItemCombo itemCombo, Random random, List<Item> randomizerItemPool, ItemList randomizerItemList)
         {
-            PlandoItemCombo returnCombo = new PlandoItemCombo
+            PlandoItemCombo returnCombo = new()
             {
-                ItemList = itemCombo.ItemList.OrderBy(x => random.Next()).ToList(),
-                CheckList = itemCombo.CheckList.OrderBy(x => random.Next()).ToList(),
+                ItemList = [.. itemCombo.ItemList.OrderBy(x => random.Next())],
+                CheckList = [.. itemCombo.CheckList.OrderBy(x => random.Next())],
                 SkipLogic = itemCombo.SkipLogic,
                 ItemDrawCount = itemCombo.ItemDrawCount,
                 Name = itemCombo.Name,

@@ -277,6 +277,7 @@ namespace MMR.Randomizer.Utils
                 {
                     Name = seqName,
                     DisplayName = seqData.DisplayName ?? seqName,
+                    PlandoName = seqData.PlandoName ?? seqName,
                     Categories = seqCategories,
                     Instrument = seqInstrument,
                 };
@@ -285,6 +286,7 @@ namespace MMR.Randomizer.Utils
                 {
                     Name = seqName,
                     DisplayName = seqData.DisplayName ?? seqName,
+                    PlandoName = seqData.PlandoName ?? seqName,
                     Categories = seqCategories,
                     Instrument = seqInstrument,
                 };
@@ -543,7 +545,7 @@ namespace MMR.Randomizer.Utils
 
                     SequenceInfo currentSong = new()
                     {
-                        Name = Path.GetFileNameWithoutExtension(filePath),
+                        Name = Path.GetFileName(filePath),
                         Filepath = filePath // Store the filepath for the music cache
                     };
 
@@ -2240,6 +2242,9 @@ namespace MMR.Randomizer.Utils
         {
             [YamlMember(Alias = "display name")]
             public string DisplayName { get; set; }
+
+            [YamlMember(Alias = "plando name")]
+            public string PlandoName { get; set; }
 
             [YamlMember(Alias = "music groups")]
             public List<object> MusicGroups { get; set; }
