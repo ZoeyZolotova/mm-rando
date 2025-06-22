@@ -41,6 +41,7 @@ mm-terminafield:
   sequence id: 0x02
   song type: "bgm"
   no recycle: false
+  plando name: "TerminaField"
 
 mm-snowheadmountains:
   display name: "Snowhead"
@@ -49,6 +50,7 @@ mm-snowheadmountains:
   sequence id: 0x13
   song type: "bgm"
   no recycle: false
+  plando name: "Snowhead"
 
 mm-greatbaycoast:
   display name: "Great Bay Coast"
@@ -57,6 +59,7 @@ mm-greatbaycoast:
   sequence id: 0x10
   song type: "bgm"
   no recycle: false
+  plando name: "GreatBay"
 
 mm-ikanacanyon:
   display name: "Ikana Canyon"
@@ -65,6 +68,7 @@ mm-ikanacanyon:
   sequence id: 0x11
   song type: "bgm"
   no recycle: false
+  plando name: "IkanaCanyon"
 
 mm-southernswamp:
   display name: "Southern Swamp"
@@ -73,6 +77,7 @@ mm-southernswamp:
   sequence id: 0x0C
   song type: "bgm"
   no recycle: false
+  plando name: "SouthernSwamp"
 
 mm-clocktown1:
   display name: "Clock Town (Day 1)"
@@ -81,6 +86,7 @@ mm-clocktown1:
   sequence id: 0x15
   song type: "bgm"
   no recycle: false
+  plando name: "ClockTown1"
 
 mm-clocktown2:
   display name: "Clock Town (Day 2)"
@@ -89,6 +95,7 @@ mm-clocktown2:
   sequence id: 0x16
   song type: "bgm"
   no recycle: false
+  plando name: "ClockTown2"
 
 mm-clocktown3:
   display name: "Clock Town (Day 3)"
@@ -97,6 +104,7 @@ mm-clocktown3:
   sequence id: 0x17
   song type: "bgm"
   no recycle: false
+  plando name: "ClockTown3"
 
 mm-goroncity:
   display name: "Goron Shrine"
@@ -105,6 +113,7 @@ mm-goroncity:
   sequence id: 0x30
   song type: "bgm"
   no recycle: false
+  plando name: "GoronShrine"
 
 mm-romaniranch:
   display name: "Romani Ranch"
@@ -113,6 +122,7 @@ mm-romaniranch:
   sequence id: 0x2F
   song type: "bgm"
   no recycle: false
+  plando name: "RomaniRanch"
 
 mm-zorahall:
   display name: "Zora Hall"
@@ -121,6 +131,7 @@ mm-zorahall:
   sequence id: 0x36
   song type: "bgm"
   no recycle: false
+  plando name: "ZoraHall"
 
 mm-dekupalace:
   display name: "Deku Palace"
@@ -129,6 +140,7 @@ mm-dekupalace:
   sequence id: 0x12
   song type: "bgm"
   no recycle: false
+  plando name: "DekuPalace"
 
 mm-caves:
   display name: "Secret Grotto"
@@ -137,6 +149,7 @@ mm-caves:
   sequence id: 0x3B
   song type: "bgm"
   no recycle: false
+  plando name: "SecretGrotto"
 
 mm-snowheadtemple:
   display name: "Snowhead Temple"
@@ -145,6 +158,7 @@ mm-snowheadtemple:
   sequence id: 0x65
   song type: "bgm"
   no recycle: false
+  plando name: "SnowheadTemple"
 
 mm-greatbaytemple:
   display name: "Great Bay Temple"
@@ -153,6 +167,7 @@ mm-greatbaytemple:
   sequence id: 0x66
   song type: "bgm"
   no recycle: false
+  plando name: "GreatBayTemple"
 
 mm-piratefortress:
   display name: "Pirates' Fortress"
@@ -161,6 +176,7 @@ mm-piratefortress:
   sequence id: 0x14
   song type: "bgm"
   no recycle: false
+  plando name: "PiratesFortress"
 
 mm-ikanacastle:
   display name: "Ancient Castle of Ikana"
@@ -169,6 +185,7 @@ mm-ikanacastle:
   sequence id: 0x6F
   song type: "bgm"
   no recycle: false
+  plando name: "IkanaCastle"
 
 mm-stonetower:
   display name: "Stone Tower Temple"
@@ -177,6 +194,7 @@ mm-stonetower:
   sequence id: 0x06
   song type: "bgm"
   no recycle: false
+  plando name: "StoneTower"
 
 mm-invertedstonetower:
   display name: "Inverted Stone Tower Temple"
@@ -185,6 +203,7 @@ mm-invertedstonetower:
   sequence id: 0x07
   song type: "bgm"
   no recycle: false
+  plando name: "InvertedStoneTower"
 
 mm-woodfalltemple:
   display name: "Woodfall Temple"
@@ -193,6 +212,7 @@ mm-woodfalltemple:
   sequence id: 0x1C
   song type: "bgm"
   no recycle: false
+  plando name: "WoodfallTemple"
 
 mm-clocktower:
   display name: "Clock Tower Interior"
@@ -201,6 +221,7 @@ mm-clocktower:
   sequence id: 0x05
   song type: "bgm"
   no recycle: false
+  plando name: "ClockTower"
 
 mm-guruguru:
   display name: "Guru-Guru's Theme"
@@ -209,6 +230,7 @@ mm-guruguru:
   sequence id: 0x2E
   song type: "bgm"
   no recycle: false
+  plando name: "GuruGurusTheme"
 
 mm-milkbar:
   display name: "Milk Bar"
@@ -217,6 +239,7 @@ mm-milkbar:
   sequence id: 0x3C
   song type: "bgm"
   no recycle: false
+  plando name: "MilkBar"
 
 mm-house:
   display name: "House"
@@ -225,6 +248,7 @@ mm-house:
   sequence id: 0x1F
   song type: "bgm"
   no recycle: false
+  plando name: "House"
 
 mm-shop:
   display name: "Item Shop"
@@ -233,6 +257,7 @@ mm-shop:
   sequence id: 0x44
   song type: "bgm"
   no recycle: false
+  plando name: "ItemShop"
 
 mm-shootinggallery:
   display name: "Minigame Shop"
@@ -241,6 +266,7 @@ mm-shootinggallery:
   sequence id: 0x46
   song type: "bgm"
   no recycle: false
+  plando name: "MinigameShop"
 
 mm-laboratory:
   display name: "Curiosity Shop"
@@ -249,7 +275,7 @@ mm-laboratory:
   sequence id: 0x2C
   song type: "bgm"
   no recycle: false
-
+  plando name: "CuriosityShop"
 
 mm-observatory:
   display name: "Astral Observatory"
@@ -258,6 +284,7 @@ mm-observatory:
   sequence id: 0x3A
   song type: "bgm"
   no recycle: false
+  plando name: "AstralObservatory"
 
 mm-musicbox:
   display name: "Music-Box House"
@@ -266,6 +293,7 @@ mm-musicbox:
   sequence id: 0x27
   song type: "bgm"
   no recycle: false
+  plando name: "MusicBoxHouse"
 
 mm-goronrace:
   display name: "Goron Race"
@@ -274,6 +302,7 @@ mm-goronrace:
   sequence id: 0x26
   song type: "bgm"
   no recycle: false
+  plando name: "GoronRace"
 
 mm-minigame:
   display name: "Minigame"
@@ -282,6 +311,7 @@ mm-minigame:
   sequence id: 0x25
   song type: "bgm"
   no recycle: false
+  plando name: "MinigameTheme"
 
 mm-wagonride:
   display name: "Cremia's Theme"
@@ -290,6 +320,7 @@ mm-wagonride:
   sequence id: 0x72
   song type: "bgm"
   no recycle: false
+  plando name: "CremiasTheme"
 
 mm-boatcruise:
   display name: "Old Koume's Boat Cruise"
@@ -298,6 +329,7 @@ mm-boatcruise:
   sequence id: 0x0E
   song type: "bgm"
   no recycle: false
+  plando name: "BoatCruise"
 
 mm-horserace:
   display name: "Horse Race"
@@ -306,6 +338,7 @@ mm-horserace:
   sequence id: 0x40
   song type: "bgm"
   no recycle: false
+  plando name: "HorseRace"
 
 mm-meeting:
   display name: "Mayor Dotour's Office"
@@ -314,6 +347,7 @@ mm-meeting:
   sequence id: 0x31
   song type: "bgm"
   no recycle: false
+  plando name: "MayorsOffice"
 
 mm-aliens:
   display name: "Aliens' Theme"
@@ -322,6 +356,7 @@ mm-aliens:
   sequence id: 0x0D
   song type: "bgm"
   no recycle: false
+  plando name: "AliensTheme"
 
 mm-swordschool:
   display name: "Swordsman's School"
@@ -330,6 +365,7 @@ mm-swordschool:
   sequence id: 0x50
   song type: "bgm"
   no recycle: false
+  plando name: "SwordSchool"
 
 mm-sharp:
   display name: "Sharp's Curse"
@@ -338,6 +374,7 @@ mm-sharp:
   sequence id: 0x0F
   song type: "bgm"
   no recycle: false
+  plando name: "SharpsCurse"
 
 mm-chase:
   display name: "Pursuit Theme"
@@ -346,6 +383,7 @@ mm-chase:
   sequence id: 0x03
   song type: "bgm"
   no recycle: false
+  plando name: "PursuitTheme"
 
 mm-skullkid:
   display name: "Majora's Theme"
@@ -354,6 +392,7 @@ mm-skullkid:
   sequence id: 0x04
   song type: "bgm"
   no recycle: false
+  plando name: "MajorasTheme"
 
 mm-maskreveal:
   display name: "The Moon Enraged"
@@ -362,6 +401,7 @@ mm-maskreveal:
   sequence id: 0x7B
   song type: "bgm"
   no recycle: false
+  plando name: "MoonEnraged"
 
 mm-fairyfountain:
   display name: "Great Fairy's Fountain"
@@ -370,6 +410,7 @@ mm-fairyfountain:
   sequence id: 0x28
   song type: "bgm"
   no recycle: false
+  plando name: "GreatFairysFountain"
 
 mm-fileselect:
   display name: "File Select"
@@ -378,6 +419,7 @@ mm-fileselect:
   sequence id: 0x18
   song type: "bgm"
   no recycle: false
+  plando name: "FileSelect"
 
 mm-keaton:
   display name: "Keaton's Theme"
@@ -386,6 +428,7 @@ mm-keaton:
   sequence id: 0x73
   song type: "bgm"
   no recycle: false
+  plando name: "KeatonsTheme"
 
 mm-kaepora:
   display name: "Kaepora Gaebora's Theme"
@@ -394,6 +437,7 @@ mm-kaepora:
   sequence id: 0x45
   song type: "bgm"
   no recycle: false
+  plando name: "OwlsTheme"
 
 mm-witches:
   display name: "Koume & Kotake's Theme"
@@ -402,6 +446,7 @@ mm-witches:
   sequence id: 0x43
   song type: "bgm"
   no recycle: false
+  plando name: "WitchesTheme"
 
 mm-gormanbros:
   display name: "Gorman Bros.' Theme"
@@ -410,6 +455,7 @@ mm-gormanbros:
   sequence id: 0x42
   song type: "bgm"
   no recycle: false
+  plando name: "GormanBrosTheme"
 
 mm-mysterywoods:
   display name: "Woods of Mystery"
@@ -418,6 +464,7 @@ mm-mysterywoods:
   sequence id: 0x3E
   song type: "bgm"
   no recycle: false
+  plando name: "WoodsOfMystery"
 
 mm-zelda:
   display name: "Zelda's Theme"
@@ -426,6 +473,7 @@ mm-zelda:
   sequence id: 0x29
   song type: "bgm"
   no recycle: false
+  plando name: "ZeldasTheme"
 
 mm-reunion:
   display name: "Reunion Theme"
@@ -434,6 +482,7 @@ mm-reunion:
   sequence id: 0x7D
   song type: "bgm"
   no recycle: false
+  plando name: "ReunionTheme"
 
 mm-healed:
   display name: "Song of Healing Theme"
@@ -442,6 +491,7 @@ mm-healed:
   sequence id: 0x0B
   song type: "bgm"
   no recycle: false
+  plando name: "HealingTheme"
 
 mm-giants:
   display name: "Giants' Theme"
@@ -450,6 +500,7 @@ mm-giants:
   sequence id: 0x2D
   song type: "bgm"
   no recycle: false
+  plando name: "GiantsTheme"
 
 mm-miniboss:
   display name: "Miniboss Battle"
@@ -458,6 +509,7 @@ mm-miniboss:
   sequence id: 0x38
   song type: "bgm"
   no recycle: false
+  plando name: "BigEnemy"
 
 mm-boss:
   display name: "Boss Battle"
@@ -466,6 +518,7 @@ mm-boss:
   sequence id: 0x1B
   song type: "bgm"
   no recycle: false
+  plando name: "BossEnemy"
 
 mm-mask:
   display name: "Majora's Mask"
@@ -474,6 +527,7 @@ mm-mask:
   sequence id: 0x6B
   song type: "bgm"
   no recycle: false
+  plando name: "MajorasMask"
 
 mm-incarnation:
   display name: "Majora's Incarnation"
@@ -482,6 +536,7 @@ mm-incarnation:
   sequence id: 0x6A
   song type: "bgm"
   no recycle: false
+  plando name: "MajorasIncarnation"
 
 mm-wrath:
   display name: "Majora's Wrath"
@@ -490,6 +545,7 @@ mm-wrath:
   sequence id: 0x69
   song type: "bgm"
   no recycle: false
+  plando name: "MajorasWrath"
 
 mm-f-chasefail:
   display name: "Event Failure 1"
@@ -498,6 +554,7 @@ mm-f-chasefail:
   sequence id: 0x08
   song type: "fanfare"
   no recycle: false
+  plando name: "EventFail1"
 
 mm-f-fail:
   display name: "Event Failure 2"
@@ -506,6 +563,7 @@ mm-f-fail:
   sequence id: 0x09
   song type: "fanfare"
   no recycle: false
+  plando name: "EventFail2"
 
 mm-f-clearshort:
   display name: "Event Success"
@@ -514,6 +572,7 @@ mm-f-clearshort:
   sequence id: 0x19
   song type: "fanfare"
   no recycle: false
+  plando name: "EventSuccess"
 
 mm-f-gameover:
   display name: "Game Over"
@@ -522,6 +581,7 @@ mm-f-gameover:
   sequence id: 0x20
   song type: "fanfare"
   no recycle: false
+  plando name: "GameOver"
 
 mm-f-bossdown:
   display name: "Boss Defeated"
@@ -530,6 +590,7 @@ mm-f-bossdown:
   sequence id: 0x21
   song type: "fanfare"
   no recycle: false
+  plando name: "BossDefeated"
 
 mm-f-gotitem:
   display name: "Item Get"
@@ -538,6 +599,7 @@ mm-f-gotitem:
   sequence id: 0x22
   song type: "fanfare"
   no recycle: false
+  plando name: "ItemGet"
 
 mm-f-heart:
   display name: "Heart Container Get"
@@ -546,6 +608,7 @@ mm-f-heart:
   sequence id: 0x24
   song type: "fanfare"
   no recycle: false
+  plando name: "HeartContainerGet"
 
 mm-f-mask:
   display name: "Mask Get"
@@ -554,6 +617,7 @@ mm-f-mask:
   sequence id: 0x37
   song type: "fanfare"
   no recycle: false
+  plando name: "MaskGet"
 
 mm-f-smallitem:
   display name: "Heart Piece Get"
@@ -562,6 +626,7 @@ mm-f-smallitem:
   sequence id: 0x39
   song type: "fanfare"
   no recycle: false
+  plando name: "HeartPieceGet"
 
 mm-f-meet:
   display name: "The Truth Revealed"
@@ -570,6 +635,7 @@ mm-f-meet:
   sequence id: 0x3D
   song type: "fanfare"
   no recycle: false
+  plando name: "TruthRevealed"
 
 mm-f-goronwin:
   display name: "Goron Race Win"
@@ -578,6 +644,7 @@ mm-f-goronwin:
   sequence id: 0x3F
   song type: "fanfare"
   no recycle: false
+  plando name: "GoronRaceWin"
 
 mm-f-horsewin:
   display name: "Horse Race Win"
@@ -586,6 +653,7 @@ mm-f-horsewin:
   sequence id: 0x41
   song type: "fanfare"
   no recycle: false
+  plando name: "HorseRaceWin"
 
 mm-f-song:
   display name: "Song Get"
@@ -594,6 +662,7 @@ mm-f-song:
   sequence id: 0x52
   song type: "fanfare"
   no recycle: false
+  plando name: "SongGet"
 
 mm-f-soar:
   display name: "Song of Soaring"
@@ -602,6 +671,7 @@ mm-f-soar:
   sequence id: 0x55
   song type: "fanfare"
   no recycle: false
+  plando name: "SoaringTheme"
 
 mm-f-dungeonopen:
   display name: "Temple Appears"
@@ -610,6 +680,7 @@ mm-f-dungeonopen:
   sequence id: 0x77
   song type: "fanfare"
   no recycle: false
+  plando name: "TempleAppears"
 
 mm-f-dungeonclearshort:
   display name: "Temple Clear (Short)"
@@ -618,6 +689,7 @@ mm-f-dungeonclearshort:
   sequence id: 0x78
   song type: "fanfare"
   no recycle: false
+  plando name: "TempleClearShort"
 
 mm-f-dungeonclearlong:
   display name: "Temple Clear (Long)"
@@ -626,6 +698,7 @@ mm-f-dungeonclearlong:
   sequence id: 0x79
   song type: "fanfare"
   no recycle: false
+  plando name: "TempleClearLong"
 
 mm-f-moonclear:
   display name: "The Moon Destroyed"
@@ -634,6 +707,7 @@ mm-f-moonclear:
   sequence id: 0x7E
   song type: "fanfare"
   no recycle: false
+  plando name: "MoonDestroyed"
 
 mm-f-giantsleave:
   display name: "The Giants Farewell"
@@ -642,13 +716,16 @@ mm-f-giantsleave:
   sequence id: 0x7C
   song type: "fanfare"
   no recycle: false
+  plando name: "GiantsLeave"
 
 mm-kamaros-mask-item-dance:
   display name: "Kamaro's Theme"
   music groups: ["KamarosTheme"]
   instrument set: 0x0A
-  song type: "bgm"
   sequence id: 0x71
+  song type: "bgm"
+  no recycle: false
+  plando name: "KamarosTheme"
 
 mm-c-giantscs:
   display name: "The Giants Appear"
@@ -657,6 +734,7 @@ mm-c-giantscs:
   sequence id: 0x70
   song type: "bgm"
   no recycle: false
+  plando name: "GiantsAppear"
 
 mm-c-titlescreen:
   display name: "Title Demo"
@@ -665,6 +743,7 @@ mm-c-titlescreen:
   sequence id: 0x76
   song type: "bgm"
   no recycle: false
+  plando name: "TitleDemo"
 
 mm-combat:
   display name: "Enemy Battle"
@@ -673,6 +752,7 @@ mm-combat:
   sequence id: 0x1A
   song type: "bgm"
   no recycle: false
+  plando name: "SmallEnemy"
 
 mm-japas-basspractice:
   display name: "Japas' Room"
@@ -681,6 +761,7 @@ mm-japas-basspractice:
   sequence id: 0x6C
   song type: "bgm"
   no recycle: false
+  plando name: "JapasRoom"
 
 mm-tijo-drumpractice:
   display name: "Tijo's Room"
@@ -689,6 +770,7 @@ mm-tijo-drumpractice:
   sequence id: 0x6D
   song type: "bgm"
   no recycle: false
+  plando name: "TijosRoom"
 
 mm-evan-pianopractice:
   display name: "Evan's Room"
@@ -697,6 +779,7 @@ mm-evan-pianopractice:
   sequence id: 0x6E
   song type: "bgm"
   no recycle: false
+  plando name: "EvansRoom"
 
 mm-finalhours:
   display name: "Final Hours"
@@ -705,6 +788,7 @@ mm-finalhours:
   sequence id: 0x57
   song type: "bgm"
   no recycle: false
+  plando name: "FinalHours"
 
 mm-opening-a-chest:
   display name: "Opening Chest"
@@ -713,6 +797,7 @@ mm-opening-a-chest:
   sequence id: 0x2B
   song type: "fanfare"
   no recycle: false
+  plando name: "OpenChest"
 
 mm-kamaros-dance-rosa-sisters:
   display name: "Rosa Sisters' Theme"
@@ -721,3 +806,4 @@ mm-kamaros-dance-rosa-sisters:
   sequence id: 0x2A
   song type: "bgm"
   no recycle: false
+  plando name: "RosaSistersTheme"
