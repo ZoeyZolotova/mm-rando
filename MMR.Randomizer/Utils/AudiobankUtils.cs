@@ -20,7 +20,9 @@ namespace MMR.Randomizer.Utils
             CODEC_S16_INMEM,
             CODEC_SMALL_ADPCM,
             CODEC_REVERB,
-            CODEC_S16
+            CODEC_S16,
+            CODEC_UNK6,
+            CODEC_UNK7
         }
 
         /// <summary>
@@ -31,7 +33,20 @@ namespace MMR.Randomizer.Utils
             MEDIUM_RAM,
             MEDIUM_UNK,
             MEDIUM_CART,
-            MEDIUM_DISK_DRIVE
+            MEDIUM_DISK_DRIVE,
+            MEDIUM_RAM_UNLOADED = 5
+        }
+
+        /// <summary>
+        /// Represents the possible Zelda64 caching policies for instrument banks, audio sequences, and audio samples.
+        /// </summary>
+        public enum AudioCacheLoadType: int
+        {
+            CACHE_LOAD_PERMANENT,
+            CACHE_LOAD_PERSISTENT,
+            CACHE_LOAD_TEMPORARY,
+            CACHE_LOAD_EITHER,
+            CACHE_LOAD_EITHER_NOSYNC
         }
 
         /// <summary>
@@ -123,8 +138,8 @@ namespace MMR.Randomizer.Utils
 
             public uint BankOffset { get; set; } // Offset of the bank in the audiotable
             public uint BankLength { get; set; } // Length of the bank in th audiotable
-            public int SampleMedium { get; set; } // The storage medium for samples, default is RAM (u8)
-            public int SequencePlayer { get; set; } // The sequence player the bank uses (u8)
+            public AudioStorageMedium SampleMedium { get; set; } // The storage medium for samples, default is RAM (u8)
+            public AudioCacheLoadType CachePolicy { get; set; } // The cache policy the bank uses (u8)
             public int AudiotableId { get; set; } // The ID of the audiotable the samples use (u8)
             public int BankId { get; set; } // The ID of the bank, default is 0xFF (u8)
             public int NumInsts { get; set; } // The number of instruments in the bank (u8)
@@ -145,8 +160,8 @@ namespace MMR.Randomizer.Utils
                     case 0x08: // 8 Bytes (.bankmeta): [Sample Medium, Sequence Player, Audiotable, ID, Num Inst, Num Drum, Num Effect MSB, Num Effect LSB]
                         BankOffset = 0;
                         BankLength = 0;
-                        SampleMedium = tableEntry[0];
-                        SequencePlayer = tableEntry[1];
+                        SampleMedium = CheckForValidEnum<AudioStorageMedium>(tableEntry[0]);
+                        CachePolicy = CheckForValidEnum<AudioCacheLoadType>(tableEntry[1]);
                         AudiotableId = tableEntry[2];
                         BankId = tableEntry[3];
                         NumInsts = tableEntry[4];
@@ -159,8 +174,8 @@ namespace MMR.Randomizer.Utils
                     case 0x10: // 16 Bytes: [4-byte Address, 4-byte Length, Sample Medium, Sequence Player, Audiotable, ID, Num Inst, Num Drum, 2-byte Num Effects]
                         BankOffset = BinaryPrimitives.ReadUInt32BigEndian(tableEntry.AsSpan(0, 4));
                         BankLength = BinaryPrimitives.ReadUInt32BigEndian(tableEntry.AsSpan(4, 4));
-                        SampleMedium = tableEntry[8];
-                        SequencePlayer = tableEntry[9];
+                        SampleMedium = CheckForValidEnum<AudioStorageMedium>(tableEntry[8]);
+                        CachePolicy = CheckForValidEnum<AudioCacheLoadType>(tableEntry[9]);
                         AudiotableId = tableEntry[10];
                         BankId = tableEntry[11];
                         NumInsts = tableEntry[12];
@@ -171,7 +186,7 @@ namespace MMR.Randomizer.Utils
                         break;
 
                     default: // When reading .bankmeta there's already a check for 8 bytes, but never hurts to be extra safe
-                        throw new Exception($"Audiobank Instnatiation Error: Invalid length for bankmeta binary - expected '8' or '16' bytes, but got '{tableEntry.Length}' bytes instead");
+                        throw new Exception($"Audiobank Instantiation Error: Invalid length for bankmeta binary - expected '8' or '16' bytes, but got '{tableEntry.Length}' bytes instead");
                 }
 
                 // If the bankmeta is just the 8 bytes, the audiobankFile should be the zbank file
@@ -451,6 +466,14 @@ namespace MMR.Randomizer.Utils
                 PrimSample = PrimSampleAddress != 0 ? new Sample<Instrument>(bankData, audiotable, audiotableIndex, PrimSampleAddress, audiotableId, this, InstrumentId, "PRIM") : null;
                 HighSample = HighSampleAddress != 0 ? new Sample<Instrument>(bankData, audiotable, audiotableIndex, HighSampleAddress, audiotableId, this, InstrumentId, "HIGH") : null;
             }
+        }
+
+        private static TEnum CheckForValidEnum<TEnum>(int value) where TEnum : Enum
+        {
+            if (!Enum.IsDefined(typeof(TEnum), value))
+                throw new InvalidOperationException($"Audiobank Instantiation Error: Invalid {typeof(TEnum).Name} value in bankmeta binary: {value}");
+
+            return (TEnum)(object)value;
         }
     }
 }
