@@ -1,5 +1,4 @@
 using MMR.Randomizer.Constants;
-using static MMR.Randomizer.Constants.AudioSequenceIds;
 using MMR.Randomizer.Models.Rom;
 using System;
 using System.Collections.Generic;
@@ -21,26 +20,26 @@ namespace MMR.Randomizer.Utils
     public class SequenceUtils
     {
         // These are scenes the play may never visit, if they do, then they are visited very briefly and very little music is heard
-        public static readonly List<int> lowUseMusicSlots =
+        public static readonly List<AudioSequenceIds.Id> lowUseMusicSlots =
         [
-            MAJORAS_THEME,        // 0x04: Majora's Theme
-            CLOCK_TOWER_INTERIOR, // 0x05: Clock Tower Interior
-            BOAT_CRUISE,          // 0x0E: Old Koume's Boat Cruise
-            SHARPS_CURSE,         // 0x0F: Sharp's Curse
-            MUSIC_BOX_HOUSE,      // 0x27: Music-Box House
-            ZELDAS_THEME,         // 0x29: Zelda's Theme
-            GIANTS_THEME,         // 0x2D: Giants' Theme
-            GURU_GURUS_THEME,     // 0x2E: Guru-Guru's Theme
-            MAYORS_OFFICE,        // 0x31: Mayor Dotour's Office
-            GORMAN_BROS_THEME,    // 0x42: Gorman Bros.' Theme
-            OWLS_THEME,           // 0x45: Kaepora Gaebora's Theme
-            SWORDSMANS_SCHOOL,    // 0x50: Swordsman's School
-            GIANTS_APPEAR,        // 0x70: The Giants Appear
-            CREMIAS_THEME,        // 0x72: Cremia's Theme
-            KEATONS_THEME,        // 0x73: Keaton's Theme
-            MOON_ENRAGED,         // 0x7B: The Moon Enraged
-            GIANTS_LEAVE,         // 0x7C: The Giants Leave
-            REUNION_THEME,        // 0x7D: Reunion Theme
+            AudioSequenceIds.Id.MAJORAS_THEME,
+            AudioSequenceIds.Id.CLOCK_TOWER_INTERIOR,
+            AudioSequenceIds.Id.BOAT_CRUISE,
+            AudioSequenceIds.Id.SHARPS_CURSE,
+            AudioSequenceIds.Id.MUSIC_BOX_HOUSE,
+            AudioSequenceIds.Id.ZELDAS_THEME,
+            AudioSequenceIds.Id.GIANTS_THEME,
+            AudioSequenceIds.Id.GURU_GURUS_THEME,
+            AudioSequenceIds.Id.MAYORS_OFFICE,
+            AudioSequenceIds.Id.GORMAN_BROS_THEME,
+            AudioSequenceIds.Id.OWLS_THEME,
+            AudioSequenceIds.Id.SWORDSMANS_SCHOOL,
+            AudioSequenceIds.Id.GIANTS_APPEAR,
+            AudioSequenceIds.Id.CREMIAS_THEME,
+            AudioSequenceIds.Id.KEATONS_THEME,
+            AudioSequenceIds.Id.MOON_ENRAGED,
+            AudioSequenceIds.Id.GIANTS_LEAVE,
+            AudioSequenceIds.Id.REUNION_THEME
         ];
 
         public static int MAX_BGM_BUDGET = 0x6000; // Vanilla: 0x3800
@@ -293,11 +292,11 @@ namespace MMR.Randomizer.Utils
 
                 // Each entry should have a sequence ID that's available in the SEQUENCE_ID_MAP,
                 // so try to match the entry's sequence ID with one in the sequence map between 0x02 and 0x7F
-                if (SEQUENCE_ID_MAP.ContainsKey(seqId) && seqId >= 0x02 && seqId <= 0x7F)
+                if (AudioSequenceIds.IsValidSequenceId(seqId))
                 {
                     // If the randomizer relies on searching for sequence names
-                    //targetSequence.Name = SEQUENCE_ID_MAP[seqId].Name;
-                    //sourceSequence.Name = SEQUENCE_ID_MAP[seqId].Name;
+                    //targetSequence.Name = AudioSequenceIds.SEQUENCE_ID_MAP[seqId].Name;
+                    //sourceSequence.Name = AudioSequenceIds.SEQUENCE_ID_MAP[seqId].Name;
 
                     targetSequence.Replaces = seqId;
                     sourceSequence.SeqId = seqId;
@@ -307,14 +306,14 @@ namespace MMR.Randomizer.Utils
                         sourceSequence.Name = "drop";
                     }
 
-                    //if (RomData.TargetSequences.Find(u => u.Name == SEQUENCE_ID_MAP[seqId].Name) != null)
+                    //if (RomData.TargetSequences.Find(u => u.Name == AudioSequenceIds.SEQUENCE_ID_MAP[seqId].Name) != null)
                     if (RomData.TargetSequences.Find(u => u.Replaces == seqId) != null)
                         continue;
 
                     RomData.TargetSequences.Add(targetSequence);
                 }
 
-                if (sourceSequence.SeqId != FILE_SELECT && sourceSequence.Name != "drop")
+                if (sourceSequence.SeqId != (int)AudioSequenceIds.Id.FILE_SELECT && sourceSequence.Name != "drop")
                 {
                     RomData.SequenceList.Add(sourceSequence);
                 }
@@ -328,7 +327,7 @@ namespace MMR.Randomizer.Utils
                 DisplayName = "Song of Time (MMR)",
                 Categories = [(int)MusicGroups.Category.ItemFanfares],
                 Instrument = 0x03,
-                Replaces = INTRO_CUTSCENE_2,
+                Replaces = (int)AudioSequenceIds.Id.INTRO_CUTSCENE_2,
             });
 
             // Search through every directory in the music folder
@@ -1068,7 +1067,7 @@ namespace MMR.Randomizer.Utils
             {
                 return RoundTo16(seq.SequenceBinary.SequenceData.Length);
             }
-            else if (SEQUENCE_ID_MAP.ContainsKey(seq.SeqId)) // If seq is vanilla, then SeqId is set and Replaces is -1; lookup from AudioSeq index table
+            else if (AudioSequenceIds.IsValidSequenceId(seq.SeqId)) // If seq is vanilla, then SeqId is set and Replaces is -1; lookup from AudioSeq index table
             {
                 // The code file ahould already be decompressed
                 int codeFID = RomUtils.GetFileIndexForWriting(Addresses.SeqTable);
@@ -1121,7 +1120,7 @@ namespace MMR.Randomizer.Utils
             // This will fill the remaining slots, that way if the player does encounter
             // the scene using the slot, it will still play music.
             //
-            ConvertSequenceSlotToPointer(ZELDAS_THEME, SONG_OF_HEALING_THEME); // Point "Zelda's Theme" to "Song of Healing Theme"
+            ConvertSequenceSlotToPointer((int)AudioSequenceIds.Id.ZELDAS_THEME, (int)AudioSequenceIds.Id.SONG_OF_HEALING_THEME);
 
             // With shortened cutscenes, slots that go unheard are converted to pointers.
             // If using a patch, "_randomized" is not set, so lookup a shortened cutscene byte instead
@@ -1144,11 +1143,11 @@ namespace MMR.Randomizer.Utils
             if (shortenedCutscenes)
             {
                 // These cutscenes are never encountered with "Shorten cutscenes" enabled, so convert them to pointers
-                ConvertSequenceSlotToPointer(CREMIAS_THEME, OWLS_THEME);            // Point "Cremia's Theme" to "Kaepora Gaebora's Theme"
-                ConvertSequenceSlotToPointer(GIANTS_THEME, ASTRAL_OBSERVATORY);     // Point "The Giants' Theme" to "Astral Observatory"
-                ConvertSequenceSlotToPointer(GIANTS_APPEAR, SONG_OF_HEALING_THEME); // Point "The Giants Appear" to "Song of Healing Theme"
-                ConvertSequenceSlotToPointer(MOON_ENRAGED, ALIENS_THEME);           // Point "The Moon Enraged" to "Aliens' Theme"
-                ConvertSequenceSlotToPointer(REUNION_THEME, CLOCK_TOWER_INTERIOR);  // Point "Reunion Theme" to "Clock Tower Interior"
+                ConvertSequenceSlotToPointer((int)AudioSequenceIds.Id.CREMIAS_THEME, (int)AudioSequenceIds.Id.OWLS_THEME);
+                ConvertSequenceSlotToPointer((int)AudioSequenceIds.Id.GIANTS_THEME, (int)AudioSequenceIds.Id.ASTRAL_OBSERVATORY);
+                ConvertSequenceSlotToPointer((int)AudioSequenceIds.Id.GIANTS_APPEAR, (int)AudioSequenceIds.Id.SONG_OF_HEALING_THEME);
+                ConvertSequenceSlotToPointer((int)AudioSequenceIds.Id.MOON_ENRAGED, (int)AudioSequenceIds.Id.ALIENS_THEME);
+                ConvertSequenceSlotToPointer((int)AudioSequenceIds.Id.REUNION_THEME, (int)AudioSequenceIds.Id.CLOCK_TOWER_INTERIOR);
             }
 
             // If the Ocarina is not randomized, then convert "Majora's Theme" to a pointer, it goes unused.
@@ -1167,19 +1166,27 @@ namespace MMR.Randomizer.Utils
 
             if (ocarinaNotRandomized)
             {
-                ConvertSequenceSlotToPointer(MAJORAS_THEME, SMALL_ENEMY_BATTLE); // Point "Majora's Theme" to "Small Enemy Battle"
+                ConvertSequenceSlotToPointer((int)AudioSequenceIds.Id.MAJORAS_THEME, (int)AudioSequenceIds.Id.SMALL_ENEMY_BATTLE);
             }
 
             // If the replacement pool is small (MM only or low variety), convert more sequences to pointers.
             if (RomData.TargetSequences.Count + 30 > RomData.SequenceList.Count)
             {
-                ConvertSequenceSlotToPointer(TITLE_DEMO, CLOCK_TOWN_1);          // Point "Title Demo" to "Clock Town (Day 1)"
-                ConvertSequenceSlotToPointer(EVENT_FAIL_1, EVENT_FAIL_2);        // Point "Event Failure 1" to "Event Failure 2"
-                ConvertSequenceSlotToPointer(EVENT_SUCCESS, TEMPLE_CLEAR_SHORT); // Point "Event Success" to "Temple Clear (Short)"
+                ConvertSequenceSlotToPointer((int)AudioSequenceIds.Id.TITLE_DEMO, (int)AudioSequenceIds.Id.CLOCK_TOWN_1);
+                ConvertSequenceSlotToPointer((int)AudioSequenceIds.Id.EVENT_FAIL_1, (int)AudioSequenceIds.Id.EVENT_FAIL_2);
+                ConvertSequenceSlotToPointer((int)AudioSequenceIds.Id.EVENT_SUCCESS, (int)AudioSequenceIds.Id.TEMPLE_CLEAR_SHORT);
             }
 
             // create some pointerized slots that are otherwise ignored, beacuse this pool gets re-used later for new song slots
-            RomData.PointerizedSequences.Add(new SequenceInfo() { Name = "mm-introcutscene1", SeqId = INTRO_CUTSCENE_1, PreviousSlot = INTRO_CUTSCENE_1, Replaces = TITLE_DEMO });
+            RomData.PointerizedSequences.Add(
+                new SequenceInfo()
+                {
+                    Name = "mm-introcutscene1",
+                    SeqId = (int)AudioSequenceIds.Id.INTRO_CUTSCENE_1,
+                    PreviousSlot = (int)AudioSequenceIds.Id.INTRO_CUTSCENE_1,
+                    Replaces = (int)AudioSequenceIds.Id.TITLE_DEMO
+                }
+            );
         }
 
         /// <summary>
@@ -1242,13 +1249,13 @@ namespace MMR.Randomizer.Utils
                     {
                         if ((entry.Addr > 0) && (entry.Addr < 128))
                         {
-                            if (sequenceList[j].Replaces != POINTER_0x18) // 0x28: Great Fairy's Fountain
+                            if (sequenceList[j].Replaces != (int)AudioSequenceIds.Id.POINTER_0x18) // Great Fairy's Fountain
                             {
                                 sequenceList[j].Replaces = entry.Addr;
                             }
                             else
                             {
-                                entry.Data = oldSeq[FILE_SELECT].Data;
+                                entry.Data = oldSeq[(int)AudioSequenceIds.Id.FILE_SELECT].Data;
                             }
                         }
                     }
@@ -1693,7 +1700,7 @@ namespace MMR.Randomizer.Utils
                 return;
 
             // Songtest always replaces the following: "File Select", "Title Demo", "Clock Town (Day 1)", and "Small Enemy Battle"
-            SequenceInfo fileselectSlot = RomData.TargetSequences.Find(u => u.Replaces == FILE_SELECT); // Don't rely on the name in the SEQS.txt, rely on the sequence ID instead
+            SequenceInfo fileselectSlot = RomData.TargetSequences.Find(u => u.Replaces == (int)AudioSequenceIds.Id.FILE_SELECT); // Don't rely on the name in the SEQS.txt, rely on the sequence ID instead
             AssignSequenceSlot(fileselectSlot, songtestSequence, sequences, "SONGTEST", log); // File Select
 
             // Because song testing is the focus, adjust the budget now
@@ -1714,8 +1721,8 @@ namespace MMR.Randomizer.Utils
                 MAX_COMBAT_BUDGET = MAX_TYPE2_MUSIC_BUDGET - MAX_BGM_BUDGET;
             }
 
-            ConvertSequenceSlotToPointer(TITLE_DEMO, FILE_SELECT);   // Point "Title Demo" to "File Select"
-            ConvertSequenceSlotToPointer(CLOCK_TOWN_1, FILE_SELECT); // Point "Clock Town (Day 1)" to "File Select"
+            ConvertSequenceSlotToPointer((int)AudioSequenceIds.Id.TITLE_DEMO, (int)AudioSequenceIds.Id.FILE_SELECT);
+            ConvertSequenceSlotToPointer((int)AudioSequenceIds.Id.CLOCK_TOWN_1, (int)AudioSequenceIds.Id.FILE_SELECT);
 
             // Additionally, every song that shares a category with the song should be added
             var allMatchingSlots = RomData.TargetSequences.FindAll(u => u.Categories.Intersect(songtestSequence.Categories).Any());
@@ -1725,10 +1732,10 @@ namespace MMR.Randomizer.Utils
             {
                 // targetSlot will encounter a null value if combat is removed from RomData.TargetSequences
                 // So combat can't be pointerized unless something changes with how song slots work....
-                if (songslot.Replaces == SMALL_ENEMY_BATTLE)
+                if (songslot.Replaces == (int)AudioSequenceIds.Id.SMALL_ENEMY_BATTLE)
                     continue;
 
-                ConvertSequenceSlotToPointer(songslot.Replaces, FILE_SELECT); // Point replacement to "File Select"
+                ConvertSequenceSlotToPointer(songslot.Replaces, (int)AudioSequenceIds.Id.FILE_SELECT);
             }
 
             RomData.TargetSequences.Remove(fileselectSlot);
@@ -1817,7 +1824,7 @@ namespace MMR.Randomizer.Utils
                 if (!TestIfAvailableBanks(testSeq))
                     continue; // The song is unacceptable
 
-                var maxSize = targetSlot.Replaces == SMALL_ENEMY_BATTLE ? MAX_COMBAT_BUDGET : MAX_BGM_BUDGET;
+                var maxSize = targetSlot.Replaces == (int)AudioSequenceIds.Id.SMALL_ENEMY_BATTLE ? MAX_COMBAT_BUDGET : MAX_BGM_BUDGET;
                 if (GetSequenceSize(testSeq) > maxSize)
                     continue; // The song is too big
 
@@ -1857,9 +1864,11 @@ namespace MMR.Randomizer.Utils
             // is greater than the size of the buffer, they clip into one another when one loads — this kills one of them, usually BGM.
 
             var combatSequences = RomData.SequenceList.FindAll(u => u.Categories.Contains((int)MusicGroups.Category.ActionThemes));
-            var BGMSlots = RomData.TargetSequences.FindAll(u => u.Categories.Contains((int)MusicGroups.Category.Fields)
-                                                             || u.Categories.Contains((int)MusicGroups.Category.Dungeons)
-                                                             || u.SeqId == DEKU_PALACE); // 0x12: Deku Palace (has enemies)
+            var BGMSlots = RomData.TargetSequences.FindAll(u =>
+                u.Categories.Contains((int)MusicGroups.Category.Fields) ||
+                u.Categories.Contains((int)MusicGroups.Category.Dungeons) ||
+                u.SeqId == (int)AudioSequenceIds.Id.DEKU_PALACE
+            );
 
             List<SequenceInfo> usedBGMSequences = [];
             foreach (var slot in BGMSlots)
@@ -1875,11 +1884,17 @@ namespace MMR.Randomizer.Utils
             // BGM or combat is the limiting factor, the other has to be smaller than the chosen limiter
             bool combatVsBGMCoinToss = rng.Next(2) == 1;
 
-            var usedCombatSequence = RomData.SequenceList.Find(u => u.Replaces == SMALL_ENEMY_BATTLE && u.SeqId != SMALL_ENEMY_BATTLE); // SequencesList has Replaces as -1, use SeqId (u.Name != "mm-combat")
+            var usedCombatSequence = RomData.SequenceList.Find(u =>
+                u.Replaces == (int)AudioSequenceIds.Id.SMALL_ENEMY_BATTLE &&
+                u.SeqId != (int)AudioSequenceIds.Id.SMALL_ENEMY_BATTLE
+            );
             if (usedCombatSequence == null) // Songtest removes the sequence and points it at "File Select" for testing
             {
                 combatVsBGMCoinToss = true; // "COMBAT" manually selected because of combat songtest
-                usedCombatSequence = RomData.SequenceList.Find(u => u.Replaces == FILE_SELECT && u.SeqId != FILE_SELECT); // SequencesList has Replaces as -1, use SeqId (u.Name != "mm-fileselect")
+                usedCombatSequence = RomData.SequenceList.Find(u =>
+                    u.Replaces == (int)AudioSequenceIds.Id.FILE_SELECT &&
+                    u.SeqId != (int)AudioSequenceIds.Id.FILE_SELECT
+                );
             }
             else if (RomData.SequenceList.Find(u => u.Name.Contains("songtest")) != null)
             {
@@ -1938,7 +1953,7 @@ namespace MMR.Randomizer.Utils
                     var seqName = usedCombatSequence.Name;
                     log.AppendLine($"Combat sequence {seqName} was too big to match your BGM music, replacing ... ");
 
-                    var combatSlot = RomData.TargetSequences.Find(u => u.Replaces == SMALL_ENEMY_BATTLE); // TargetSequences has SeqId as -1, use Replaces (u.Name == "mm-combat")
+                    var combatSlot = RomData.TargetSequences.Find(u => u.Replaces == (int)AudioSequenceIds.Id.SMALL_ENEMY_BATTLE);
                     usedCombatSequence.Replaces = -1; // Cancel using this song
 
                     if (!SearchForValidSongReplacement(cosmeticSettings, unassignedSequences, combatSlot, rng, log))

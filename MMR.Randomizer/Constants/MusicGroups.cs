@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace MMR.Randomizer.Constants
 {
-    // Alignment is intentional, please don't remove it, it's easier to read and the file is mostly enums and dictionaries ＜(´⌯ w ⌯`)＞
+    // Alignment is intentional, please don't remove it, it's easier to read and multi-line edit
 
     /// <summary>
     /// Represents the possible named MusicGroups for Majora's Mask Randomizer.

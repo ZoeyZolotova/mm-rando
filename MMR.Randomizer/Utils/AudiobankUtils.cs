@@ -15,14 +15,14 @@ namespace MMR.Randomizer.Utils
         /// </summary>
         public enum AudioSampleCodec : int
         {
-            CODEC_ADPCM,
-            CODEC_S8,
-            CODEC_S16_INMEM,
-            CODEC_SMALL_ADPCM,
-            CODEC_REVERB,
-            CODEC_S16,
-            CODEC_UNK6,
-            CODEC_UNK7
+            ADPCM,
+            S8,
+            S16_INMEM,
+            SMALL_ADPCM,
+            REVERB,
+            S16,
+            UNK6,
+            UNK7
         }
 
         /// <summary>
@@ -30,11 +30,11 @@ namespace MMR.Randomizer.Utils
         /// </summary>
         public enum AudioStorageMedium: int
         {
-            MEDIUM_RAM,
-            MEDIUM_UNK,
-            MEDIUM_CART,
-            MEDIUM_DISK_DRIVE,
-            MEDIUM_RAM_UNLOADED = 5
+            RAM,
+            UNK,
+            CART,
+            DISK_DRIVE,
+            RAM_UNLOADED = 5
         }
 
         /// <summary>
@@ -42,11 +42,11 @@ namespace MMR.Randomizer.Utils
         /// </summary>
         public enum AudioCacheLoadType: int
         {
-            CACHE_LOAD_PERMANENT,
-            CACHE_LOAD_PERSISTENT,
-            CACHE_LOAD_TEMPORARY,
-            CACHE_LOAD_EITHER,
-            CACHE_LOAD_EITHER_NOSYNC
+            LOAD_PERMANENT,
+            LOAD_PERSISTENT,
+            LOAD_TEMPORARY,
+            LOAD_EITHER,
+            LOAD_EITHER_NOSYNC
         }
 
         /// <summary>
@@ -140,8 +140,8 @@ namespace MMR.Randomizer.Utils
             public uint BankLength { get; set; } // Length of the bank in th audiotable
             public AudioStorageMedium SampleMedium { get; set; } // The storage medium for samples, default is RAM (u8)
             public AudioCacheLoadType CachePolicy { get; set; } // The cache policy the bank uses (u8)
-            public int AudiotableId { get; set; } // The ID of the audiotable the samples use (u8)
-            public int BankId { get; set; } // The ID of the bank, default is 0xFF (u8)
+            public int SampleBankId1 { get; set; } // The primary sample bank ID audio samples use (u8)
+            public int SampleBankId2 { get; set; } // The secondary sample bank ID audio samples use, default is 0xFF (u8)
             public int NumInsts { get; set; } // The number of instruments in the bank (u8)
             public int NumDrums { get; set; } // The number of drums in the bank (u8)
             public int NumEffects { get; set; } // The number of effects in the bank (u16)
@@ -162,8 +162,8 @@ namespace MMR.Randomizer.Utils
                         BankLength = 0;
                         SampleMedium = CheckForValidEnum<AudioStorageMedium>(tableEntry[0]);
                         CachePolicy = CheckForValidEnum<AudioCacheLoadType>(tableEntry[1]);
-                        AudiotableId = tableEntry[2];
-                        BankId = tableEntry[3];
+                        SampleBankId1 = tableEntry[2];
+                        SampleBankId2 = tableEntry[3];
                         NumInsts = tableEntry[4];
                         NumDrums = tableEntry[5];
                         NumEffects = BinaryPrimitives.ReadUInt16BigEndian(tableEntry.AsSpan(6, 2));
@@ -176,8 +176,8 @@ namespace MMR.Randomizer.Utils
                         BankLength = BinaryPrimitives.ReadUInt32BigEndian(tableEntry.AsSpan(4, 4));
                         SampleMedium = CheckForValidEnum<AudioStorageMedium>(tableEntry[8]);
                         CachePolicy = CheckForValidEnum<AudioCacheLoadType>(tableEntry[9]);
-                        AudiotableId = tableEntry[10];
-                        BankId = tableEntry[11];
+                        SampleBankId1 = tableEntry[10];
+                        SampleBankId2 = tableEntry[11];
                         NumInsts = tableEntry[12];
                         NumDrums = tableEntry[13];
                         NumEffects = BinaryPrimitives.ReadUInt16BigEndian(tableEntry.AsSpan(14, 2));
@@ -204,7 +204,7 @@ namespace MMR.Randomizer.Utils
                 {
                     uint offset = drumListAddr + (uint)(4 * i);
                     offset = BinaryPrimitives.ReadUInt32BigEndian(BankData.AsSpan((int)offset, 4));
-                    Drum drum = offset != 0 ? new Drum(i, BankData, audiotableFile, audiotableIndex, (int)offset, AudiotableId) : null;
+                    Drum drum = offset != 0 ? new Drum(i, BankData, audiotableFile, audiotableIndex, (int)offset, SampleBankId1) : null;
                     Drums.Add(drum);
                 }
 
@@ -213,7 +213,7 @@ namespace MMR.Randomizer.Utils
                 for (int i = 0; i < NumEffects; i++)
                 {
                     uint offset = effectListAddr + (uint)(8 * i);
-                    Effect effect = offset != 0 ? new Effect(i, BankData, audiotableFile, audiotableIndex, (int)offset, AudiotableId) : null;
+                    Effect effect = offset != 0 ? new Effect(i, BankData, audiotableFile, audiotableIndex, (int)offset, SampleBankId1) : null;
                     Effects.Add(effect);
                 }
 
@@ -222,7 +222,7 @@ namespace MMR.Randomizer.Utils
                 {
                     uint offset = 0x08 + (uint)(4 * i);
                     offset = BinaryPrimitives.ReadUInt32BigEndian(BankData.AsSpan((int)offset, 4));
-                    Instrument instrument = offset != 0 ? new Instrument(i, BankData, audiotableFile, audiotableIndex, (int)offset, AudiotableId) : null;
+                    Instrument instrument = offset != 0 ? new Instrument(i, BankData, audiotableFile, audiotableIndex, (int)offset, SampleBankId1) : null;
                     Instruments.Add(instrument);
                 }
             }
@@ -293,7 +293,7 @@ namespace MMR.Randomizer.Utils
             public uint? AudiotableAddress { get; set; } // Sample address in the bank's corresponding audiotable
             public byte[] Data { get; set; } // Binary ADPCM audio sample data
 
-            public Sample(byte[] bankData, byte[] audiotable, byte[] audiotableIndex, uint sampleOffset, int audiotableId, TParent parent, int parentId, string keyRegion = null)
+            public Sample(byte[] bankData, byte[] audiotable, byte[] audiotableIndex, uint sampleOffset, int sampleBankId1, TParent parent, int parentId, string keyRegion = null)
             {
                 Parent = parent;
                 ParentString = parent switch
@@ -326,10 +326,10 @@ namespace MMR.Randomizer.Utils
                 Address = BinaryPrimitives.ReadUInt32BigEndian(sampleHeader.AsSpan(4, 4));
 
                 // Samples should always be ADPCM or small ADPCM, using RAM, and not be relocated
-                if (Codec != AudioSampleCodec.CODEC_ADPCM && Codec != AudioSampleCodec.CODEC_SMALL_ADPCM)
-                    throw new InvalidOperationException($"AudiobankUtils Error: Expected Codec of 'CODEC_ADPCM' or 'CODEC_SMALL_ADPCM', but got '{Codec}' instead.");
+                if (Codec != AudioSampleCodec.ADPCM && Codec != AudioSampleCodec.SMALL_ADPCM)
+                    throw new InvalidOperationException($"AudiobankUtils Error: Expected Codec of 'ADPCM' or 'SMALL_ADPCM', but got '{Codec}' instead.");
 
-                if (Medium != AudioStorageMedium.MEDIUM_RAM)
+                if (Medium != AudioStorageMedium.RAM)
                     throw new InvalidOperationException($"AudiobankUtils Error: Expected Medium of 'MEDIUM_RAM', but got '{Medium}' instead.");
 
                 if (IsRelocated)
@@ -346,7 +346,7 @@ namespace MMR.Randomizer.Utils
                 // Read the sample data from the audiotable
                 if (audiotable != null && audiotableIndex != null)
                 {
-                    int atOffset = 0x10 + (audiotableId * 0x10);
+                    int atOffset = 0x10 + (sampleBankId1 * 0x10);
                     byte[] audiotableEntry = new byte[0x10];
                     Array.Copy(audiotableIndex, atOffset, audiotableEntry, 0, 0x10);
                     uint audiotableOffset = BinaryPrimitives.ReadUInt32BigEndian(audiotableEntry.AsSpan(0, 4));
@@ -379,7 +379,7 @@ namespace MMR.Randomizer.Utils
             public uint EnvelopeAddress { get; set; } // Offset to the envelope point array in the bank
             public Sample<Drum> Sample { get; set; } = null;
 
-            public Drum(int drumId, byte[] bankData, byte[] audiotable, byte[] audiotableIndex, int drumOffset, int audiotableId)
+            public Drum(int drumId, byte[] bankData, byte[] audiotable, byte[] audiotableIndex, int drumOffset, int sampleBankId1)
             {
                 DrumId = drumId;
 
@@ -393,7 +393,7 @@ namespace MMR.Randomizer.Utils
                 EnvelopeAddress = BinaryPrimitives.ReadUInt32BigEndian(bankData.AsSpan(drumOffset + 12, 4));
 
                 // Need to figure out how to pass the name so the error can report which song... should be good enough for sinlge song testing though...
-                Sample = SampleAddress != 0 ? new Sample<Drum>(bankData, audiotable, audiotableIndex, SampleAddress, audiotableId, this, DrumId) : throw new Exception($"Drum Instantiation Error: Drum sample address is 0x00000000 for audiobank, audio engine will crash!");
+                Sample = SampleAddress != 0 ? new Sample<Drum>(bankData, audiotable, audiotableIndex, SampleAddress, sampleBankId1, this, DrumId) : throw new Exception($"Drum Instantiation Error: Drum sample address is 0x00000000 for audiobank, audio engine will crash!");
             }
         }
 
@@ -407,7 +407,7 @@ namespace MMR.Randomizer.Utils
             public float SampleTuning { get; set; } // The tuning float for the audio sample
             public Sample<Effect> Sample { get; set; } = null;
 
-            public Effect(int effectId, byte[] bankData, byte[] audiotable, byte[] audiotableIndex, int sampleOffset, int audiotableId)
+            public Effect(int effectId, byte[] bankData, byte[] audiotable, byte[] audiotableIndex, int sampleOffset, int sampleBankId1)
             {
                 EffectId = effectId;
 
@@ -416,8 +416,8 @@ namespace MMR.Randomizer.Utils
                 SampleTuning = BinaryPrimitives.ReadSingleBigEndian(bankData.AsSpan(sampleOffset + 4, 4));
 
                 // Unsure if this also crashes the audio engine, but it should never be 0 nonetheless...
-                //Sample = SampleAddress != 0 ? new Sample<Effect>(bankData, audiotable, audiotableIndex, SampleAddress, audiotableId, this) : throw new Exception($"Effect Instantiation Error: Effect sample address is 0x00000000 for audiobank, audio engine will crash!");
-                Sample = new Sample<Effect>(bankData, audiotable, audiotableIndex, SampleAddress, audiotableId, this, EffectId);
+                //Sample = SampleAddress != 0 ? new Sample<Effect>(bankData, audiotable, audiotableIndex, SampleAddress, sampleBankId1, this) : throw new Exception($"Effect Instantiation Error: Effect sample address is 0x00000000 for audiobank, audio engine will crash!");
+                Sample = new Sample<Effect>(bankData, audiotable, audiotableIndex, SampleAddress, sampleBankId1, this, EffectId);
             }
         }
 
@@ -442,7 +442,7 @@ namespace MMR.Randomizer.Utils
             public Sample<Instrument> PrimSample { get; set; } = null;
             public Sample<Instrument> HighSample { get; set; } = null;
 
-            public Instrument(int instrumentId, byte[] bankData, byte[] audiotable, byte[] audiotableIndex, int instrumentOffset, int audiotableId)
+            public Instrument(int instrumentId, byte[] bankData, byte[] audiotable, byte[] audiotableIndex, int instrumentOffset, int sampleBankId1)
             {
                 InstrumentId = instrumentId;
 
@@ -462,9 +462,9 @@ namespace MMR.Randomizer.Utils
                 HighSampleTuning = BinaryPrimitives.ReadSingleBigEndian(bankData.AsSpan(instrumentOffset + 28, 4));
 
                 // Instantiate and store sample structs as objects
-                LowSample = LowSampleAddress != 0 ? new Sample<Instrument>(bankData, audiotable, audiotableIndex, LowSampleAddress, audiotableId, this, InstrumentId, "LOW") : null;
-                PrimSample = PrimSampleAddress != 0 ? new Sample<Instrument>(bankData, audiotable, audiotableIndex, PrimSampleAddress, audiotableId, this, InstrumentId, "PRIM") : null;
-                HighSample = HighSampleAddress != 0 ? new Sample<Instrument>(bankData, audiotable, audiotableIndex, HighSampleAddress, audiotableId, this, InstrumentId, "HIGH") : null;
+                LowSample = LowSampleAddress != 0 ? new Sample<Instrument>(bankData, audiotable, audiotableIndex, LowSampleAddress, sampleBankId1, this, InstrumentId, "LOW") : null;
+                PrimSample = PrimSampleAddress != 0 ? new Sample<Instrument>(bankData, audiotable, audiotableIndex, PrimSampleAddress, sampleBankId1, this, InstrumentId, "PRIM") : null;
+                HighSample = HighSampleAddress != 0 ? new Sample<Instrument>(bankData, audiotable, audiotableIndex, HighSampleAddress, sampleBankId1, this, InstrumentId, "HIGH") : null;
             }
         }
 
