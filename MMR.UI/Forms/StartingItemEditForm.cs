@@ -1,17 +1,19 @@
-﻿using MMR.Randomizer.Models.Settings;
-using MMR.Randomizer.Utils;
+﻿using MMR.Common.Extensions;
+using MMR.Randomizer.Attributes.Setting;
+using MMR.Randomizer.Extensions;
 using MMR.Randomizer.GameObjects;
+using MMR.Randomizer.Models.Settings;
+using MMR.Randomizer.Utils;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Runtime.Versioning;
 using System.Windows.Forms;
-using MMR.Randomizer.Extensions;
-using MMR.Common.Extensions;
-using MMR.Randomizer.Attributes.Setting;
 
 namespace MMR.UI.Forms
 {
+    [SupportedOSPlatform("windows")]
     public partial class StartingItemEditForm : Form
     {
         private readonly List<Item> _startingItems;

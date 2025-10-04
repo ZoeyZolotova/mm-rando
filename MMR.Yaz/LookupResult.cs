@@ -5,7 +5,7 @@ namespace MMR.Yaz
     /// <summary>
     /// Contains state for result of a lookup operation.
     /// </summary>
-    public readonly ref struct LookupResult
+    public readonly struct LookupResult
     {
         /// <summary>
         /// Offset of lookup result, or -1 if none found.

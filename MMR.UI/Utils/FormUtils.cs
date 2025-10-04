@@ -1,8 +1,10 @@
 ﻿using System.Drawing;
+using System.Runtime.Versioning;
 using System.Windows.Forms;
 
 namespace MMR.UI.Utils
 {
+    [SupportedOSPlatform("windows")]
     public static class FormUtils
     {
         /// <summary>

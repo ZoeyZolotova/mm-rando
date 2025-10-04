@@ -1,21 +1,23 @@
-﻿using MMR.Randomizer.LogicMigrator;
-using MMR.Randomizer.Properties;
+﻿using DynamicExpresso.Exceptions;
+using MMR.Common.Utils;
+using MMR.Randomizer.Extensions;
 using MMR.Randomizer.GameObjects;
+using MMR.Randomizer.LogicMigrator;
+using MMR.Randomizer.Models;
+using MMR.Randomizer.Properties;
+using MMR.Randomizer.Utils;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Runtime.Versioning;
 using System.Windows.Forms;
-using MMR.Randomizer.Extensions;
-using MMR.Randomizer.Models;
-using MMR.Common.Utils;
-using MMR.Randomizer.Utils;
-using DynamicExpresso.Exceptions;
 
 namespace MMR.UI.Forms
 {
+    [SupportedOSPlatform("windows")]
     public partial class LogicEditorForm : Form
     {
         bool updating = false;

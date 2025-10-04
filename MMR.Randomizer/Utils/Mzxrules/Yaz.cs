@@ -20,7 +20,7 @@ namespace MMR.Randomizer.Utils.Mzxrules
             byte[] buf = new byte[sizeof(int)];
 
             sr.Position += 4;
-            sr.Read(buf, 0, sizeof(int));
+            sr.ReadExactly(buf, 0, sizeof(int));
             Endian.ReverseBytes(ref buf, sizeof(int));
             Buffer.BlockCopy(buf, 0, size, 0, sizeof(int));
             sizeInt = size[0];
@@ -43,14 +43,14 @@ namespace MMR.Randomizer.Utils.Mzxrules
             size = new int[1];
 
             sr.Position += 4;
-            sr.Read(buf, 0, sizeof(int));
+            sr.ReadExactly(buf, 0, sizeof(int));
             Endian.ReverseBytes(ref buf, sizeof(int));
             Buffer.BlockCopy(buf, 0, size, 0, sizeof(int));
             sr.Position += 8;
 
             blockSize -= 0x10;
             buf = new byte[blockSize];
-            sr.Read(buf, 0, blockSize);
+            sr.ReadExactly(buf, 0, blockSize);
 
             Decode(buf, out byte[] result, size[0]);
             return result;

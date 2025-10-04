@@ -4,10 +4,12 @@ using MMR.UI.Utils;
 using System;
 using System.ComponentModel;
 using System.Drawing;
+using System.Runtime.Versioning;
 using System.Windows.Forms;
 
 namespace MMR.UI.Forms
 {
+    [SupportedOSPlatform("windows")]
     public partial class HudConfigForm : Form
     {
         /// <summary>

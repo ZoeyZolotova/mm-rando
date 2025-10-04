@@ -9,10 +9,12 @@ using System.Data;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.Versioning;
 using System.Windows.Forms;
 
 namespace MMR.UI.Forms
 {
+    [SupportedOSPlatform("windows")]
     public partial class ToggleTricksForm : Form
     {
         public HashSet<string> Result { get; private set; }

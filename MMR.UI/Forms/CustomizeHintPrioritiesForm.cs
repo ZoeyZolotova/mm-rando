@@ -9,11 +9,13 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.Versioning;
 using System.Text;
 using System.Windows.Forms;
 
 namespace MMR.UI.Forms
 {
+    [SupportedOSPlatform("windows")]
     public partial class CustomizeHintPrioritiesForm : Form
     {
         public List<List<Item>> Result { get; private set; }

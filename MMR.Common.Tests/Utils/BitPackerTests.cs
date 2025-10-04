@@ -1,5 +1,6 @@
 ﻿using MMR.Common.Utils;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 namespace MMR.Common.Tests.Utils
 {
@@ -23,14 +24,14 @@ namespace MMR.Common.Tests.Utils
 
             var bitUnpacker = new BitUnpacker(result);
 
-            Assert.AreEqual(false, bitUnpacker.ReadBool());
-            Assert.AreEqual(false, bitUnpacker.ReadBool());
-            Assert.AreEqual(true, bitUnpacker.ReadBool());
-            Assert.AreEqual(false, bitUnpacker.ReadBool());
-            Assert.AreEqual(false, bitUnpacker.ReadBool());
-            Assert.AreEqual(true, bitUnpacker.ReadBool());
-            Assert.AreEqual(false, bitUnpacker.ReadBool());
-            Assert.AreEqual(false, bitUnpacker.ReadBool());
+            ClassicAssert.AreEqual(false, bitUnpacker.ReadBool());
+            ClassicAssert.AreEqual(false, bitUnpacker.ReadBool());
+            ClassicAssert.AreEqual(true, bitUnpacker.ReadBool());
+            ClassicAssert.AreEqual(false, bitUnpacker.ReadBool());
+            ClassicAssert.AreEqual(false, bitUnpacker.ReadBool());
+            ClassicAssert.AreEqual(true, bitUnpacker.ReadBool());
+            ClassicAssert.AreEqual(false, bitUnpacker.ReadBool());
+            ClassicAssert.AreEqual(false, bitUnpacker.ReadBool());
         }
 
         [Test]
@@ -47,10 +48,10 @@ namespace MMR.Common.Tests.Utils
 
             var bitUnpacker = new BitUnpacker(result);
 
-            Assert.AreEqual(1, bitUnpacker.ReadS32(3));
-            Assert.AreEqual(1, bitUnpacker.ReadS32(2));
-            Assert.AreEqual(1, bitUnpacker.ReadS32(1));
-            Assert.AreEqual(1, bitUnpacker.ReadS32(2));
+            ClassicAssert.AreEqual(1, bitUnpacker.ReadS32(3));
+            ClassicAssert.AreEqual(1, bitUnpacker.ReadS32(2));
+            ClassicAssert.AreEqual(1, bitUnpacker.ReadS32(1));
+            ClassicAssert.AreEqual(1, bitUnpacker.ReadS32(2));
         }
 
         [Test]
@@ -67,10 +68,10 @@ namespace MMR.Common.Tests.Utils
 
             var bitUnpacker = new BitUnpacker(result);
 
-            Assert.AreEqual(1, bitUnpacker.ReadS32(3));
-            Assert.AreEqual(1, bitUnpacker.ReadS32(3));
-            Assert.AreEqual(1, bitUnpacker.ReadS32(3));
-            Assert.AreEqual(1, bitUnpacker.ReadS32(3));
+            ClassicAssert.AreEqual(1, bitUnpacker.ReadS32(3));
+            ClassicAssert.AreEqual(1, bitUnpacker.ReadS32(3));
+            ClassicAssert.AreEqual(1, bitUnpacker.ReadS32(3));
+            ClassicAssert.AreEqual(1, bitUnpacker.ReadS32(3));
         }
 
     }

@@ -351,12 +351,12 @@ namespace MMR.Randomizer.Utils
             {
                 // read bank file
                 byte[] zBankData = new byte[bankFileEntry.Length];
-                bankFileEntry.Open().Read(zBankData, 0, zBankData.Length);
+                bankFileEntry.Open().ReadExactly(zBankData, 0, zBankData.Length);
 
                 // read bankmeta file
                 var bankmetaFileEntry = zip.GetEntry(sequenceName + ".bankmeta");
                 var bankmetaData = new byte[bankmetaFileEntry.Length];
-                bankmetaFileEntry.Open().Read(bankmetaData, 0, bankmetaData.Length);
+                bankmetaFileEntry.Open().ReadExactly(bankmetaData, 0, bankmetaData.Length);
 
                 combo.InstrumentSet = new InstrumentSetInfo()
                 {
@@ -429,7 +429,7 @@ namespace MMR.Randomizer.Utils
             {
                 // read sequence binary file
                 var rawSeqData = new byte[sequenceFile.Length];
-                sequenceFile.Open().Read(rawSeqData, 0, rawSeqData.Length);
+                sequenceFile.Open().ReadExactly(rawSeqData, 0, rawSeqData.Length);
                 var sequence = new SequenceBinaryData() { SequenceBinary = rawSeqData };
 
                 // zseq filename is the instrument set
@@ -518,7 +518,7 @@ namespace MMR.Randomizer.Utils
                         foreach (ZipArchiveEntry zSoundFile in zip.Entries.Where(e => e.Name.Contains(".zsound")))
                         {
                             var sampleData = new byte[zSoundFile.Length];
-                            zSoundFile.Open().Read(sampleData, 0, sampleData.Length);
+                            zSoundFile.Open().ReadExactly(sampleData, 0, sampleData.Length);
                             var sampleNameSplit = zSoundFile.Name.Split('_'); // everything before _ is a comment, readability, discard here
                             var sampleName = sampleNameSplit.Length > 1 ? sampleNameSplit[sampleNameSplit.Length - 1] : zSoundFile.Name;
                             sampleName = sampleName.Split('.')[0];        // we don't need the filetype after here either at this point

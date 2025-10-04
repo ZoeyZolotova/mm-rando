@@ -1,45 +1,56 @@
-﻿using MMR.Randomizer.Models.Settings;
-using MMR.UI.Forms.Tooltips;
+﻿using MMR.Common.Extensions;
+using MMR.Common.Utils;
 using MMR.Randomizer;
-using MMR.Common.Extensions;
+using MMR.Randomizer.Asm;
+using MMR.Randomizer.Attributes.Setting;
+using MMR.Randomizer.Constants;
+using MMR.Randomizer.Extensions;
+using MMR.Randomizer.GameObjects;
+using MMR.Randomizer.Models;
+using MMR.Randomizer.Models.Colors;
+using MMR.Randomizer.Models.Settings;
+using MMR.Randomizer.Utils;
+using MMR.UI.Controls;
+using MMR.UI.Forms.Tooltips;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Windows.Forms;
-using MMR.Randomizer.Models;
-using MMR.Randomizer.Utils;
-using MMR.Randomizer.Asm;
-using MMR.Randomizer.Models.Colors;
-using MMR.Common.Utils;
-using MMR.Randomizer.GameObjects;
-using MMR.Randomizer.Extensions;
-using System.Collections.Generic;
-using System.Text.RegularExpressions;
-using MMR.Randomizer.Constants;
-using System.Threading;
-using MMR.UI.Controls;
 using System.Linq.Expressions;
-using MMR.Randomizer.Attributes.Setting;
+using System.Reflection;
+using System.Runtime.Versioning;
+using System.Text.RegularExpressions;
+using System.Threading;
+using System.Windows.Forms;
 
 namespace MMR.UI.Forms
 {
     using Randomizer = Randomizer.Randomizer;
+
+    [SupportedOSPlatform("windows")]
     public partial class MainForm : Form
     {
         private bool _isUpdating = false;
         private int _seedOld = 0;
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public Configuration _configuration { get; set; }
 
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public AboutForm About { get; private set; }
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public ManualForm Manual { get; private set; }
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public LogicEditorForm LogicEditor { get; private set; }
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public CustomItemListEditForm ItemEditor { get; }
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public StartingItemEditForm StartingItemEditor { get; private set; }
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public JunkLocationEditForm JunkLocationEditor { get; private set; }
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public HudConfigForm HudConfig { get; private set; }
 
 
@@ -501,6 +512,7 @@ namespace MMR.UI.Forms
 
         private class LocationCategoryLabel : Label
         {
+            [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
             public List<string> Lines { get; set; }
 
             protected override void OnPaint(PaintEventArgs e)

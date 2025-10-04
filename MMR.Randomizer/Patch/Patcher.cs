@@ -124,7 +124,7 @@ namespace MMR.Randomizer.Patch
                 readerIn.Close();
 
                 var aes = Aes.Create();
-                var hashAlg = new SHA256Managed();
+                var hashAlg = SHA256.Create();
                 using (var cryptoStream = new CryptoStream(compressedStream, aes.CreateDecryptor(key, iv), CryptoStreamMode.Read))
                 using (var hashStream = new CryptoStream(cryptoStream, hashAlg, CryptoStreamMode.Read))
                 using (var decompressStream = new GZipStream(hashStream, CompressionMode.Decompress))
@@ -240,7 +240,7 @@ namespace MMR.Randomizer.Patch
 
             var encryptedStream = new MemoryStream();
             var aes = Aes.Create();
-            var hashAlg = new SHA256Managed();
+            var hashAlg = SHA256.Create();
             using (var cryptoStream = new CryptoStream(encryptedStream, aes.CreateEncryptor(key, iv), CryptoStreamMode.Write, true))
             using (var hashStream = new CryptoStream(cryptoStream, hashAlg, CryptoStreamMode.Write, true))
             using (var compressStream = new GZipStream(hashStream, CompressionMode.Compress, leaveOpen: true))
