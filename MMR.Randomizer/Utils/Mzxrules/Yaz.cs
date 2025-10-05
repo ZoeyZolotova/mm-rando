@@ -3,6 +3,7 @@
 using System;
 using System.IO;
 using System.Runtime.CompilerServices;
+using MMR.Common.Helpers;
 
 namespace MMR.Randomizer.Utils.Mzxrules
 {
@@ -422,7 +423,7 @@ namespace MMR.Randomizer.Utils.Mzxrules
                 if (!success)
                     return -1;
             }
-            return Align.To16(dstSize);
+            return AlignmentHelpers.AlignTo16(dstSize);
 
             bool FlushToDest(byte[] dFile)//byte[] dstFile, ref int dstPos, byte[] dst, ref int dstSize, ref byte curCode)
             {

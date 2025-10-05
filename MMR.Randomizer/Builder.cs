@@ -26,6 +26,7 @@ using System.Text.RegularExpressions;
 using SixLabors.ImageSharp.Formats.Png;
 using System.Security.Cryptography;
 using MMR.Common.Utils;
+using MMR.Randomizer.Utils.Music;
 
 namespace MMR.Randomizer
 {
@@ -147,10 +148,10 @@ namespace MMR.Randomizer
                 /// mute all music by setting their master volume to zero
                 // Traverse the audioseq index table to get the locations of all sequences
                 // the audioseq index table is not its own file, its buried within the code file, we need the offset to the table
-                var codeFile = RomData.MMFileList[RomUtils.GetFileIndexForWriting(Addresses.SeqTable)];
+                var codeFile = RomData.MMFileList[RomUtils.GetFileIndexForWriting(Addresses.AUDIOSEQ_TABLE)];
                 var audioseqIndexTable = codeFile.Data;
-                int audioseqIndexTableAddr = Addresses.SeqTable - codeFile.Addr;
-                var audioseq = RomData.MMFileList[RomUtils.GetFileIndexForWriting(Addresses.AudioSequence)].Data;
+                int audioseqIndexTableAddr = Addresses.AUDIOSEQ_TABLE - codeFile.Addr;
+                var audioseq = RomData.MMFileList[RomUtils.GetFileIndexForWriting(Addresses.AUDIOSEQ_ADDR)].Data;
                 // for each sequence, search for the master volume byte and change to zero
                 for (int seq = 2; seq < 128; seq += 1)
                 {
@@ -6542,7 +6543,25 @@ namespace MMR.Randomizer
                 WriteSoundEffects(new Random(BitConverter.ToInt32(hash, 0)));
                 WriteLowHealthSound(new Random(BitConverter.ToInt32(hash, 0)));
 
-                progressReporter.ReportProgress(74, "Writing music...");
+                // Back up the music folder, check for old music files, convert any old music files
+                if (Directory.Exists(Values.MusicDirectory))
+                {
+                    progressReporter.ReportProgress(73, "Checking for old music files...");
+                    MusicConversionUtils.CheckForOldFiles(Values.MusicDirectory);
+
+                    if (MusicConversionUtils.OLD_MUSIC_FILES.Count > 0)
+                    {
+                        progressReporter.ReportProgress(74, "Backing up music folder...");
+                        MusicConversionUtils.BackupMusicFolder(Values.MusicDirectory);
+
+                        progressReporter.ReportProgress(75, "Converting old music files...");
+                        MusicConversionUtils.ConvertMusicFiles();
+
+                        MusicConversionUtils.OLD_MUSIC_FILES.Clear();
+                    }
+                }
+
+                progressReporter.ReportProgress(76, "Writing music...");
                 SequenceUtils.MoveAudioBankTable();
                 WriteMuteMusic();
                 WriteEnemyCombatMusicMute();
@@ -6566,7 +6585,7 @@ namespace MMR.Randomizer
             {
                 WriteAudioSeq(new Random(BitConverter.ToInt32(hash, 0)), outputSettings);
 
-                progressReporter.ReportProgress(75, "Building ROM...");
+                progressReporter.ReportProgress(80, "Building ROM...");
 
                 if (outputSettings.GenerateROM)
                 {
