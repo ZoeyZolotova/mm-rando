@@ -252,10 +252,12 @@ export class GUISettingsElement implements OnInit {
       return;
     }
 
-    if (("isNewPreset" in targetPreset) && targetPreset.isNewPreset == true) {
+    if ((("isNewPreset" in targetPreset) && targetPreset.isNewPreset == true) || (("isDefaultPreset" in targetPreset) && targetPreset.isDefaultPreset == true)) {
+
       this.dialogService.open(DialogWindowComponent, {
-        autoFocus: true, closeOnBackdropClick: true, closeOnEsc: true, hasBackdrop: true, hasScroll: false, context: { dialogHeader: "Warning", dialogMessage: "You need to save this custom preset first." }
+        autoFocus: true, closeOnBackdropClick: true, closeOnEsc: true, hasBackdrop: true, hasScroll: false, context: { dialogHeader: "Warning", dialogMessage: "System presets can not be exported!" }
       });
+
       return;
     }
 
