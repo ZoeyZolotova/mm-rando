@@ -38,12 +38,16 @@
 
     .dark-mode .spoiler{ background-color:#ccc }
     .dark-mode .spoiler:active { background-color: #111;  }
+    .dark-mode .spoiler >span { visibility: hidden; }
+    .dark-mode .spoiler:active >span { visibility: visible; }
     .dark-mode .show-highlight .unavailable .newlocation { background-color: #500705; }
     .dark-mode .show-highlight .acquired .newlocation { background-color: #69591f; }
     .dark-mode .show-highlight .available .newlocation { background-color: #313776; }
 
     .light-mode .spoiler{ background-color:#111 }
     .light-mode .spoiler:active { background-color: #ccc;  }
+    .light-mode .spoiler >span { visibility: hidden; }
+    .light-mode .spoiler:active >span { visibility: visible; }
     .light-mode .show-highlight .unavailable .newlocation { background-color: #FF9999; }
     .light-mode .show-highlight .acquired .newlocation { background-color: #99FF99; }
     .light-mode .show-highlight .available .newlocation { background-color: #9999FF; }
