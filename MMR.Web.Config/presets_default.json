@@ -1742,7 +1742,7 @@
       "Road to Ikana Fences With Goron Bomb Jumps"
     ],
     "GameplaySettings.CustomStartingItemListString": "20000----dfbfc-5840000-",
-    "GameplaySettings.CustomJunkLocationsString": "-----40000-------------------------fe0000----62-100400-190e0201-f000",
+    "GameplaySettings.CustomJunkLocationsString": "-----40000-------------------------fe0000----62-100400-190e0201-100f000",
     "GameplaySettings.CustomItemListString": "1e00-----40000----------6f370f8----------840f-80000000----ffffff-ffffffff-ffffffff-f0000000-7ffffffe-7fffffff-fffffffe-ffffffff",
     "GameplaySettings.EntranceMode": "Default",
     "GameplaySettings.VictoryMode": "CantFightMajora, FourBossRemains",
